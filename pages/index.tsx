@@ -1,24 +1,23 @@
-import { GetStaticPropsResult } from 'next';
+import ExploreAwards from '@/components/Home/ExploreAwards';
+import HeroSection from '@/components/Home/HeroSection';
+import Head from 'next/head';
 
-import Pricing from '@/components/Pricing';
-import { getActiveProductsWithPrices } from '@/utils/supabase-client';
-import { Product } from 'types';
-
-interface Props {
-  products: Product[];
-}
-
-export default function PricingPage({ products }: Props) {
-  return <Pricing products={products} />;
-}
-
-export async function getStaticProps(): Promise<GetStaticPropsResult<Props>> {
-  const products = await getActiveProductsWithPrices();
-
-  return {
-    props: {
-      products
-    },
-    revalidate: 60
-  };
+export default function Home() {
+  return (
+    <>
+      <Head>
+        <title>Spotlight — Digital Awards</title>
+        <meta name="robots" content="follow, index" />
+        <link href="/favicon.ico" rel="shortcut icon" />
+        <meta
+          content="Spotlight is the no.1 Digital Awards issuer that recognizes and promotes the talent and effort of the best developers, designers and web agencies in the world."
+          name="description"
+        />
+      </Head>
+      <main className="">
+        <HeroSection />
+        <ExploreAwards />
+      </main>
+    </>
+  );
 }

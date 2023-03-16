@@ -11,6 +11,24 @@ import type { Database } from 'types_db';
 import 'styles/main.css';
 import 'styles/chrome-bug.css';
 
+import localFont from 'next/font/local';
+
+export const acidGrotesk = localFont({
+  src: [
+    {
+      path: './fonts/AcidGrotesk-Normal.woff2',
+      weight: '400',
+      style: 'normal'
+    },
+    {
+      path: './fonts/AcidGrotesk-Regular.woff2',
+      weight: '500',
+      style: 'normal'
+    }
+  ],
+  display: 'swap'
+});
+
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() =>
     createBrowserSupabaseClient<Database>()
