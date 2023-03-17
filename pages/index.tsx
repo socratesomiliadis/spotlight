@@ -17,6 +17,7 @@ export default function Home() {
       <main className="">
         <HeroSection />
         <ExploreAwards />
+        <div className="h-[500vh] bg-white"></div>
       </main>
     </>
   );

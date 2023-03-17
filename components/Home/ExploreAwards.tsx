@@ -5,8 +5,8 @@ export default function ExploreAwards() {
         <span className="text-base uppercase text-[#8F8F8F]">
           Explore Awards
         </span>
-        <h2 className="text-2xl text-black">Websites of the Day</h2>
-        <p className="text-3xl font-light text-[#8F8F8F]">
+        <h2 className="text-3xl text-black">Websites of the Day</h2>
+        <p className="text-3xl text-[#8F8F8F]">
           An award is a recognition given to outstanding websites <br /> that
           provide exceptional content, design, and user experience.
         </p>
