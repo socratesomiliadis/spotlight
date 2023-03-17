@@ -12,6 +12,7 @@ import 'styles/main.css';
 import 'styles/chrome-bug.css';
 
 import localFont from 'next/font/local';
+import PreloaderProvider from '@/hooks/usePreloader';
 
 export const acidGrotesk = localFont({
   src: [
@@ -41,9 +42,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <div className="bg-black">
       <SessionContextProvider supabaseClient={supabaseClient}>
         <MyUserContextProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <PreloaderProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </PreloaderProvider>
         </MyUserContextProvider>
       </SessionContextProvider>
     </div>

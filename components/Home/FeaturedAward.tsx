@@ -21,7 +21,7 @@ export default function FeaturedAward({
   date: string;
 }) {
   return (
-    <article className="flex flex-col items-center absolute z-20 left-1/2 -translate-x-1/2 top-[31%] gap-6">
+    <article className="featured-award flex flex-col items-center absolute z-20 left-1/2 -translate-x-1/2 top-[31%] gap-6 opacity-0">
       <div className="profile-info-wrapper flex flex-col items-center gap-6">
         <Link href={userlink}>
           <Image

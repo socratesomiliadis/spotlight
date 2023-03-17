@@ -4,4 +4,9 @@
 
 html {
   overflow-x: hidden;
+  overflow-y: overlay;
+}
+
+html.loading {
+  overflow: hidden;
 }
