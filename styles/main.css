@@ -22,3 +22,7 @@ html.loading {
 ::-webkit-scrollbar-thumb {
   background: #161616;
 }
+
+.month-indicator {
+  transition: all 0.45s ease-in-out;
+}

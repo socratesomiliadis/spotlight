@@ -12,7 +12,7 @@ export default function Preloader() {
         setIsInApp(true);
         setIsPreloading(false);
       }}
-      src="/static/videos/loader.mp4"
+      src="/static/videos/SpotlightLoader.mp4"
       className="w-screen h-full fixed z-[9999] object-cover"
       muted
       autoPlay

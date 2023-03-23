@@ -1,6 +1,9 @@
+import MonthsFilter from '../MonthsFilter';
+import AwardsSlider from './AwardsSlider';
+
 export default function ExploreAwards() {
   return (
-    <div className="flex flex-col items-start justify-center w-screen bg-white px-44 py-64">
+    <div className="flex flex-col gap-24 items-start justify-center w-screen bg-white px-44 py-64">
       <div className="flex flex-col gap-3">
         <span className="text-base uppercase text-[#8F8F8F]">
           Explore Awards
@@ -10,6 +13,14 @@ export default function ExploreAwards() {
           An award is a recognition given to outstanding websites <br /> that
           provide exceptional content, design, and user experience.
         </p>
+      </div>
+      <div className="w-full flex flex-col gap-16">
+        <div className="flex flex-row w-full">
+          <div className="basis-3/4">
+            <MonthsFilter />
+          </div>
+        </div>
+        <AwardsSlider />
       </div>
     </div>
   );

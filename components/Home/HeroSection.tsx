@@ -33,7 +33,7 @@ export default function HeroSection() {
         date="March 2023"
       />
       <video
-        src="/static/videos/heroLoop.mp4"
+        src="/static/videos/SpotlightLoop.mp4"
         className="hero-vid absolute w-full h-full inset-0 object-cover z-0"
         muted
         playsInline
