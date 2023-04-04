@@ -16,8 +16,7 @@ export default function ExploreTextSection() {
         start: 'center center',
         end: 'bottom center',
         pin: '.explore-text',
-        scrub: true,
-        markers: true
+        scrub: true
       }
     });
     animTl.fromTo(
