@@ -3,7 +3,7 @@ import AwardsSlider from './AwardsSlider';
 
 export default function ExploreAwards() {
   return (
-    <div className="flex flex-col gap-24 items-start justify-center w-screen bg-white px-44 py-64">
+    <section className="flex flex-col gap-24 items-start justify-center w-screen bg-white px-44 py-32">
       <div className="flex flex-col gap-3">
         <span className="text-base uppercase text-[#8F8F8F]">
           Explore Awards
@@ -22,6 +22,6 @@ export default function ExploreAwards() {
         </div>
         <AwardsSlider />
       </div>
-    </div>
+    </section>
   );
 }

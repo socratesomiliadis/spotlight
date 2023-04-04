@@ -11,6 +11,10 @@ html.loading {
   overflow: hidden;
 }
 
+body {
+  background-color: #fff;
+}
+
 ::-webkit-scrollbar {
   width: 7px;
 }
@@ -25,4 +29,27 @@ html.loading {
 
 .month-indicator {
   transition: all 0.45s ease-in-out;
+}
+
+.studio-line .arrow-div {
+  margin-right: 0;
+  transition: max-width 0.6s cubic-bezier(0.19, 1, 0.22, 1),
+    margin 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.studio-line {
+  padding-left: 0;
+  padding-right: 0;
+  transition: padding 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.studio-line:hover .arrow-div {
+  max-width: 24px;
+  margin-right: 1.5rem;
+}
+
+.studio-line:hover {
+  background-color: #f4f4f4;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }

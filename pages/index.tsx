@@ -1,4 +1,6 @@
 import ExploreAwards from '@/components/Home/ExploreAwards';
+import ExploreTextSection from '@/components/Home/ExploreTextSection';
+import FeaturedStudios from '@/components/Home/FeaturedStudios';
 import HeroSection from '@/components/Home/HeroSection';
 import Head from 'next/head';
 
@@ -14,10 +16,12 @@ export default function Home() {
           name="description"
         />
       </Head>
-      <main className="">
+      <main className="bg-white">
         <HeroSection />
         <ExploreAwards />
-        <div className="h-[500vh] bg-white"></div>
+        <FeaturedStudios />
+        <ExploreTextSection />
+        {/* <div className="h-[500vh] bg-white"></div> */}
       </main>
     </>
   );
