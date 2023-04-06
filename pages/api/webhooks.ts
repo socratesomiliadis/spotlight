@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
-import { Readable } from "node:stream";
 import { NextApiRequest, NextApiResponse } from "next";
 import { deleteUserRecord, upsertUserRecord } from "@/utils/supa-admin";
+import { buffer } from "micro";
 
 export const config = {
   api: {
@@ -9,29 +9,12 @@ export const config = {
   },
 };
 
-async function buffer(readable: Readable) {
-  const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
-}
-
 const secret = process.env.CLERK_WEBHOOK_SECRET as string;
-
-const relevantEvents = new Set([
-  "user.created",
-  "user.updated",
-  "user.deleted",
-]);
 
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const payload = (await buffer(req)).toString();
   const headers = req.headers as any;
 
-  res
-    .status(400)
-    .send("Webhook error: " + payload + "Webhook handler failed. View logs.");
   const wh = new Webhook(secret);
   let msg: any;
   try {
