@@ -1,54 +1,51 @@
-import { useEffect, useState } from 'react';
-import React from 'react';
-import { AppProps } from 'next/app';
-import { SessionContextProvider } from '@supabase/auth-helpers-react';
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
-
-import Layout from '@/components/Layout';
-import { MyUserContextProvider } from '@/utils/useUser';
-import type { Database } from 'types_db';
-
-import 'styles/main.css';
-import 'styles/chrome-bug.css';
-
-import localFont from 'next/font/local';
-import PreloaderProvider from '@/hooks/usePreloader';
+import "@/styles/globals.css";
+import type { AppProps } from "next/app";
+import { ClerkProvider } from "@clerk/nextjs";
+import localFont from "next/font/local";
+import Layout from "@/components/Layout";
+import PreloaderProvider from "@/hooks/usePreloader";
+import AuthPopupProvider from "@/hooks/useAuthPopup";
 
 export const acidGrotesk = localFont({
   src: [
     {
-      path: './fonts/AcidGrotesk-Normal.woff2',
-      weight: '400',
-      style: 'normal'
+      path: "./fonts/AcidGrotesk-Normal.woff2",
+      weight: "400",
+      style: "normal",
     },
     {
-      path: './fonts/AcidGrotesk-Regular.woff2',
-      weight: '500',
-      style: 'normal'
-    }
+      path: "./fonts/AcidGrotesk-Regular.woff2",
+      weight: "500",
+      style: "normal",
+    },
   ],
-  display: 'swap'
+  display: "swap",
 });
 
-export default function MyApp({ Component, pageProps }: AppProps) {
-  const [supabaseClient] = useState(() =>
-    createBrowserSupabaseClient<Database>()
-  );
-  useEffect(() => {
-    document.body.classList?.remove('loading');
-  }, []);
-
+export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className="bg-black">
-      <SessionContextProvider supabaseClient={supabaseClient}>
-        <MyUserContextProvider>
-          <PreloaderProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          fontFamily: acidGrotesk.style.fontFamily,
+          colorPrimary: "#1400FF",
+          colorAlphaShade: "#0f0f0f",
+        },
+        elements: {
+          badge: "pt-1 pb-[0.1rem] px-2 text-xs",
+        },
+      }}
+      {...pageProps}
+    >
+      <div className={`${acidGrotesk.className} font-wrapper`}>
+        <PreloaderProvider>
+          <AuthPopupProvider>
             <Layout>
               <Component {...pageProps} />
             </Layout>
-          </PreloaderProvider>
-        </MyUserContextProvider>
-      </SessionContextProvider>
-    </div>
+          </AuthPopupProvider>
+        </PreloaderProvider>
+      </div>
+    </ClerkProvider>
   );
 }
