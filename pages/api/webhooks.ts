@@ -40,24 +40,22 @@ export default async function handler(
     res.status(400).json({});
   }
 
-  if (relevantEvents.has(msg.type)) {
-    try {
-      switch (msg.type) {
-        case "user.created":
-          upsertUserRecord(msg.data);
-          break;
-        case "user.updated":
-          upsertUserRecord(msg.data);
-          break;
-        case "user.deleted":
-          deleteUserRecord(msg.data.id);
-          break;
-      }
-    } catch (error) {
-      console.log(error);
-      return res
-        .status(400)
-        .send('Webhook error: "Webhook handler failed. View logs."');
+  res.status(400).send("Webhook error: " + msg);
+
+  try {
+    switch (msg.type) {
+      case "user.created":
+        upsertUserRecord(msg.data);
+        break;
+      case "user.updated":
+        upsertUserRecord(msg.data);
+        break;
+      case "user.deleted":
+        deleteUserRecord(msg.data.id);
+        break;
     }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send('Webhook error: "Webhook handler failed. View logs."');
   }
 }
