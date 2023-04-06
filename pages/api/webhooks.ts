@@ -17,7 +17,7 @@ async function buffer(readable: Readable) {
   return Buffer.concat(chunks);
 }
 
-const secret = process.env.CLERK_WEBOOHK_SECRET as string;
+const secret = process.env.CLERK_WEBHOOK_SECRET as string;
 
 const relevantEvents = new Set([
   "user.created",
