@@ -25,10 +25,7 @@ const relevantEvents = new Set([
   "user.deleted",
 ]);
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const payload = (await buffer(req)).toString();
   const headers = req.headers as any;
 
@@ -36,8 +33,9 @@ export default async function handler(
   let msg: any;
   try {
     msg = wh.verify(payload, headers);
+    res.status(400).send("Webhook error: " + msg);
   } catch (err) {
-    res.status(400).json({});
+    res.status(400).send("Webhook error: " + msg);
   }
 
   res.status(400).send("Webhook error: " + msg);
@@ -58,4 +56,5 @@ export default async function handler(
     console.log(error);
     res.status(400).send('Webhook error: "Webhook handler failed. View logs."');
   }
-}
+};
+export default webhookHandler;
