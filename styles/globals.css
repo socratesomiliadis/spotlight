@@ -7,6 +7,28 @@ html {
   overflow-y: overlay;
 }
 
+.cl-internal-b3fm6y,
+.cl-userButtonPopoverFooter,
+.cl-internal-3fgo0t {
+  display: none;
+}
+
+input::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 1; /* Firefox */
+}
+
+input:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: white;
+}
+
+input::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: white;
+}
+
 html.loading {
   overflow: hidden;
 }
