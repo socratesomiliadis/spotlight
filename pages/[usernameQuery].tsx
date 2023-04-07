@@ -6,42 +6,42 @@ import { supabaseClient } from "@/utils/helpers";
 import { useEffect, useState } from "react";
 import HeroSection from "@/components/UserProfile/HeroSection";
 
-export default function ProfilePage() {
-  const router = useRouter();
-  const { usernameQuery } = router.query;
-  const usernameQueryAsStr = usernameQuery as string;
-  const { isLoaded, getToken } = useAuth();
-  const { user } = useUser();
-  const [profileData, setProfileData] = useState<any>();
-  const [profileLoaded, setProfileLoaded] = useState<boolean>(false);
-  const usernameQueryWithoutAt = usernameQueryAsStr?.replace("@", "");
+export default function ProfilePage({ profileData }: { profileData: any }) {
+  // const router = useRouter();
+  // const { usernameQuery } = router.query;
+  // const usernameQueryAsStr = usernameQuery as string;
+  // const { isLoaded, getToken } = useAuth();
+  // const { user } = useUser();
+  // const [profileData, setProfileData] = useState<any>();
+  const [profileLoaded, setProfileLoaded] = useState<boolean>(true);
+  // const usernameQueryWithoutAt = usernameQueryAsStr?.replace("@", "");
 
-  const getProfileData = async () => {
-    const { data, error } = await supabaseClient
-      .from("profile")
-      .select("*")
-      .eq("username", usernameQueryWithoutAt)
-      .single();
+  // const getProfileData = async () => {
+  //   const { data, error } = await supabaseClient
+  //     .from("profile")
+  //     .select("*")
+  //     .eq("username", usernameQueryWithoutAt)
+  //     .single();
 
-    if (error) {
-      console.log(error);
-    }
-    if (data) {
-      setProfileData(data);
-      setProfileLoaded(true);
-    }
-  };
+  //   if (error) {
+  //     console.log(error);
+  //   }
+  //   if (data) {
+  //     setProfileData(data);
+  //     setProfileLoaded(true);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (!!usernameQueryWithoutAt)
-      getProfileData().catch((err) => console.log(err));
-  }, [usernameQueryWithoutAt]);
+  // useEffect(() => {
+  //   if (!!usernameQueryWithoutAt)
+  //     getProfileData().catch((err) => console.log(err));
+  // }, [usernameQueryWithoutAt]);
 
-  useEffect(() => {
-    if (isLoaded && user) {
-      console.log(user.profileImageUrl);
-    }
-  }, [isLoaded, user]);
+  // useEffect(() => {
+  //   if (isLoaded && user) {
+  //     console.log(user.profileImageUrl);
+  //   }
+  // }, [isLoaded, user]);
 
   return (
     <>
@@ -66,4 +66,35 @@ export default function ProfilePage() {
       </main>
     </>
   );
+}
+
+export const getStaticPaths = async () => {
+  const { data, error } = await supabaseClient
+    .from("profile")
+    .select("username");
+
+  const paths = data!.map((userPath: any) => ({
+    params: {
+      usernameQuery: `@${userPath}`,
+    },
+  }));
+  return {
+    paths,
+    fallback: "blocking",
+  };
+};
+
+export async function getStaticProps({ params }: { params: any }) {
+  const { data, error } = await supabaseClient
+    .from("profile")
+    .select("*")
+    .eq("username", params?.usernameQuery.replace("@", ""))
+    .single();
+
+  return {
+    props: {
+      profileData: data,
+    },
+    revalidate: 1,
+  };
 }
