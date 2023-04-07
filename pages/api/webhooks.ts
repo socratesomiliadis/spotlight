@@ -9,13 +9,11 @@ export const config = {
   },
 };
 
-const secret = process.env.CLERK_WEBHOOK_SECRET as string;
+const secret = "whsec_55+UNQDPCMKc7Uf9KUFCKkQvbZqTa/mV";
 
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const payload = (await buffer(req)).toString();
   const headers = req.headers as any;
-
-  res.status(400).send("Webhook error: " + payload);
 
   const wh = new Webhook(secret);
   let msg: any;
@@ -26,7 +24,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    switch (msg.type) {
+    switch (msg.data.type) {
       case "user.created":
         upsertUserRecord(msg.data);
         break;
