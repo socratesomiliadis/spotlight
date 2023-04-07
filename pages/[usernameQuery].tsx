@@ -9,16 +9,18 @@ import HeroSection from "@/components/UserProfile/HeroSection";
 export default function ProfilePage() {
   const router = useRouter();
   const { usernameQuery } = router.query;
+  const usernameQueryAsStr = usernameQuery as string;
   const { isLoaded, getToken } = useAuth();
   const { user } = useUser();
   const [profileData, setProfileData] = useState<any>();
   const [profileLoaded, setProfileLoaded] = useState<boolean>(false);
+  const usernameQueryWithoutAt = usernameQueryAsStr?.replace("@", "");
 
   const getProfileData = async () => {
     const { data, error } = await supabaseClient
       .from("profile")
       .select("*")
-      .eq("username", usernameQuery)
+      .eq("username", usernameQueryWithoutAt)
       .single();
 
     if (error) {
@@ -31,8 +33,9 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    if (!!usernameQuery) getProfileData().catch((err) => console.log(err));
-  }, [usernameQuery]);
+    if (!!usernameQueryWithoutAt)
+      getProfileData().catch((err) => console.log(err));
+  }, [usernameQueryWithoutAt]);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -52,7 +55,14 @@ export default function ProfilePage() {
         />
       </Head>
       <main className="bg-white w-screen">
-        <HeroSection bannerUrl={profileData?.banner_url} />
+        <HeroSection
+          bannerUrl={profileData?.banner_url}
+          profileImg={profileData?.avatar_url}
+          profileLoaded={profileLoaded}
+          // username={profileData?.username}
+          firstName={profileData?.first_name}
+          lastName={profileData?.last_name}
+        />
       </main>
     </>
   );
