@@ -31,6 +31,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(400).json({});
   }
 
+  res.status(400).json({ msg });
+
   try {
     switch (msg.data.type) {
       case "user.created":
