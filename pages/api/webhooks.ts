@@ -31,21 +31,21 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(400).json({});
   }
 
-  // try {
-  //   switch (msg.data.type) {
-  //     case "user.created":
-  //       upsertUserRecord(msg.data);
-  //       break;
-  //     case "user.updated":
-  //       upsertUserRecord(msg.data);
-  //       break;
-  //     case "user.deleted":
-  //       deleteUserRecord(msg.data.id);
-  //       break;
-  //   }
-  // } catch (error) {
-  //   console.log(error);
-  //   res.status(400).send('Webhook error: "Webhook handler failed. View logs."');
-  // }
+  try {
+    switch (msg.data.type) {
+      case "user.created":
+        upsertUserRecord(msg.data);
+        break;
+      case "user.updated":
+        upsertUserRecord(msg.data);
+        break;
+      case "user.deleted":
+        deleteUserRecord(msg.data.id);
+        break;
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).send('Webhook error: "Webhook handler failed. View logs."');
+  }
 };
 export default webhookHandler;
