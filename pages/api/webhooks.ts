@@ -31,7 +31,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(400).json({});
   }
 
-  res.status(400).json({ msg });
+  // res.status(400).json({ msg });
 
   try {
     switch (msg.data.type) {
@@ -49,5 +49,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log(error);
     res.status(400).send('Webhook error: "Webhook handler failed. View logs."');
   }
+
+  res.status(200).json({});
 };
 export default webhookHandler;
