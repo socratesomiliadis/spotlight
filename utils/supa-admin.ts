@@ -17,7 +17,10 @@ export const upsertUserRecord = async (user: any) => {
     email: user.email,
   };
 
-  const { error } = await supabaseAdmin.from("profile").upsert([userData]);
+  const { error } = await supabaseAdmin
+    .from("profile")
+    .upsert(userData)
+    .select();
   if (error) throw error;
   console.log(`User inserted/updated: ${user.id}`);
 };
