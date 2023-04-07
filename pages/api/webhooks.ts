@@ -34,7 +34,7 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   // res.status(400).json({ msg });
 
   try {
-    switch (msg.data.type) {
+    switch (msg.type) {
       case "user.created":
         await upsertUserRecord(msg.data);
         break;
