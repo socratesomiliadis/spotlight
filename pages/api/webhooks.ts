@@ -36,13 +36,13 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     switch (msg.data.type) {
       case "user.created":
-        upsertUserRecord(msg.data);
+        await upsertUserRecord(msg.data);
         break;
       case "user.updated":
-        upsertUserRecord(msg.data);
+        await upsertUserRecord(msg.data);
         break;
       case "user.deleted":
-        deleteUserRecord(msg.data.id);
+        await deleteUserRecord(msg.data.id);
         break;
     }
   } catch (error) {
