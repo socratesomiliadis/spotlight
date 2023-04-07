@@ -1,13 +1,21 @@
 import { Webhook } from "svix";
 import { NextApiRequest, NextApiResponse } from "next";
 import { deleteUserRecord, upsertUserRecord } from "@/utils/supa-admin";
-import { buffer } from "micro";
+import { Readable } from "node:stream";
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+async function buffer(readable: Readable) {
+  const chunks = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
 
 const secret = "whsec_55+UNQDPCMKc7Uf9KUFCKkQvbZqTa/mV";
 
