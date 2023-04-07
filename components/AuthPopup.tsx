@@ -1,7 +1,8 @@
 import { useAuthPopup } from "@/hooks/useAuthPopup";
-import { SignIn, SignUp } from "@clerk/nextjs";
+import { SignIn, SignUp, UserProfile } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { motion } from "framer-motion";
 
 export default function AuthPopup() {
   const { authPopupType, setAuthPopupType } = useAuthPopup();
@@ -39,6 +40,7 @@ export default function AuthPopup() {
   useEffect(() => {
     if (router.query.auth === "signIn") setAuthPopupType("signIn");
     else if (router.query.auth === "signUp") setAuthPopupType("signUp");
+    else if (router.query.auth === "settings") setAuthPopupType("settings");
     else setAuthPopupType("none");
   }, [router.query.auth]);
 
@@ -48,8 +50,7 @@ export default function AuthPopup() {
     else html.classList?.add("overflow-hidden");
   }, [authPopupType]);
 
-  if (authPopupType === "none") return null;
-  else if (authPopupType === "signIn")
+  if (authPopupType === "signIn")
     return (
       <PopupWrapper>
         <SignIn
@@ -81,6 +82,27 @@ export default function AuthPopup() {
             },
           }}
         />
+      </PopupWrapper>
+    );
+  else if (authPopupType === "settings")
+    return (
+      <PopupWrapper>
+        <motion.div
+          className="relative h-[70vh]"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+            transition: { duration: 0.35, ease: "easeOut" },
+          }}
+        >
+          <UserProfile
+            appearance={{
+              elements: {
+                rootBox: "h-[70vh]",
+              },
+            }}
+          />
+        </motion.div>
       </PopupWrapper>
     );
   else return null;

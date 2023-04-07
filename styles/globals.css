@@ -182,6 +182,18 @@ input::-ms-input-placeholder {
   color: white;
 }
 
+.avatar-btn:focus,
+.avatar-btn[aria-expanded="true"] {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: rgb(151, 144, 255) 0px 0px 0px 3px;
+  transition-property: background-color, border-color, color, fill, stroke,
+    opacity, box-shadow, transform;
+  transition-timing-function: ease;
+  transition-duration: 200ms;
+  border-radius: 9999px;
+}
+
 html.loading {
   overflow: hidden;
 }

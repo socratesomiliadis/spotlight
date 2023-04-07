@@ -1,23 +1,52 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import LoadingLine from "../LoadingLine";
+import { useUser } from "@clerk/nextjs";
 
 export default function HeroSection({
   bannerUrl,
   profileImg,
   profileLoaded,
+  username,
   firstName,
   lastName,
 }: {
   bannerUrl: string;
   profileImg: string;
   profileLoaded: boolean;
+  username: string;
   firstName: string;
   lastName: string;
 }) {
+  const { user } = useUser();
+
   return (
     <section className="hero-section-profile w-full flex flex-col items-start">
       <div className="banner relative bg-[#F4F4F4] text-black/50 w-full aspect-[1920/300] h-auto bg-cover bg-center bg-no-repeat flex items-center justify-center">
+        {username === user?.username && (
+          <div className="absolute bottom-8 right-16 banner-btns z-10 flex flex-row items-center gap-4">
+            <button className="flex rounded-full text-white bg-white/20 backdrop-blur-md px-12 py-3 gap-6">
+              <span className="-mb-1 text-base">Edit Profile</span>
+            </button>
+            <button className="flex items-center justify-center rounded-full text-white bg-white/20 backdrop-blur-md w-11 h-11">
+              <svg
+                width="40%"
+                viewBox="0 0 21 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 0C2.79086 0 1 1.79086 1 4V11C1 9.34315 2.34315 8 4 8C5.65685 8 7 9.34315 7 11C8.65685 11 10 12.3431 10 14C10 15.6569 8.65685 17 7 17H17C19.2091 17 21 15.2091 21 13V7C21 4.79086 19.2091 3 17 3H12.0704C11.736 3 11.4238 2.8329 11.2383 2.5547L10.4258 1.3359C9.86939 0.501303 8.93269 0 7.92963 0H5Z"
+                  fill="white"
+                />
+                <path
+                  d="M5 11C5 10.4477 4.55228 10 4 10C3.44772 10 3 10.4477 3 11V13H1C0.447715 13 0 13.4477 0 14C0 14.5523 0.447715 15 1 15H3V17C3 17.5523 3.44772 18 4 18C4.55228 18 5 17.5523 5 17V15H7C7.55228 15 8 14.5523 8 14C8 13.4477 7.55228 13 7 13H5V11Z"
+                  fill="white"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
         {profileLoaded && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -96,8 +125,8 @@ export default function HeroSection({
                 y2="30.0093"
                 gradientUnits="userSpaceOnUse"
               >
-                <stop stop-color="#1400FF" />
-                <stop offset="1" stop-color="#0075FF" />
+                <stop stopColor="#1400FF" />
+                <stop offset="1" stopColor="#0075FF" />
               </linearGradient>
             </defs>
           </svg>

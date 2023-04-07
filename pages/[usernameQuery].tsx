@@ -59,7 +59,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
           bannerUrl={profileData?.banner_url}
           profileImg={profileData?.avatar_url}
           profileLoaded={profileLoaded}
-          // username={profileData?.username}
+          username={profileData?.username}
           firstName={profileData?.first_name}
           lastName={profileData?.last_name}
         />
