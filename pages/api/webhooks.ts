@@ -15,6 +15,8 @@ const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const payload = (await buffer(req)).toString();
   const headers = req.headers as any;
 
+  res.status(400).send("Webhook error: " + payload);
+
   const wh = new Webhook(secret);
   let msg: any;
   try {
