@@ -17,7 +17,7 @@ async function buffer(readable: Readable) {
   return Buffer.concat(chunks);
 }
 
-const secret = "whsec_55+UNQDPCMKc7Uf9KUFCKkQvbZqTa/mV";
+const secret = process.env.CLERK_WEBHOOK_SECRET as string;
 
 const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const payload = (await buffer(req)).toString();

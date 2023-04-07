@@ -11,7 +11,7 @@ export default function Home() {
     <>
       <Head>
         <title>Spotlight — Digital Awards</title>
-        <meta name="robots" content="nofollow, noindex" />
+        <meta name="robots" content="follow, index" />
         <link href="/favicon.ico" rel="shortcut icon" />
         <meta
           content="Spotlight is the no.1 Digital Awards issuer that recognizes and promotes the talent and effort of the best developers, designers and web agencies in the world."
