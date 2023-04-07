@@ -40,7 +40,7 @@ export default function AuthPopup() {
     if (router.query.auth === "signIn") setAuthPopupType("signIn");
     else if (router.query.auth === "signUp") setAuthPopupType("signUp");
     else setAuthPopupType("none");
-  }, [router.query]);
+  }, [router.query.auth]);
 
   useEffect(() => {
     const html = document.querySelector("html") as HTMLElement;
@@ -53,7 +53,9 @@ export default function AuthPopup() {
     return (
       <PopupWrapper>
         <SignIn
-          signUpUrl="/?auth=signUp"
+          signUpUrl={`${router.asPath.split("?")[0]}/?auth=signUp`}
+          afterSignInUrl={`${router.asPath.split("?")[0]}`}
+          afterSignUpUrl={`${router.asPath.split("?")[0]}`}
           appearance={{
             elements: {
               formButtonPrimary:
@@ -68,7 +70,9 @@ export default function AuthPopup() {
     return (
       <PopupWrapper>
         <SignUp
-          signInUrl="/?auth=signIn"
+          signInUrl={`${router.asPath.split("?")[0]}/?auth=signIn`}
+          afterSignInUrl={`${router.asPath.split("?")[0]}`}
+          afterSignUpUrl={`${router.asPath.split("?")[0]}`}
           appearance={{
             elements: {
               formButtonPrimary:
