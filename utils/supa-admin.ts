@@ -11,7 +11,7 @@ export const upsertUserRecord = async (user: any) => {
   const userData = {
     id: user.id,
     username: user.username,
-    avatar_url: user.profileImageUrl,
+    avatar_url: user.profile_image_url,
     first_name: user.first_name,
     last_name: user.last_name,
   };
