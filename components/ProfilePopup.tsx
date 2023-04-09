@@ -44,7 +44,7 @@ export default function ProfilePopup() {
                 Add more information about you here.
               </p>
             </div>
-            <Tabs defaultValue="account" className="w-full">
+            <Tabs defaultValue="account" className="w-full h-full">
               <TabsList>
                 <TabsTrigger value="account">
                   <span className="-mb-1">Account</span>
@@ -57,6 +57,9 @@ export default function ProfilePopup() {
               <TabsContent className="w-full border-none" value="account">
                 <UserProfile
                   appearance={{
+                    variables: {
+                      colorPrimary: "#000",
+                    },
                     elements: {
                       rootBox: {
                         width: "100%",
@@ -90,46 +93,54 @@ export default function ProfilePopup() {
                   }}
                 />
               </TabsContent>
-              <TabsContent className="w-full border-none" value="social-links">
-                <UserProfile
-                  appearance={{
-                    elements: {
-                      rootBox: {
-                        width: "100%",
+              <TabsContent
+                className="w-full border-none data-[state=active]:h-full flex flex-row"
+                value="social-links"
+              >
+                <div className="basis-[15rem] max-w-[15rem] pl-[0.25rem] pr-[1rem] h-full border-r-[1px] border-r-[#d8d8d8]"></div>
+                <div className="pl-[2rem] pr-[2rem] w-full">
+                  <UserProfile
+                    appearance={{
+                      variables: {
+                        colorPrimary: "#000",
                       },
-                      pageScrollBox: {
-                        padding: "0 1rem 0 0.5rem",
+                      elements: {
+                        rootBox: {
+                          width: "100%",
+                        },
+                        pageScrollBox: {
+                          padding: "0 1rem 0 0.5rem",
+                        },
+                        card: {
+                          width: "100%",
+                          boxShadow: "none",
+                          margin: "0",
+                          position: "relative",
+                        },
+                        navbar: {
+                          display: "none",
+                        },
+                        header: {
+                          display: "none",
+                        },
+                        profileSection__emailAddresses: {
+                          display: "none",
+                        },
+                        profileSection__connectedAccounts: {
+                          display: "none",
+                        },
+                        profileSection__password: {
+                          display: "none",
+                        },
+                        profileSection__activeDevices: {
+                          display: "none",
+                        },
                       },
-                      card: {
-                        width: "100%",
-                        boxShadow: "none",
-                        margin: "0",
-                        position: "relative",
-                      },
-                      navbar: {
-                        display: "none",
-                      },
-                      header: {
-                        display: "none",
-                      },
-                      profileSection__emailAddresses: {
-                        display: "none",
-                      },
-                      profileSection__connectedAccounts: {
-                        display: "none",
-                      },
-                      profileSection__password: {
-                        display: "none",
-                      },
-                      profileSection__activeDevices: {
-                        display: "none",
-                      },
-                    },
-                  }}
-                />
-                <div className="pl-[1rem] pr-[0.5rem] text-[1rem]">
-                  <h3 className="font-medium">Social Links</h3>
-                  <hr />
+                    }}
+                  />
+                  <div className="pl-[0.5rem] pr-[1rem] text-[1rem]">
+                    <ProfileForm />
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
