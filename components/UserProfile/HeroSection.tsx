@@ -2,7 +2,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import LoadingLine from "../LoadingLine";
 import { useUser } from "@clerk/nextjs";
-
+import { useProfilePopup } from "@/hooks/useProfilePopup";
 export default function HeroSection({
   bannerUrl,
   profileImg,
@@ -10,6 +10,7 @@ export default function HeroSection({
   username,
   firstName,
   lastName,
+  tagline,
 }: {
   bannerUrl: string;
   profileImg: string;
@@ -17,15 +18,19 @@ export default function HeroSection({
   username: string;
   firstName: string;
   lastName: string;
+  tagline: string;
 }) {
   const { user } = useUser();
-
+  const { setIsProfilePopupOpen } = useProfilePopup();
   return (
     <section className="hero-section-profile w-full flex flex-col items-start">
       <div className="banner relative bg-[#F4F4F4] text-black/50 w-full aspect-[1920/300] h-auto bg-cover bg-center bg-no-repeat flex items-center justify-center">
-        {username === user?.username && (
+        {!!username && username === user?.username && (
           <div className="absolute bottom-8 right-16 banner-btns z-10 flex flex-row items-center gap-4">
-            <button className="flex rounded-full text-white bg-white/20 backdrop-blur-md px-12 py-3 gap-6">
+            <button
+              onClick={() => setIsProfilePopupOpen(true)}
+              className="flex rounded-full text-white bg-white/20 backdrop-blur-md px-12 py-3 gap-6"
+            >
               <span className="-mb-1 text-base">Edit Profile</span>
             </button>
             <button className="flex items-center justify-center rounded-full text-white bg-white/20 backdrop-blur-md w-11 h-11">
@@ -66,7 +71,7 @@ export default function HeroSection({
           </motion.div>
         )}
       </div>
-      <div className="info-section flex flex-col gap-8 w-full items-center -mt-[100px]">
+      <div className="info-section flex flex-col gap-4 w-full items-center -mt-[100px]">
         <div className="z-[1] profile-image aspect-square w-[200px] h-[200px] bg-white flex items-center justify-center rounded-full">
           <div className="w-[160px] h-[160px] bg-[#f4f4f4] rounded-full">
             {profileLoaded && (
@@ -131,6 +136,7 @@ export default function HeroSection({
             </defs>
           </svg>
         </h1>
+        <p className="text-[#8F8F8F] text-2xl">{tagline}</p>
       </div>
     </section>
   );

@@ -1,12 +1,17 @@
 import { useAuthPopup } from "@/hooks/useAuthPopup";
 import { SignIn, SignUp, UserProfile } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 
 export default function AuthPopup() {
   const { authPopupType, setAuthPopupType } = useAuthPopup();
   const router = useRouter();
+  const [paths, setPaths] = useState({
+    signIn: `${router.asPath.split("?")[0]}/?auth=signIn`,
+    signUp: `${router.asPath.split("?")[0]}/?auth=signUp`,
+    afterSuccess: `${router.asPath.split("?")[0]}`,
+  });
 
   function PopupWrapper({ children }: { children: React.ReactNode }) {
     // useEffect(() => {
@@ -38,11 +43,28 @@ export default function AuthPopup() {
   }
 
   useEffect(() => {
-    if (router.query.auth === "signIn") setAuthPopupType("signIn");
-    else if (router.query.auth === "signUp") setAuthPopupType("signUp");
-    else if (router.query.auth === "settings") setAuthPopupType("settings");
+    const currentPath = router.asPath.split("?")[0];
+    const currentPathNoTrailSlash = currentPath.endsWith("/")
+      ? currentPath.slice(0, -1)
+      : currentPath;
+
+    if (router.query.auth === "signIn") {
+      setPaths({
+        signIn: `${currentPathNoTrailSlash}/?auth=signIn`,
+        signUp: `${currentPathNoTrailSlash}/?auth=signUp`,
+        afterSuccess: `${currentPathNoTrailSlash}`,
+      });
+      setAuthPopupType("signIn");
+    } else if (router.query.auth === "signUp") {
+      setPaths({
+        signIn: `${currentPathNoTrailSlash}/?auth=signIn`,
+        signUp: `${currentPathNoTrailSlash}/?auth=signUp`,
+        afterSuccess: `${currentPathNoTrailSlash}`,
+      });
+      setAuthPopupType("signUp");
+    } else if (router.query.auth === "settings") setAuthPopupType("settings");
     else setAuthPopupType("none");
-  }, [router.query.auth]);
+  }, [router.query]);
 
   useEffect(() => {
     const html = document.querySelector("html") as HTMLElement;
@@ -54,9 +76,9 @@ export default function AuthPopup() {
     return (
       <PopupWrapper>
         <SignIn
-          signUpUrl={`${router.asPath.split("?")[0]}/?auth=signUp`}
-          afterSignInUrl={`${router.asPath.split("?")[0]}`}
-          afterSignUpUrl={`${router.asPath.split("?")[0]}`}
+          signUpUrl={paths.signUp}
+          afterSignInUrl={paths.afterSuccess}
+          afterSignUpUrl={paths.afterSuccess}
           appearance={{
             elements: {
               formButtonPrimary:
@@ -71,9 +93,9 @@ export default function AuthPopup() {
     return (
       <PopupWrapper>
         <SignUp
-          signInUrl={`${router.asPath.split("?")[0]}/?auth=signIn`}
-          afterSignInUrl={`${router.asPath.split("?")[0]}`}
-          afterSignUpUrl={`${router.asPath.split("?")[0]}`}
+          signInUrl={paths.signIn}
+          afterSignInUrl={paths.afterSuccess}
+          afterSignUpUrl={paths.afterSuccess}
           appearance={{
             elements: {
               formButtonPrimary:

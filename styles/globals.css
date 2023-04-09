@@ -166,6 +166,12 @@ html {
   display: none;
 }
 
+.profile-form input::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: black;
+  opacity: 1; /* Firefox */
+}
+
 input::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: white;

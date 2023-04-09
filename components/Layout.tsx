@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import Header from "./Header/Header";
 import AuthPopup from "./AuthPopup";
 import { useRouter } from "next/router";
+import ProfilePopupProvider from "@/hooks/useProfilePopup";
+import ProfilePopup from "./ProfilePopup";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { isPreloading, setIsPreloading, isInApp, setIsInApp } = usePreloader();
@@ -20,12 +22,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className={`${acidGrotesk.className} layout-wrapper`}>
-        {isPreloading && <Preloader />}
-        <Header />
-        <AuthPopup />
-        {children}
-      </div>
+      <ProfilePopupProvider>
+        <div className={`${acidGrotesk.className} layout-wrapper`}>
+          {isPreloading && <Preloader />}
+          <Header />
+          <AuthPopup />
+          <ProfilePopup />
+          {children}
+        </div>
+      </ProfilePopupProvider>
     </>
   );
 }

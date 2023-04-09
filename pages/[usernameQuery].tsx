@@ -5,7 +5,7 @@ import ChangeBannerUrlInput from "@/components/changeBannerUrlInput";
 import { supabaseClient } from "@/utils/helpers";
 import { useEffect, useState } from "react";
 import HeroSection from "@/components/UserProfile/HeroSection";
-
+import Image from "next/image";
 export default function ProfilePage({ profileData }: { profileData: any }) {
   // const router = useRouter();
   // const { usernameQuery } = router.query;
@@ -14,6 +14,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
   // const { user } = useUser();
   // const [profileData, setProfileData] = useState<any>();
   const [profileLoaded, setProfileLoaded] = useState<boolean>(true);
+  const { user } = useUser();
   // const usernameQueryWithoutAt = usernameQueryAsStr?.replace("@", "");
 
   // const getProfileData = async () => {
@@ -43,29 +44,55 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
   //   }
   // }, [isLoaded, user]);
 
-  return (
-    <>
-      <Head>
-        <title>Spotlight — Digital Awards</title>
-        <meta name="robots" content="follow, index" />
-        <link href="/favicon.ico" rel="shortcut icon" />
-        <meta
-          content="Spotlight is the no.1 Digital Awards issuer that recognizes and promotes the talent and effort of the best developers, designers and web agencies in the world."
-          name="description"
-        />
-      </Head>
-      <main className="bg-white w-screen">
-        <HeroSection
-          bannerUrl={profileData?.banner_url}
-          profileImg={profileData?.avatar_url}
-          profileLoaded={profileLoaded}
-          username={profileData?.username}
-          firstName={profileData?.first_name}
-          lastName={profileData?.last_name}
-        />
-      </main>
-    </>
-  );
+  if (!!profileData)
+    return (
+      <>
+        <Head>
+          <title>Spotlight — Digital Awards</title>
+          <meta name="robots" content="nofollow, noindex" />
+          <link href="/favicon.ico" rel="shortcut icon" />
+          <meta
+            content="Spotlight is the no.1 Digital Awards issuer that recognizes and promotes the talent and effort of the best developers, designers and web agencies in the world."
+            name="description"
+          />
+        </Head>
+        <main className="bg-white w-screen">
+          <HeroSection
+            bannerUrl={profileData?.banner_url}
+            profileImg={profileData?.avatar_url}
+            profileLoaded={profileLoaded}
+            username={profileData?.username}
+            firstName={profileData?.first_name}
+            lastName={profileData?.last_name}
+            tagline={profileData?.tagline}
+          />
+        </main>
+      </>
+    );
+  else
+    return (
+      <>
+        <Head>
+          <title>Error 404 (Not Founed)</title>
+          <meta name="robots" content="nofollow, noindex" />
+          <link href="/favicon.ico" rel="shortcut icon" />
+          <meta
+            content="Spotlight is the no.1 Digital Awards issuer that recognizes and promotes the talent and effort of the best developers, designers and web agencies in the world."
+            name="description"
+          />
+        </Head>
+        <main className="bg-white w-screen flex items-center justify-center h-screen relative">
+          <h1 className="text-8xl text-black">Error 404</h1>
+          <Image
+            src="/static/images/404.jpg"
+            width={1920}
+            height={1080}
+            alt=""
+            className="w-full h-full object-cover absolute top-0 left-0"
+          />
+        </main>
+      </>
+    );
 }
 
 export const getStaticPaths = async () => {
