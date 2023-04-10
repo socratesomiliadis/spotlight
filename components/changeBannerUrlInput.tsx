@@ -18,7 +18,7 @@ export default function ChangeBannerUrlInput() {
       .update({
         banner_url: bannerUrl,
       })
-      .eq("id", userId);
+      .eq("user_id", userId);
 
     if (error) {
       console.log(error);

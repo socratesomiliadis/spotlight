@@ -58,6 +58,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
         </Head>
         <main className="bg-white w-screen">
           <HeroSection
+            otherUserId={profileData?.user_id}
             bannerUrl={profileData?.banner_url}
             profileImg={profileData?.avatar_url}
             profileLoaded={profileLoaded}

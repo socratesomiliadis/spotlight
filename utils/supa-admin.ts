@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
 
 export const upsertUserRecord = async (user: any) => {
   const userData = {
-    id: user.id,
+    user_id: user.id,
     username: user.username,
     avatar_url: user.profile_image_url,
     first_name: user.first_name,
@@ -25,7 +25,7 @@ export const deleteUserRecord = async (userId: any) => {
   const { error } = await supabaseAdmin
     .from("profile")
     .delete()
-    .eq("id", userId);
+    .eq("user_id", userId);
   if (error) throw error;
   console.log(`User deleted: ${userId}`);
 };

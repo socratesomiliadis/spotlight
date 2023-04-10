@@ -3,7 +3,10 @@ import { motion } from "framer-motion";
 import LoadingLine from "../LoadingLine";
 import { useUser } from "@clerk/nextjs";
 import { useProfilePopup } from "@/hooks/useProfilePopup";
+import FollowBtn from "./FollowBtn";
+
 export default function HeroSection({
+  otherUserId,
   bannerUrl,
   profileImg,
   profileLoaded,
@@ -12,6 +15,7 @@ export default function HeroSection({
   lastName,
   tagline,
 }: {
+  otherUserId: string;
   bannerUrl: string;
   profileImg: string;
   profileLoaded: boolean;
@@ -136,7 +140,10 @@ export default function HeroSection({
             </defs>
           </svg>
         </h1>
-        <p className="text-[#8F8F8F] text-2xl">{tagline}</p>
+        <p className="text-[#8F8F8F] text-xl">{tagline}</p>
+        {!!user && (
+          <FollowBtn currentUserId={user?.id} otherUserId={otherUserId} />
+        )}
       </div>
     </section>
   );

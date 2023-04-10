@@ -167,10 +167,21 @@ html {
   display: none;
 }
 
+.toast div[data-title] {
+  @apply -mb-1;
+}
+
 .profile-form input::placeholder {
   /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: black;
   opacity: 1; /* Firefox */
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgb(244 244 244 / 1) inset !important;
 }
 
 input::placeholder {
