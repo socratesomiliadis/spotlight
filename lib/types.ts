@@ -1,1 +1,1 @@
-export type AuthPopupType = "signUp" | "signIn" | "settings" | "none";
+export type AuthPopupType = "signUp" | "signIn" | "none";

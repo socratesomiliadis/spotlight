@@ -62,8 +62,7 @@ export default function AuthPopup() {
         afterSuccess: `${currentPathNoTrailSlash}`,
       });
       setAuthPopupType("signUp");
-    } else if (router.query.auth === "settings") setAuthPopupType("settings");
-    else setAuthPopupType("none");
+    } else setAuthPopupType("none");
   }, [router.query]);
 
   useEffect(() => {
@@ -104,27 +103,6 @@ export default function AuthPopup() {
             },
           }}
         />
-      </PopupWrapper>
-    );
-  else if (authPopupType === "settings")
-    return (
-      <PopupWrapper>
-        <motion.div
-          className="relative h-[70vh]"
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            transition: { duration: 0.35, ease: "easeOut" },
-          }}
-        >
-          <UserProfile
-            appearance={{
-              elements: {
-                rootBox: "h-[70vh]",
-              },
-            }}
-          />
-        </motion.div>
       </PopupWrapper>
     );
   else return null;

@@ -4,8 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { supabaseClientWithAuth } from "@/utils/helpers";
 import { toast } from "sonner";
 import { useProfilePopup } from "@/hooks/useProfilePopup";
-import { useState, useEffect } from "react";
-import { Twitter, Instagram } from "lucide-react";
+import { Twitter, Instagram, LinkedinIcon } from "lucide-react";
 
 type Inputs = {
   tagline: string;
@@ -15,6 +14,8 @@ type Inputs = {
   twitter: string;
   instagram: string;
   read_cv: string;
+  linkedin: string;
+  behance: string;
 };
 
 function Input({
@@ -172,6 +173,9 @@ export default function ProfileForm({ profileData }: { profileData: any }) {
         user_id: userId,
         twitter: inputData.twitter,
         instagram: inputData.instagram,
+        read_cv: inputData.read_cv,
+        linkedin: inputData.linkedin,
+        behance: inputData.behance,
       })
       .select();
 
@@ -300,6 +304,27 @@ export default function ProfileForm({ profileData }: { profileData: any }) {
           />
           <SocialInput
             link="https://read.cv/"
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                viewBox="0 0 28 28"
+                className="-mr-1"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M10.809 5.242a1.25 1.25 0 00-1.531.884L6.042 18.2a1.25 1.25 0 00.884 1.53l9.66 2.59a1.25 1.25 0 001.53-.885l3.236-12.074a1.25 1.25 0 00-.884-1.53l-9.66-2.589zm-2.98.496a2.75 2.75 0 013.368-1.945l9.66 2.588A2.75 2.75 0 0122.8 9.75l-3.236 12.074a2.75 2.75 0 01-3.368 1.945L6.538 21.18a2.75 2.75 0 01-1.944-3.368L7.829 5.738z"
+                  fill="#000"
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M10.518 8.27a.75.75 0 01.919-.53l7.241 1.94a.75.75 0 01-.388 1.449l-7.242-1.94a.75.75 0 01-.53-.919zM9.677 11.41a.75.75 0 01.918-.531l7.242 1.94a.75.75 0 11-.388 1.45l-7.242-1.941a.75.75 0 01-.53-.919zM8.836 14.549a.75.75 0 01.918-.53l4.83 1.293a.75.75 0 11-.388 1.45l-4.83-1.295a.75.75 0 01-.53-.918z"
+                  fill="#000"
+                ></path>
+              </svg>
+            }
             label="Read CV"
             type="text"
             autocomplete="username"
@@ -312,6 +337,54 @@ export default function ProfileForm({ profileData }: { profileData: any }) {
             }}
             error={errors.read_cv}
             errorMessage="Provide a valid Read CV handle"
+          />
+          <SocialInput
+            link="https://linkedin.com/in/"
+            icon={
+              <LinkedinIcon
+                className="mb-1"
+                fill="#000"
+                stroke="#00000000"
+                size={22}
+              />
+            }
+            label="LinkedIn"
+            type="text"
+            autocomplete="username"
+            name="linkedin"
+            watch={watch}
+            register={register}
+            defaultValue={profileData?.socials?.linkedin}
+            validationObj={{
+              pattern: /^[a-z0-9_\.]+$/,
+            }}
+            error={errors.linkedin}
+            errorMessage="Provide a valid LinkedIn handle"
+          />
+          <SocialInput
+            link="https://behance.net/"
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                className="mb-1"
+                viewBox="0 0 24 24"
+              >
+                <path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z" />
+              </svg>
+            }
+            label="Behance"
+            type="text"
+            autocomplete="username"
+            name="behance"
+            watch={watch}
+            register={register}
+            defaultValue={profileData?.socials?.behance}
+            validationObj={{
+              pattern: /^[a-z0-9_\.]+$/,
+            }}
+            error={errors.behance}
+            errorMessage="Provide a valid Behance handle"
           />
         </div>
       </form>

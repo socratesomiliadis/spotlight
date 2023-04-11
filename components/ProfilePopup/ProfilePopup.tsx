@@ -78,7 +78,7 @@ export default function ProfilePopup() {
                 Add more information about you here.
               </p>
             </div>
-            <Tabs defaultValue="profile" className="w-full h-[80%] relative">
+            <Tabs defaultValue="account" className="w-full h-[80%] relative">
               <TabsList className="">
                 <TabsTrigger value="account">
                   <span className="-mb-1">Account</span>

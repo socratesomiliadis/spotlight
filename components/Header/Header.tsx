@@ -35,12 +35,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/primitives/Dropdown";
+import { useProfilePopup } from "@/hooks/useProfilePopup";
 
 export default function Header() {
   const router = useRouter();
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
-
+  const { setIsProfilePopupOpen } = useProfilePopup();
   return (
     <header className="absolute z-[999] w-screen top-0 py-8 flex flex-row items-center justify-between px-16">
       <div className="flex flex-row gap-20">
@@ -100,11 +101,7 @@ export default function Header() {
                   <User className="mr-2 h-4 w-4" />
                   <span className="-mb-1">Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    router.push(`${router.asPath.split("?")[0]}?auth=settings`)
-                  }
-                >
+                <DropdownMenuItem onClick={() => setIsProfilePopupOpen(true)}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span className="-mb-1">Settings</span>
                 </DropdownMenuItem>

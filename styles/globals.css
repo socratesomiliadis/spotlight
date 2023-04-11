@@ -232,6 +232,25 @@ body {
   background: #161616;
 }
 
+.follow-btn {
+  transition: background-color 0.25s ease-in-out;
+  background-color: #fff;
+  color: #000;
+}
+
+.follow-btn.following {
+  background-color: #000;
+  color: #fff;
+}
+
+.follow-btn.following:hover {
+  background-color: #2e2e2e;
+}
+
+.follow-btn:hover {
+  background-color: #f4f4f4;
+}
+
 .month-indicator {
   transition: all 0.45s ease-in-out;
 }

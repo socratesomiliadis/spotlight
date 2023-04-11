@@ -4,6 +4,7 @@ import LoadingLine from "../LoadingLine";
 import { useUser } from "@clerk/nextjs";
 import { useProfilePopup } from "@/hooks/useProfilePopup";
 import FollowBtn from "./FollowBtn";
+import Socials from "./Socials";
 
 export default function HeroSection({
   otherUserId,
@@ -14,6 +15,7 @@ export default function HeroSection({
   firstName,
   lastName,
   tagline,
+  socials,
 }: {
   otherUserId: string;
   bannerUrl: string;
@@ -23,6 +25,7 @@ export default function HeroSection({
   firstName: string;
   lastName: string;
   tagline: string;
+  socials: any;
 }) {
   const { user } = useUser();
   const { setIsProfilePopupOpen } = useProfilePopup();
@@ -141,9 +144,23 @@ export default function HeroSection({
           </svg>
         </h1>
         <p className="text-[#8F8F8F] text-xl">{tagline}</p>
-        {!!user && (
-          <FollowBtn currentUserId={user?.id} otherUserId={otherUserId} />
-        )}
+        <div className="flex flex-row items-center gap-6">
+          <Socials links={socials} />
+          {!!user && (
+            <FollowBtn currentUserId={user?.id} otherUserId={otherUserId} />
+          )}
+          <button
+            style={{
+              boxShadow: "1px 1px 3px 0px #00000040",
+            }}
+            className="px-12 cursor-not-allowed relative bg-white text-black flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]"
+          >
+            <span className="-mb-1 flex items-center justify-center">Hire</span>
+            <span className="absolute left-1/2 -translate-x-1/2 -bottom-1/4 text-xs text-white bg-black whitespace-nowrap py-1 rounded-full px-6">
+              <span>Soon</span>
+            </span>
+          </button>
+        </div>
       </div>
     </section>
   );

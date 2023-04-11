@@ -66,6 +66,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
             firstName={profileData?.first_name}
             lastName={profileData?.last_name}
             tagline={profileData?.tagline}
+            socials={profileData?.socials}
           />
         </main>
       </>
@@ -115,7 +116,10 @@ export const getStaticPaths = async () => {
 export async function getStaticProps({ params }: { params: any }) {
   const { data, error } = await supabaseClient
     .from("profile")
-    .select("*")
+    .select(
+      `*, socials (*
+      )`
+    )
     .eq("username", params?.usernameQuery.replace("@", ""))
     .single();
 

@@ -15,6 +15,7 @@ export default function FollowBtn({
   const { getToken } = useAuth();
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
   useEffect(() => {
     checkIfFollowing();
   }, [otherUserId, currentUserId]);
@@ -34,6 +35,7 @@ export default function FollowBtn({
     }
     if (data) {
       if (data.length > 0) setIsFollowing(true);
+      else setIsFollowing(false);
       setIsLoaded(true);
     }
   }
@@ -53,6 +55,7 @@ export default function FollowBtn({
     }
     if (data) {
       console.log(data);
+      // setIsFollowing(false);
     }
   }
 
@@ -73,37 +76,52 @@ export default function FollowBtn({
     }
     if (data) {
       console.log(data);
+      // setIsFollowing(true);
+      console.log(isFollowing);
     }
   }
 
-  return (
-    <div>
-      <button
-        onClick={() => followUser()}
-        style={{
-          boxShadow: "1px 1px 3px 0px #00000040",
-          opacity: otherUserId === currentUserId ? 0.5 : 1,
-          cursor: otherUserId === currentUserId ? "not-allowed" : "pointer",
-          color: isFollowing ? "#fff" : "#000",
-          backgroundColor: isFollowing ? "#000" : "#fff",
-        }}
-        className="px-12 flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]"
-      >
-        <span className="-mb-1 flex items-center justify-center">
-          {!isLoaded && (
-            <div className="relative flex items-center">
-              <div className="absolute w-full">
-                <LoadingLine className="w-full h-[16px] rounded-lg" />
-              </div>
-              <span aria-hidden className="opacity-0 pointer-events-none">
-                Unfollow
-              </span>
-            </div>
-          )}
+  function isSameUser() {
+    return otherUserId === currentUserId;
+  }
 
-          {isLoaded ? (isFollowing ? "Unfollow" : "Follow") : ""}
-        </span>
-      </button>
-    </div>
+  return (
+    <button
+      onClick={async () => {
+        if (!isFollowing && !isSameUser()) {
+          setIsFollowing(true);
+          await followUser();
+        }
+        if (isFollowing && !isSameUser()) {
+          setIsFollowing(false);
+          await unfollowUser();
+        }
+        await checkIfFollowing();
+      }}
+      style={{
+        boxShadow: "1px 1px 3px 0px #00000040",
+        opacity: isSameUser() ? 0.5 : 1,
+        cursor: isSameUser() ? "not-allowed" : "pointer",
+        pointerEvents: isSameUser() ? "none" : "auto",
+      }}
+      className={`follow-btn ${
+        isFollowing ? "following" : ""
+      } px-12 flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]`}
+    >
+      <span className="-mb-1 flex items-center justify-center">
+        {!isLoaded && (
+          <div className="relative flex items-center">
+            <div className="absolute w-full">
+              <LoadingLine className="w-full h-[16px] rounded-lg" />
+            </div>
+            <span aria-hidden className="opacity-0 pointer-events-none">
+              Unfollow
+            </span>
+          </div>
+        )}
+
+        {isLoaded ? (isFollowing ? "Unfollow" : "Follow") : ""}
+      </span>
+    </button>
   );
 }
