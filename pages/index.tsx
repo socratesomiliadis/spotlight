@@ -2,9 +2,7 @@ import ExploreAwards from "@/components/Home/ExploreAwards";
 import ExploreTextSection from "@/components/Home/ExploreTextSection";
 import FeaturedStudios from "@/components/Home/FeaturedStudios";
 import HeroSection from "@/components/Home/HeroSection";
-import { upsertUserRecord } from "@/utils/supa-admin";
 import Head from "next/head";
-import { useEffect } from "react";
 
 export default function Home() {
   return (

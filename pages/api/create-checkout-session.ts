@@ -1,23 +1,22 @@
 import { NextApiHandler } from "next";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
-
 import { stripe } from "@/utils/stripe";
 import { createOrRetrieveCustomer } from "@/utils/supa-admin";
 import { getURL } from "@/utils/helpers";
+import { getAuth } from "@clerk/nextjs/server";
 
 const CreateCheckoutSession: NextApiHandler = async (req, res) => {
   if (req.method === "POST") {
     const { price, quantity = 1, metadata = {} } = req.body;
+    const { userId, user } = getAuth(req);
 
     try {
-      const supabase = createServerSupabaseClient({ req, res });
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const primaryEmail = user?.emailAddresses.find(
+        (email) => email.id === user.primaryEmailAddressId
+      )?.emailAddress;
 
       const customer = await createOrRetrieveCustomer({
-        uuid: user?.id || "",
-        email: user?.email || "",
+        userId: userId || "",
+        email: primaryEmail || "",
       });
 
       const session = await stripe.checkout.sessions.create({
