@@ -160,6 +160,14 @@ html {
   overflow-y: overlay;
 }
 
+body {
+  position: inherit !important;
+}
+
+button {
+  user-select: none;
+}
+
 .cl-internal-b3fm6y,
 .cl-userButtonPopoverFooter,
 .cl-internal-3fgo0t,

@@ -139,9 +139,12 @@ export default function Header() {
           </button>
         </SignedOut>
 
-        <button className="px-10 flex py-2 bg-white text-black text-lg rounded-full">
+        <Link
+          href="/subscribe"
+          className="px-10 flex py-2 bg-white text-black text-lg rounded-full"
+        >
           <span className="-mb-1">Subscribe</span>
-        </button>
+        </Link>
       </div>
     </header>
   );

@@ -17,7 +17,7 @@ export default function FollowBtn({
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    checkIfFollowing();
+    if (otherUserId && currentUserId) checkIfFollowing();
   }, [otherUserId, currentUserId]);
 
   async function checkIfFollowing() {
@@ -85,43 +85,47 @@ export default function FollowBtn({
     return otherUserId === currentUserId;
   }
 
-  return (
-    <button
-      onClick={async () => {
-        if (!isFollowing && !isSameUser()) {
-          setIsFollowing(true);
-          await followUser();
-        }
-        if (isFollowing && !isSameUser()) {
-          setIsFollowing(false);
-          await unfollowUser();
-        }
-        await checkIfFollowing();
-      }}
-      style={{
-        boxShadow: "1px 1px 3px 0px #00000040",
-        opacity: isSameUser() ? 0.5 : 1,
-        cursor: isSameUser() ? "not-allowed" : "pointer",
-        pointerEvents: isSameUser() ? "none" : "auto",
-      }}
-      className={`follow-btn ${
-        isFollowing ? "following" : ""
-      } px-12 flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]`}
-    >
-      <span className="-mb-1 flex items-center justify-center">
-        {!isLoaded && (
-          <div className="relative flex items-center">
-            <div className="absolute w-full">
-              <LoadingLine className="w-full h-[16px] rounded-lg" />
-            </div>
-            <span aria-hidden className="opacity-0 pointer-events-none">
-              Unfollow
-            </span>
-          </div>
-        )}
-
-        {isLoaded ? (isFollowing ? "Unfollow" : "Follow") : ""}
-      </span>
-    </button>
-  );
+  if (!!isSameUser()) return null;
+  else {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <button
+          onClick={async () => {
+            if (!isFollowing && !isSameUser()) {
+              setIsFollowing(true);
+              await followUser();
+            }
+            if (isFollowing && !isSameUser()) {
+              setIsFollowing(false);
+              await unfollowUser();
+            }
+            await checkIfFollowing();
+          }}
+          style={{
+            boxShadow: "1px 1px 3px 0px #00000040",
+            opacity: isSameUser() ? 0.5 : 1,
+            cursor: isSameUser() ? "not-allowed" : "pointer",
+            pointerEvents: isSameUser() ? "none" : "auto",
+          }}
+          className={`follow-btn ${
+            isFollowing ? "following" : ""
+          } px-12 flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]`}
+        >
+          <span className="-mb-1 flex items-center justify-center">
+            {!isLoaded && (
+              <div className="relative flex items-center">
+                <div className="absolute w-full">
+                  <LoadingLine className="w-full h-[16px] rounded-lg" />
+                </div>
+                <span aria-hidden className="opacity-0 pointer-events-none">
+                  Unfollow
+                </span>
+              </div>
+            )}
+            {isLoaded ? (isFollowing ? "Unfollow" : "Follow") : ""}
+          </span>
+        </button>
+      </div>
+    );
+  }
 }

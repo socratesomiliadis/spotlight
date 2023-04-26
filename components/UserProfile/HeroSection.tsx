@@ -5,6 +5,8 @@ import { useUser } from "@clerk/nextjs";
 import { useProfilePopup } from "@/hooks/useProfilePopup";
 import FollowBtn from "./FollowBtn";
 import Socials from "./Socials";
+import { useState } from "react";
+import FollowsYouComp from "./FollowsYouComp";
 
 export default function HeroSection({
   otherUserId,
@@ -29,8 +31,9 @@ export default function HeroSection({
 }) {
   const { user } = useUser();
   const { setIsProfilePopupOpen } = useProfilePopup();
+
   return (
-    <section className="hero-section-profile w-full flex flex-col items-start">
+    <section className="hero-section-profile w-full flex flex-col items-start relative min-h-screen">
       <div className="banner relative bg-[#F4F4F4] text-black/50 w-full aspect-[1920/300] h-auto bg-cover bg-center bg-no-repeat flex items-center justify-center">
         {!!username && username === user?.username && (
           <div className="absolute bottom-8 right-16 banner-btns z-10 flex flex-row items-center gap-4">
@@ -142,9 +145,10 @@ export default function HeroSection({
               </linearGradient>
             </defs>
           </svg>
+          <FollowsYouComp otherUserId={otherUserId} />
         </h1>
         <p className="text-[#8F8F8F] text-xl">{tagline}</p>
-        <div className="flex flex-row items-center gap-6">
+        <div className="flex flex-row items-start gap-6">
           <Socials links={socials} />
           {!!user && (
             <FollowBtn currentUserId={user?.id} otherUserId={otherUserId} />

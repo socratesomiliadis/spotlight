@@ -1,14 +1,11 @@
-import ExploreAwards from "@/components/Home/ExploreAwards";
-import ExploreTextSection from "@/components/Home/ExploreTextSection";
-import FeaturedStudios from "@/components/Home/FeaturedStudios";
-import HeroSection from "@/components/Home/HeroSection";
+import IndividualSection from "@/components/Subscribe/IndividualSection";
 import Head from "next/head";
 
-export default function Home() {
+export default function Subscribe() {
   return (
     <>
       <Head>
-        <title>Spotlight — Digital Awards</title>
+        <title>Spotlight — Subscribe</title>
         <meta name="robots" content="follow, index" />
         <link href="/favicon.ico" rel="shortcut icon" />
         <meta
@@ -17,10 +14,7 @@ export default function Home() {
         />
       </Head>
       <main className="bg-white relative">
-        <HeroSection />
-        <ExploreAwards />
-        <FeaturedStudios />
-        <ExploreTextSection />
+        <IndividualSection />
         {/* <div className="h-[500vh] bg-white"></div> */}
       </main>
     </>

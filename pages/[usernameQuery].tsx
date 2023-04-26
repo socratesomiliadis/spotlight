@@ -43,6 +43,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
   //     console.log(user.profileImageUrl);
   //   }
   // }, [isLoaded, user]);
+  
 
   if (!!profileData)
     return (
@@ -56,7 +57,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
             name="description"
           />
         </Head>
-        <main className="bg-white w-screen">
+        <main className="bg-white w-screen relative">
           <HeroSection
             otherUserId={profileData?.user_id}
             bannerUrl={profileData?.banner_url}
