@@ -43,7 +43,6 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
   //     console.log(user.profileImageUrl);
   //   }
   // }, [isLoaded, user]);
-  
 
   if (!!profileData)
     return (
@@ -117,16 +116,20 @@ export const getStaticPaths = async () => {
 export async function getStaticProps({ params }: { params: any }) {
   const { data, error } = await supabaseClient
     .from("profile")
-    .select(
-      `*, socials (*
-      )`
-    )
+    .select(`*, socials (*), subscriptions (*)`)
     .eq("username", params?.usernameQuery.replace("@", ""))
+    .single();
+
+  const { data: subData, error: subError } = await supabaseClient
+    .from("subscriptions")
+    .select("*, prices(*, products(*))")
+    .in("status", ["trialing", "active"])
     .single();
 
   return {
     props: {
       profileData: data,
+      subData: subData,
     },
     revalidate: 1,
   };

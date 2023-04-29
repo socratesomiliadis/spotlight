@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import Layout from "@/components/Layout";
 import PreloaderProvider from "@/hooks/usePreloader";
 import AuthPopupProvider from "@/hooks/useAuthPopup";
+import { MyUserContextProvider } from "@/utils/getUser";
 
 export const acidGrotesk = localFont({
   src: [
@@ -38,13 +39,15 @@ export default function App({ Component, pageProps }: AppProps) {
       {...pageProps}
     >
       <div className={`${acidGrotesk.className} font-wrapper`}>
-        <PreloaderProvider>
-          <AuthPopupProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </AuthPopupProvider>
-        </PreloaderProvider>
+        <MyUserContextProvider>
+          <PreloaderProvider>
+            <AuthPopupProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </AuthPopupProvider>
+          </PreloaderProvider>
+        </MyUserContextProvider>
       </div>
     </ClerkProvider>
   );

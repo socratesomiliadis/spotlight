@@ -1,7 +1,9 @@
 import IndividualSection from "@/components/Subscribe/IndividualSection";
 import Head from "next/head";
+import { supabaseClient } from "@/utils/helpers";
+import { Price } from "@/types";
 
-export default function Subscribe() {
+export default function Subscribe({ prices }: { prices: Price[] }) {
   return (
     <>
       <Head>
@@ -14,9 +16,20 @@ export default function Subscribe() {
         />
       </Head>
       <main className="bg-white relative">
-        <IndividualSection />
+        <IndividualSection prices={prices} />
         {/* <div className="h-[500vh] bg-white"></div> */}
       </main>
     </>
   );
+}
+
+export async function getStaticProps({ params }: { params: any }) {
+  const { data, error } = await supabaseClient.from("prices").select(`*`);
+
+  return {
+    props: {
+      prices: data,
+    },
+    revalidate: 1,
+  };
 }

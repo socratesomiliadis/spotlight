@@ -1,4 +1,4 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 export interface PageMeta {
   title: string;
   description: string;
@@ -24,11 +24,18 @@ export interface ProductWithPrice extends Product {
 }
 
 export interface UserDetails {
-  id: string /* primary key */;
-  first_name: string;
-  last_name: string;
-  full_name?: string;
-  avatar_url?: string;
+  avatar_url?: string | null;
+  banner_url?: string | null;
+  created_at: string | null;
+  first_name?: string | null;
+  last_name: string | null;
+  location?: string | null;
+  occupation?: string | null;
+  tagline?: string | null;
+  updated_at?: string | null;
+  user_id: string;
+  username: string;
+  website?: string | null;
   billing_address?: Stripe.Address;
   payment_method?: Stripe.PaymentMethod[Stripe.PaymentMethod.Type];
 }
