@@ -6,6 +6,10 @@ import Layout from "@/components/Layout";
 import PreloaderProvider from "@/hooks/usePreloader";
 import AuthPopupProvider from "@/hooks/useAuthPopup";
 import { MyUserContextProvider } from "@/utils/getUser";
+import { Inter } from "next/font/google";
+import { NextUIProvider } from "@nextui-org/react";
+
+export const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const acidGrotesk = localFont({
   src: [
@@ -28,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <ClerkProvider
       appearance={{
         variables: {
-          fontFamily: acidGrotesk.style.fontFamily,
+          fontFamily: inter.style.fontFamily,
           colorPrimary: "#1400FF",
           colorAlphaShade: "#0f0f0f",
         },
@@ -38,14 +42,16 @@ export default function App({ Component, pageProps }: AppProps) {
       }}
       {...pageProps}
     >
-      <div className={`${acidGrotesk.className} font-wrapper`}>
+      <div className={`${inter.className} font-wrapper`}>
         <MyUserContextProvider>
           <PreloaderProvider>
-            <AuthPopupProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </AuthPopupProvider>
+            <NextUIProvider>
+              <AuthPopupProvider>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </AuthPopupProvider>
+            </NextUIProvider>
           </PreloaderProvider>
         </MyUserContextProvider>
       </div>

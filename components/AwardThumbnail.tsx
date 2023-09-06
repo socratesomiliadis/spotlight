@@ -1,11 +1,11 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 export default function AwardThumnail({
   image,
   awardTitle,
   projectTitle,
-  projectLink
+  projectLink,
 }: {
   image: string;
   awardTitle: string;
@@ -29,7 +29,7 @@ export default function AwardThumnail({
           <span className="text-black">{projectTitle}</span>
         </span>
         <button className="rounded-full py-2 px-12 bg-black flex items-center">
-          <span className="text-white -mb-1">VISIT</span>
+          <span className="text-white ">VISIT</span>
         </button>
       </div>
     </article>

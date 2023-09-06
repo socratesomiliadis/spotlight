@@ -60,7 +60,7 @@ export default function ProfileTab({ profileData }: { profileData: any }) {
           type="submit"
           form="profileForm"
         >
-          <span className="-mb-1">Done</span>
+          <span className="">Done</span>
         </button>
       </div>
     </>

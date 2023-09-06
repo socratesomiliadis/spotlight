@@ -81,11 +81,11 @@ export default function ProfilePopup() {
             <Tabs defaultValue="account" className="w-full h-[80%] relative">
               <TabsList className="">
                 <TabsTrigger value="account">
-                  <span className="-mb-1">Account</span>
+                  <span className="">Account</span>
                 </TabsTrigger>
                 <TabsTrigger value="profile">
                   {" "}
-                  <span className="-mb-1">Profile</span>
+                  <span className="">Profile</span>
                 </TabsTrigger>
               </TabsList>
               <TabsContent

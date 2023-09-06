@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { supabaseClientWithAuth } from "@/utils/helpers";
-import { Loader2 } from "lucide-react";
 import LoadingLine from "../LoadingLine";
-import LoadingDots from "../LoadingDots";
+import { motion } from "framer-motion";
 
 export default function FollowBtn({
   otherUserId,
@@ -102,16 +101,15 @@ export default function FollowBtn({
             await checkIfFollowing();
           }}
           style={{
-            boxShadow: "1px 1px 3px 0px #00000040",
             opacity: isSameUser() ? 0.5 : 1,
             cursor: isSameUser() ? "not-allowed" : "pointer",
             pointerEvents: isSameUser() ? "none" : "auto",
           }}
           className={`follow-btn ${
-            isFollowing ? "following" : ""
-          } px-12 flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]`}
+            isFollowing ? "following border-[#262626]" : "border-[#E2E2E2]"
+          } px-16 flex py-2 text-base rounded-full border-[1px] `}
         >
-          <span className="-mb-1 flex items-center justify-center">
+          <span className="flex items-center justify-center">
             {!isLoaded && (
               <div className="relative flex items-center">
                 <div className="absolute w-full">

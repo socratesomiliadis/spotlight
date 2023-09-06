@@ -1,8 +1,5 @@
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/primitives/Popover";
+import { inter } from "@/pages/_app";
+import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import { Instagram, Twitter } from "lucide-react";
 import Link from "next/link";
 
@@ -18,28 +15,27 @@ function SocialLink({
   link: string;
 }) {
   return (
-    <div className="flex flex-row items-center justify-between gap-24">
+    <div
+      style={inter.style}
+      className="flex flex-row items-center w-full justify-between gap-24"
+    >
       <div className="flex flex-row items-center gap-3">
         <div
           style={{
             backgroundColor: color,
-            boxShadow: "1px 1px 2px 0px #00000033",
           }}
-          className="w-14 h-14 rounded-full flex items-center justify-center border-[1px] border-[#E2E2E2]"
+          className="w-10 h-10 rounded-full flex items-center justify-center border-[1px] border-[#E2E2E2]"
         >
           {icon}
         </div>
-        <span className="text-xl font-medium -mb-1">{text}</span>
+        <span className="text-base font-medium">{text}</span>
       </div>
       <Link
         href={link}
         target="_blank"
-        style={{
-          boxShadow: "1px 1px 3px 0px #00000040",
-        }}
-        className="px-8 flex py-2 text-base rounded-full border-[1px] bg-white text-black border-[#E2E2E2]"
+        className="px-8 flex py-1 text-sm rounded-full border-[1px] bg-white text-black border-[#E2E2E2]"
       >
-        <span className="-mb-1 flex items-center justify-center">Follow</span>
+        <span className="flex items-center justify-center">Follow</span>
       </Link>
     </div>
   );
@@ -47,20 +43,26 @@ function SocialLink({
 
 export default function Socials({ links }: { links: any }) {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          style={{
-            boxShadow: "1px 1px 3px 0px #00000040",
-          }}
-          className="px-12 bg-white text-black flex py-3 text-base rounded-full border-[1px] border-[#E2E2E2]"
-        >
-          <span className="-mb-1 flex items-center justify-center">
-            Socials
+    <Popover placement="bottom-start">
+      <PopoverTrigger>
+        <button className="px-6 bg-white text-black flex items-center py-2 text-base rounded-full border-[1px] border-[#E2E2E2]">
+          <span className="w-6">
+            <svg
+              width="100%"
+              viewBox="0 0 18 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1M9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1M9 17C7.13967 17 5.63158 13.4183 5.63158 9C5.63158 4.58172 7.13967 1 9 1M9 17C10.8603 17 12.3684 13.4183 12.3684 9C12.3684 4.58172 10.8603 1 9 1M16.5789 9H1.42105"
+                stroke="black"
+                strokeLinecap="square"
+              />
+            </svg>
           </span>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-fit flex flex-col gap-4">
+      <PopoverContent className="w-fit p-4 flex flex-col gap-4">
         {links.twitter && (
           <SocialLink
             color="#1D9BF0"

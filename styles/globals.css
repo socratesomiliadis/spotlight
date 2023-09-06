@@ -175,8 +175,12 @@ button {
   display: none;
 }
 
-.toast div[data-title] {
-  @apply -mb-1;
+h1,
+h2,
+h3,
+p,
+span {
+  @apply tracking-tight;
 }
 
 .profile-form input::placeholder {
@@ -242,21 +246,12 @@ body {
 
 .follow-btn {
   transition: background-color 0.25s ease-in-out;
-  background-color: #fff;
-  color: #000;
-}
-
-.follow-btn.following {
   background-color: #000;
   color: #fff;
 }
 
-.follow-btn.following:hover {
-  background-color: #2e2e2e;
-}
-
 .follow-btn:hover {
-  background-color: #f4f4f4;
+  background-color: #2e2e2e;
 }
 
 .month-indicator {

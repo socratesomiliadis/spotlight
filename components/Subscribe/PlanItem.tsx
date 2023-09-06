@@ -65,7 +65,7 @@ export default function PlanItem({
           </svg>
         </div>
         <span className="py-2 rounded-full select-none text-sm w-fit flex px-10 bg-[#8a8a8a]/50 text-white">
-          <span className="-mb-1">{planName} Plan</span>
+          <span className="">{planName} Plan</span>
         </span>
         <div className="flex flex-col gap-6">
           <span className="badge-box p-1 w-20 h-20 bg-[#8a8a8a]/50 rounded-lg flex items-center justify-center">
@@ -77,7 +77,7 @@ export default function PlanItem({
             </span>
           </span>
           <span className="flex flex-col">
-            <span className="text-2xl text-white leading-none -mb-1">
+            <span className="text-2xl text-white leading-none ">
               {planName} Badge
             </span>
             <span className="text-lg text-[#8a8a8a]">by Spotlight</span>
@@ -86,7 +86,7 @@ export default function PlanItem({
       </div>
       <div className="price-div p-8 flex flex-row items-start z-10 basis-2/3 rounded-3xl bg-black relative overflow-hidden">
         <span className="py-2 rounded-full z-10 select-none text-sm w-fit flex px-10 bg-[#8a8a8a]/50 text-white">
-          <span className="-mb-1">Price</span>
+          <span className="">Price</span>
         </span>
         <div className="absolute z-10 flex flex-col items-center gap-6 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
           <div className="flex flex-col items-center">
@@ -96,7 +96,7 @@ export default function PlanItem({
           </div>
           <div className="flex flex-row items-center gap-3">
             <button className="px-8 flex py-2 text-white border-[1px] border-white text-base rounded-full items-center gap-4">
-              <span className="-mb-1">Details</span>
+              <span className="">Details</span>
               <svg
                 width="14"
                 viewBox="0 0 30 23"
@@ -113,7 +113,7 @@ export default function PlanItem({
               onClick={() => handleCheckout()}
               className="px-8 flex py-2 text-black bg-white text-base rounded-full items-center gap-4"
             >
-              <span className="-mb-1">Buy Now</span>
+              <span className="">Buy Now</span>
               <svg
                 width="14"
                 viewBox="0 0 30 23"

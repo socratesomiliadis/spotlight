@@ -107,7 +107,7 @@ function SocialInput({
           htmlFor={name}
         >
           {icon}
-          <span className="-mb-1">{label}</span>
+          <span className="">{label}</span>
         </label>
         <span>
           {validationObj?.maxLength && (

@@ -1,4 +1,4 @@
-import { acidGrotesk } from "@/pages/_app";
+import { inter } from "@/pages/_app";
 import Preloader from "./Preloader";
 import { usePreloader } from "@/hooks/usePreloader";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ProfilePopupProvider>
-        <div className={`${acidGrotesk.className} layout-wrapper`}>
+        <div className={`layout-wrapper`}>
           {isPreloading && <Preloader />}
           <Header />
           <AuthPopup />
@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Toaster
             toastOptions={{
               style: {
-                fontFamily: acidGrotesk.style.fontFamily,
+                fontFamily: inter.style.fontFamily,
               },
               className: "toast",
             }}

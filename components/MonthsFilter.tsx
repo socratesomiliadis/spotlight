@@ -1,10 +1,10 @@
-import { motion } from 'framer-motion';
-import { useRef, useEffect, useState } from 'react';
+import { motion } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
 
 function MonthFilterBtn({
   text,
   index,
-  setPos
+  setPos,
 }: {
   text: string;
   index: number;
@@ -14,7 +14,7 @@ function MonthFilterBtn({
     <button
       id={`monthFilterBtn${index}`}
       onClick={() => setPos(index)}
-      className="month-filter-btn basis-1/12 -mb-1 py-2 z-10"
+      className="month-filter-btn basis-1/12  py-2 z-10"
     >
       {text}
     </button>
@@ -40,20 +40,20 @@ export default function MonthsFilter() {
     indicator!.style.height = `${target.offsetHeight}px`;
 
     if (indicatorPosition === 0) {
-      indicator!.style.borderTopLeftRadius = '9999px';
-      indicator!.style.borderBottomLeftRadius = '9999px';
-      indicator!.style.borderTopRightRadius = '2500px';
-      indicator!.style.borderBottomRightRadius = '2500px';
+      indicator!.style.borderTopLeftRadius = "9999px";
+      indicator!.style.borderBottomLeftRadius = "9999px";
+      indicator!.style.borderTopRightRadius = "2500px";
+      indicator!.style.borderBottomRightRadius = "2500px";
     } else if (indicatorPosition === 11) {
-      indicator!.style.borderTopRightRadius = '9999px';
-      indicator!.style.borderBottomRightRadius = '9999px';
-      indicator!.style.borderTopLeftRadius = '2500px';
-      indicator!.style.borderBottomLeftRadius = '2500px';
+      indicator!.style.borderTopRightRadius = "9999px";
+      indicator!.style.borderBottomRightRadius = "9999px";
+      indicator!.style.borderTopLeftRadius = "2500px";
+      indicator!.style.borderBottomLeftRadius = "2500px";
     } else {
-      indicator!.style.borderTopLeftRadius = '9999px';
-      indicator!.style.borderBottomLeftRadius = '9999px';
-      indicator!.style.borderTopRightRadius = '9999px';
-      indicator!.style.borderBottomRightRadius = '9999px';
+      indicator!.style.borderTopLeftRadius = "9999px";
+      indicator!.style.borderBottomLeftRadius = "9999px";
+      indicator!.style.borderTopRightRadius = "9999px";
+      indicator!.style.borderBottomRightRadius = "9999px";
     }
   }, [indicatorPosition]);
 

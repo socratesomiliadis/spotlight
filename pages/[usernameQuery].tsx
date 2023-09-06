@@ -75,7 +75,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
     return (
       <>
         <Head>
-          <title>Error 404 (Not Founed)</title>
+          <title>Error 404 (Not Found)</title>
           <meta name="robots" content="nofollow, noindex" />
           <link href="/favicon.ico" rel="shortcut icon" />
           <meta
@@ -90,6 +90,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
             width={1920}
             height={1080}
             alt=""
+            priority
             className="w-full h-full object-cover absolute top-0 left-0"
           />
         </main>

@@ -1,115 +1,124 @@
-import * as React from "react";
 import Link from "next/link";
-
-import { cn } from "@/lib/utils";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/primitives/NavMenu";
-
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Alert Dialog",
-    href: "/docs/primitives/alert-dialog",
-    description:
-      "A modal dialog that interrupts the user with important content and expects a response.",
-  },
-  {
-    title: "Hover Card",
-    href: "/docs/primitives/hover-card",
-    description:
-      "For sighted users to preview content available behind a link.",
-  },
-  {
-    title: "Progress",
-    href: "/docs/primitives/progress",
-    description:
-      "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-  },
-  {
-    title: "Scroll-area",
-    href: "/docs/primitives/scroll-area",
-    description: "Visually or semantically separates content.",
-  },
-  {
-    title: "Tabs",
-    href: "/docs/primitives/tabs",
-    description:
-      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-  },
-  {
-    title: "Tooltip",
-    href: "/docs/primitives/tooltip",
-    description:
-      "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
-  },
-];
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { gsap } from "gsap";
 
 export function SpotlightNavigation() {
+  const [isHovering, setIsHovering] = useState<boolean>(false);
+
+  useEffect(() => {
+    const openTl = gsap.timeline({
+      paused: true,
+      defaults: {
+        duration: 0.4,
+        ease: "power4.Out",
+      },
+    });
+    // openTl.to("nav", { borderRadius: "1.5rem", duration: 1.2 });
+    openTl.to(".nav-content", {
+      height: "300px",
+    });
+    openTl.to(
+      "nav",
+      {
+        border: "1px solid #f6f6f6",
+      },
+      0
+    );
+    openTl.to(
+      "nav .nav-trigger",
+      {
+        backgroundColor: "transparent",
+      },
+      0
+    );
+    openTl.to(
+      "nav .nav-indicator",
+      {
+        rotate: "45deg",
+      },
+      0
+    );
+
+    const closeTl = gsap.timeline({
+      paused: true,
+      defaults: {
+        duration: 0.4,
+        ease: "power3.Out",
+      },
+    });
+    closeTl.to(".nav-content", {
+      height: "0",
+    });
+    // closeTl.to("nav", { borderRadius: "9999px", duration: 0.2 });
+    closeTl.to(
+      "nav",
+      {
+        border: "1px solid transparent",
+      },
+      0.1
+    );
+    closeTl.to(
+      "nav .nav-trigger",
+      {
+        duration: 1,
+        backgroundColor: "#D9D9D94F",
+      },
+      0.1
+    );
+    closeTl.to(
+      "nav .nav-indicator",
+      {
+        rotate: "0deg",
+      },
+      0
+    );
+
+    if (isHovering) {
+      openTl.restart();
+    } else {
+      closeTl.restart();
+    }
+
+    return () => {
+      openTl.kill();
+      closeTl.kill();
+    };
+  }, [isHovering]);
+
   return (
-    <div className="relative">
-      <NavigationMenu className="text-white">
-        <NavigationMenuList className="gap-2">
-          <NavigationMenuItem>
-            <Link href="/" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                <span className="-mb-1">Home</span>
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>
-              <span className="-mb-1">Components</span>
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                {components.map((component) => (
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    href={component.href}
-                  >
-                    {component.description}
-                  </ListItem>
-                ))}
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+    <nav
+      onMouseOver={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      className="absolute bg-white rounded-3xl overflow-hidden top-8 left-1/2 -translate-x-1/2 w-[40vw]"
+    >
+      <div className="nav-trigger border-b-[1px] border-[#f6f6f6] cursor-pointer w-full bg-[#D9D9D94F] h-12 flex flex-row items-center justify-between px-6">
+        <Link href="/" className="h-full flex items-center">
+          <Image
+            src="/static/images/Logo.png"
+            width={157}
+            height={37}
+            alt="Spotlight Logo"
+            className="h-[40%] invert object-contain object-left"
+          />
+        </Link>
+        <span className="nav-indicator w-5 text-black">
+          <svg
+            width="100%"
+            viewBox="0 0 23 23"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.25 0.99707V21.5032M21.503 11.2501H0.996952"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+      </div>
+      <div className="nav-content w-full h-0"></div>
+    </nav>
   );
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-slate-700 dark:focus:bg-slate-700",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none text-black">
-            {title}
-          </div>
-          <p className="line-clamp-2 text-sm leading-snug text-gray-500">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";

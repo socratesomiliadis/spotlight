@@ -2,7 +2,7 @@ import Image from "next/image";
 import { SpotlightNavigation } from "./Nav";
 import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
-import { acidGrotesk } from "@/pages/_app";
+import { acidGrotesk, inter } from "@/pages/_app";
 import { useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import {
@@ -43,39 +43,8 @@ export default function Header() {
   const { signOut } = useClerk();
   const { setIsProfilePopupOpen } = useProfilePopup();
   return (
-    <header className="absolute z-[999] w-screen top-0 py-8 flex flex-row items-center justify-between px-16">
-      <div className="flex flex-row gap-20">
-        <Link href="/">
-          <Image
-            src="/static/images/Logo.png"
-            width={157}
-            height={37}
-            alt="Spotlight Logo"
-            className="w-[150px] object-contain aspect-[157/37]"
-          />
-        </Link>
-        <SpotlightNavigation />
-      </div>
-      <div className="absolute left-1/2 -translate-x-1/2 search-bar flex flex-row items-center rounded-full text-white bg-white/10 backdrop-blur-md px-6 py-3 gap-6">
-        <svg
-          width="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M13 13L10.0375 10.0375M11.5 6.25C11.5 9.1495 9.1495 11.5 6.25 11.5C3.35051 11.5 1 9.1495 1 6.25C1 3.35051 3.35051 1 6.25 1C9.1495 1 11.5 3.35051 11.5 6.25Z"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-        <input
-          type="text"
-          placeholder="Search Spotlight Awards"
-          className="bg-transparent w-[320px] -mb-1 text-white focus:outline-none"
-        />
-      </div>
+    <header className="fixed z-[999] w-screen top-0 py-8 flex flex-row items-center justify-end px-16">
+      <SpotlightNavigation />
       <div className="header-btns flex flex-row items-center gap-6 text-white">
         <SignedIn>
           <DropdownMenu>
@@ -87,9 +56,7 @@ export default function Header() {
                 }`}</AvatarFallback> */}
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className={`mt-2 w-56 ${acidGrotesk.className}`}
-            >
+            <DropdownMenuContent className={`mt-2 w-56 ${inter.className}`}>
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
@@ -99,30 +66,30 @@ export default function Header() {
                   }
                 >
                   <User className="mr-2 h-4 w-4" />
-                  <span className="-mb-1">Profile</span>
+                  <span className="">Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setIsProfilePopupOpen(true)}>
                   <Settings className="mr-2 h-4 w-4" />
-                  <span className="-mb-1">Settings</span>
+                  <span className="">Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>
                   <CreditCard className="mr-2 h-4 w-4" />
-                  <span className="-mb-1">Billing</span>
+                  <span className="">Billing</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LifeBuoy className="mr-2 h-4 w-4" />
-                <span className="-mb-1">Support</span>
+                <span className="">Support</span>
               </DropdownMenuItem>
               <DropdownMenuItem disabled>
                 <Cloud className="mr-2 h-4 w-4" />
-                <span className="-mb-1">API</span>
+                <span className="">API</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span className="-mb-1">Log out</span>
+                <span className="">Log out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -130,7 +97,7 @@ export default function Header() {
 
         <SignedOut>
           <button
-            className="-mb-1 text-lg"
+            className=" text-lg"
             onClick={() => {
               router.push(`${router.asPath}?auth=signIn`);
             }}
@@ -141,9 +108,9 @@ export default function Header() {
 
         <Link
           href="/subscribe"
-          className="px-10 flex py-2 bg-white text-black text-lg rounded-full"
+          className="px-10 flex py-2 bg-[#D9D9D94F] text-black text-lg rounded-full"
         >
-          <span className="-mb-1">Subscribe</span>
+          <span className="">Subscribe</span>
         </Link>
       </div>
     </header>

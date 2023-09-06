@@ -1,17 +1,17 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 export default function StudioLine({
   image,
   title,
   link,
   type,
-  numOfAwards
+  numOfAwards,
 }: {
   image: string;
   title: string;
   link: string;
-  type: 'Individual' | 'Studio' | 'Freelancer';
+  type: "Individual" | "Studio" | "Freelancer";
   numOfAwards: number;
 }) {
   return (
@@ -47,10 +47,10 @@ export default function StudioLine({
       </div>
       <div className="flex flex-row items-center gap-6 font-medium text-xl">
         <span className="rounded-full flex px-10 py-3 border-[1px] border-black opacity-70">
-          <span className="-mb-1">{type}</span>
+          <span className="">{type}</span>
         </span>
         <span className="rounded-full flex px-10 py-3 border-[1px] border-black">
-          <span className="-mb-1">{`${numOfAwards} Awards`}</span>
+          <span className="">{`${numOfAwards} Awards`}</span>
         </span>
       </div>
     </Link>
