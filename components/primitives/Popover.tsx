@@ -2,7 +2,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@/lib/utils";
-import { acidGrotesk, inter } from "@/pages/_app";
+import { inter } from "@/pages/_app";
 
 const Popover = PopoverPrimitive.Root;
 

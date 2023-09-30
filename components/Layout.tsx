@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import ProfilePopupProvider from "@/hooks/useProfilePopup";
 import ProfilePopup from "./ProfilePopup/ProfilePopup";
 import { Toaster } from "sonner";
+import Footer from "./Footer";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { isPreloading, setIsPreloading, isInApp, setIsInApp } = usePreloader();
@@ -38,6 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }}
           />
           {children}
+          <Footer />
         </div>
       </ProfilePopupProvider>
     </>

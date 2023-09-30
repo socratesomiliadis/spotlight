@@ -2,9 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { gsap } from "gsap";
+import { useHeaderTheme } from "@/hooks/useHeaderTheme";
 
 export function SpotlightNavigation() {
   const [isHovering, setIsHovering] = useState<boolean>(false);
+  const { headerTheme } = useHeaderTheme();
 
   useEffect(() => {
     const openTl = gsap.timeline({
@@ -21,17 +23,11 @@ export function SpotlightNavigation() {
     openTl.to(
       "nav",
       {
-        border: "1px solid #f6f6f6",
+        border: "1px solid #f6f6f610",
       },
       0
     );
-    openTl.to(
-      "nav .nav-trigger",
-      {
-        backgroundColor: "transparent",
-      },
-      0
-    );
+
     openTl.to(
       "nav .nav-indicator",
       {
@@ -59,14 +55,6 @@ export function SpotlightNavigation() {
       0.1
     );
     closeTl.to(
-      "nav .nav-trigger",
-      {
-        duration: 1,
-        backgroundColor: "#D9D9D94F",
-      },
-      0.1
-    );
-    closeTl.to(
       "nav .nav-indicator",
       {
         rotate: "0deg",
@@ -90,19 +78,27 @@ export function SpotlightNavigation() {
     <nav
       onMouseOver={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
-      className="absolute bg-white rounded-3xl overflow-hidden top-8 left-1/2 -translate-x-1/2 w-[40vw]"
+      className="absolute group bg-[#d9d9d9]/40 backdrop-blur-xl rounded-3xl overflow-hidden top-8 left-1/2 -translate-x-1/2 w-[40vw]"
     >
-      <div className="nav-trigger border-b-[1px] border-[#f6f6f6] cursor-pointer w-full bg-[#D9D9D94F] h-12 flex flex-row items-center justify-between px-6">
+      <div className="nav-trigger border-b-[1px] border-transparent transition-[border-color] duration-100 ease-out group-hover:border-[#f6f6f6]/10 cursor-pointer w-full h-12 flex flex-row items-center justify-between px-6">
         <Link href="/" className="h-full flex items-center">
           <Image
+            style={{
+              filter: headerTheme === "dark" ? "invert(1)" : "invert(0)",
+            }}
             src="/static/images/Logo.png"
             width={157}
             height={37}
             alt="Spotlight Logo"
-            className="h-[40%] invert object-contain object-left"
+            className="h-[40%] object-contain object-left"
           />
         </Link>
-        <span className="nav-indicator w-5 text-black">
+        <span
+          style={{
+            color: headerTheme === "dark" ? "#000" : "#fff",
+          }}
+          className="nav-indicator w-5 text-white"
+        >
           <svg
             width="100%"
             viewBox="0 0 23 23"

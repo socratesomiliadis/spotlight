@@ -1,9 +1,8 @@
 import Image from "next/image";
 import { SpotlightNavigation } from "./Nav";
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/router";
-import { acidGrotesk, inter } from "@/pages/_app";
-import { useClerk } from "@clerk/nextjs";
+import { inter } from "@/pages/_app";
 import Link from "next/link";
 import {
   Avatar,
@@ -36,12 +35,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/primitives/Dropdown";
 import { useProfilePopup } from "@/hooks/useProfilePopup";
+import { useHeaderTheme } from "@/hooks/useHeaderTheme";
+import { useEffect } from "react";
 
 export default function Header() {
   const router = useRouter();
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const { setIsProfilePopupOpen } = useProfilePopup();
+  const { headerTheme } = useHeaderTheme();
+
+  useEffect(() => {
+    console.log(headerTheme);
+  }, [headerTheme]);
+
   return (
     <header className="fixed z-[999] w-screen top-0 py-8 flex flex-row items-center justify-end px-16">
       <SpotlightNavigation />
@@ -97,18 +104,24 @@ export default function Header() {
 
         <SignedOut>
           <button
-            className=" text-lg"
+            style={{
+              color: headerTheme === "dark" ? "#000" : "#fff",
+            }}
+            className="text-lg"
             onClick={() => {
               router.push(`${router.asPath}?auth=signIn`);
             }}
           >
-            Sign In
+            Sign In 
           </button>
         </SignedOut>
 
         <Link
           href="/subscribe"
-          className="px-10 flex py-2 bg-[#D9D9D94F] text-black text-lg rounded-full"
+          style={{
+            color: headerTheme === "dark" ? "#000" : "#fff",
+          }}
+          className="px-10 backdrop-blur-xl flex py-2 bg-[#d9d9d94a] text-black text-lg rounded-full"
         >
           <span className="">Subscribe</span>
         </Link>

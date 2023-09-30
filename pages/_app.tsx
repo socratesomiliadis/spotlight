@@ -1,31 +1,15 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { ClerkProvider } from "@clerk/nextjs";
-import localFont from "next/font/local";
 import Layout from "@/components/Layout";
 import PreloaderProvider from "@/hooks/usePreloader";
 import AuthPopupProvider from "@/hooks/useAuthPopup";
 import { MyUserContextProvider } from "@/utils/getUser";
 import { Inter } from "next/font/google";
 import { NextUIProvider } from "@nextui-org/react";
+import HeaderThemeProvider from "@/hooks/useHeaderTheme";
 
 export const inter = Inter({ subsets: ["latin"], display: "swap" });
-
-export const acidGrotesk = localFont({
-  src: [
-    {
-      path: "./fonts/AcidGrotesk-Normal.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "./fonts/AcidGrotesk-Regular.woff2",
-      weight: "500",
-      style: "normal",
-    },
-  ],
-  display: "swap",
-});
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -43,7 +27,8 @@ export default function App({ Component, pageProps }: AppProps) {
       {...pageProps}
     >
       <div className={`${inter.className} font-wrapper`}>
-        <MyUserContextProvider>
+        {/* <MyUserContextProvider> */}
+        <HeaderThemeProvider>
           <PreloaderProvider>
             <NextUIProvider>
               <AuthPopupProvider>
@@ -53,7 +38,8 @@ export default function App({ Component, pageProps }: AppProps) {
               </AuthPopupProvider>
             </NextUIProvider>
           </PreloaderProvider>
-        </MyUserContextProvider>
+        </HeaderThemeProvider>
+        {/* </MyUserContextProvider> */}
       </div>
     </ClerkProvider>
   );
