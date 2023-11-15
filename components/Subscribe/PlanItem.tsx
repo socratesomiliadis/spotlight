@@ -4,7 +4,7 @@ import { Price } from "@/types";
 
 import { postData } from "@/utils/helpers";
 import { getStripe } from "@/utils/stripe-client";
-import { useUser } from "@/utils/getUser";
+// import { useUser } from "@/utils/getUser";
 
 export default function PlanItem({
   planName,
@@ -22,29 +22,27 @@ export default function PlanItem({
   price: Price | undefined;
 }) {
   const router = useRouter();
-  const { user, userDetails, subscription } = useUser();
+  // const { user, userDetails, subscription } = useUser();
   const handleCheckout = async () => {
     // setPriceIdLoading(price.id);
-    if (!user) {
-      return router.push("/signin");
-    }
-    if (subscription) {
-      return router.push("/account");
-    }
-
-    try {
-      const { sessionId } = await postData({
-        url: "/api/create-checkout-session",
-        data: price ? { price } : undefined,
-      });
-
-      const stripe = await getStripe();
-      stripe?.redirectToCheckout({ sessionId });
-    } catch (error) {
-      return alert((error as Error)?.message);
-    } finally {
-      //   setPriceIdLoading(undefined);
-    }
+    // if (!user) {
+    //   return router.push("/signin");
+    // }
+    // if (subscription) {
+    //   return router.push("/account");
+    // }
+    // try {
+    //   const { sessionId } = await postData({
+    //     url: "/api/create-checkout-session",
+    //     data: price ? { price } : undefined,
+    //   });
+    //   const stripe = await getStripe();
+    //   stripe?.redirectToCheckout({ sessionId });
+    // } catch (error) {
+    //   return alert((error as Error)?.message);
+    // } finally {
+    //   //   setPriceIdLoading(undefined);
+    // }
   };
 
   return (

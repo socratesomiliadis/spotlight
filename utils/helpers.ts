@@ -1,4 +1,3 @@
-import { useAuth } from "@clerk/clerk-react";
 import { createClient } from "@supabase/supabase-js";
 import { Price } from "@/types";
 
