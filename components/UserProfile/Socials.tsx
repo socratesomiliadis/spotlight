@@ -63,7 +63,7 @@ export default function Socials({ links }: { links: any }) {
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-fit p-4 flex flex-col gap-4">
-        {links.twitter && (
+        {links?.twitter && (
           <SocialLink
             color="#1D9BF0"
             icon={
@@ -83,7 +83,7 @@ export default function Socials({ links }: { links: any }) {
             link={`https://twitter.com/${links.twitter}`}
           />
         )}
-        {links.read_cv && (
+        {links?.read_cv && (
           <SocialLink
             color="#fff"
             icon={
@@ -110,7 +110,7 @@ export default function Socials({ links }: { links: any }) {
             link={`https://read.cv/${links.read_cv}`}
           />
         )}
-        {links.linkedin && (
+        {links?.linkedin && (
           <SocialLink
             color="#0a66c2"
             icon={
@@ -147,7 +147,7 @@ export default function Socials({ links }: { links: any }) {
             link={`https://linkedin.com/in/${links.linkedin}`}
           />
         )}
-        {links.instagram && (
+        {links?.instagram && (
           <SocialLink
             color="#fd01c4"
             icon={<Instagram stroke="#fff" />}
@@ -155,7 +155,7 @@ export default function Socials({ links }: { links: any }) {
             link={`https://instagram.com/${links.instagram}`}
           />
         )}
-        {links.behance && (
+        {links?.behance && (
           <SocialLink
             color="#1769FF"
             icon={

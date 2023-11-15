@@ -40,6 +40,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.46.2",
+    "react-verification-input": "^4.0.0",
     "sonner": "^0.7.4",
     "split-type": "^0.3.3",
     "stripe": "^13.8.0",

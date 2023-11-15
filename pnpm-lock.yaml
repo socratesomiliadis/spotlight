@@ -98,6 +98,9 @@ dependencies:
   react-hook-form:
     specifier: ^7.46.2
     version: 7.46.2(react@18.2.0)
+  react-verification-input:
+    specifier: ^4.0.0
+    version: 4.0.0(react-dom@18.2.0)(react@18.2.0)
   sonner:
     specifier: ^0.7.4
     version: 0.7.4(react-dom@18.2.0)(react@18.2.0)
@@ -5917,6 +5920,16 @@ packages:
       use-latest: 1.2.1(@types/react@18.2.21)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
+    dev: false
+
+  /react-verification-input@4.0.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-P69fAaKzp+7wDJFdNwwb0x/LZ4RCnsckhxTXNdOWSe4HbvhB0b/9ppH6PxBbR615KXouJGE3lrUSguO1t49cPw==}
+    peerDependencies:
+      react: 16.8.0 - 18.x.x
+      react-dom: 16.8.0 - 18.x.x
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /react@18.2.0:
