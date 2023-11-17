@@ -2,7 +2,7 @@ import TabMenu from "./TabMenu";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import ProfileTab from "./ProfileTab";
-
+import { useUser } from "@clerk/nextjs";
 export type menuLinkType = {
   key: string;
   label: string;
@@ -22,6 +22,7 @@ const MenuLinks = [
 ];
 
 export default function Account() {
+  const { isLoaded } = useUser();
   const { push, query } = useRouter();
 
   const selectedTab = query.tab ?? "profile";
@@ -44,7 +45,7 @@ export default function Account() {
   return (
     <div className="bg-white w-screen h-screen pt-44 flex flex-col items-center">
       <TabMenu menuLinks={MenuLinks} />
-      <ProfileTab />
+      {isLoaded && <ProfileTab />}
     </div>
   );
 }

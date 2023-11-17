@@ -14,12 +14,12 @@ import { AnimatePresence, motion } from "framer-motion";
 // import PhoneInput from "@/components/PhoneInput";
 import { CircularProgress } from "@nextui-org/react";
 import { countries } from "@/lib/countries";
+import { inter } from "@/pages/_app";
 
 export default function ProfileTab() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { isLoaded, user } = useUser();
-  const [pendingVerification, setPendingVerification] = useState(false);
 
   const [clerkErrors, setClerkErrors] = useState<any>(null);
 
@@ -29,7 +29,20 @@ export default function ProfileTab() {
     reset,
     control,
     formState: { errors },
-  } = useForm({});
+  } = useForm({
+    defaultValues: {
+      username: user?.username?.toString(),
+      displayName: user?.firstName?.toString(),
+      websiteURL: user?.unsafeMetadata?.websiteURL?.toString(),
+      role: user?.unsafeMetadata?.role?.toString(),
+      country: user?.unsafeMetadata?.country?.toString(),
+      tagline: user?.unsafeMetadata?.tagline?.toString(),
+    },
+  });
+
+  useEffect(() => {
+    console.log(user?.username);
+  }, [user]);
 
   if (!isLoaded) {
     return null;
@@ -49,6 +62,9 @@ export default function ProfileTab() {
         firstName: data.displayName,
         unsafeMetadata: {
           country: data.country,
+          websiteURL: data.websiteURL,
+          role: data.role,
+          tagline: data.tagline,
         },
       });
 
@@ -63,8 +79,6 @@ export default function ProfileTab() {
       console.error(JSON.stringify(err, null, 2));
     }
   };
-
-  if (!isLoaded) return null;
 
   return (
     <motion.div
@@ -91,221 +105,256 @@ export default function ProfileTab() {
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="mt-6 grid grid-cols-2 gap-8 w-full"
+          className="mt-6 flex flex-col items-end gap-8 w-full"
         >
-          <Input
-            type="text"
-            label="Username"
-            size="lg"
-            disableAnimation
-            labelPlacement="outside"
-            defaultValue={user?.username?.toString()}
-            errorMessage={
-              errors.username &&
-              "Your username must be at least 3 characters long"
-            }
-            startContent={
-              <span className="text-[#ACACAC] text-sm">spotlight.com/@</span>
-            }
-            className="spotlight-input w-full"
-            isInvalid={!!errors.username}
-            classNames={{
-              //   innerWrapper: ["py-6"],
-              inputWrapper: [
-                "bg-white pl-6 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
-              ],
-              input: ["font-medium text-sm data-[has-start-content=true]:ps-0"],
-            }}
-            {...register("username", {
-              required: true,
-              validate: (value) => value.length >= 3,
-            })}
-          />
-          <Input
-            type="text"
-            label="Display Name"
-            labelPlacement="outside"
-            size="lg"
-            disableAnimation
-            defaultValue={user?.firstName?.toString()}
-            errorMessage={
-              errors.displayName &&
-              "Your display name must be at least 3 characters long"
-            }
-            className="spotlight-input w-full"
-            isInvalid={!!errors.displayName}
-            classNames={{
-              inputWrapper: [
-                "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
-              ],
-              input: ["font-medium text-sm"],
-            }}
-            {...register("displayName", {
-              required: true,
-              validate: (value) => value.length >= 3,
-            })}
-          />
-          <Input
-            type="text"
-            label="Website URL"
-            placeholder="https://example.com"
-            labelPlacement="outside"
-            size="lg"
-            disableAnimation
-            defaultValue={user?.unsafeMetadata?.websiteURL?.toString()}
-            errorMessage={
-              errors.displayName &&
-              "Your display name must be at least 3 characters long"
-            }
-            className="spotlight-input w-full"
-            isInvalid={!!errors.displayName}
-            classNames={{
-              inputWrapper: [
-                "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
-              ],
-              input: [
-                "font-medium text-sm placeholder:text-[#ACACAC] placeholder:font-normal",
-              ],
-            }}
-            {...register("websiteURL", {
-              required: true,
-              pattern:
-                /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g,
-            })}
-          />
-          <Controller
-            control={control}
-            name="role"
-            render={({ field: { onChange, onBlur, value, name, ref } }) => (
-              <Select
-                label="What are you?"
-                labelPlacement="outside"
-                size="lg"
-                className="spotlight-select"
-                onChange={onChange}
-                selectedKeys={[value]}
-                //@ts-expect-error
-                defaultSelectedKeys={[
-                  user?.unsafeMetadata?.role ?? "Individual",
-                ]}
-                placeholder="Your role"
-                classNames={{
-                  trigger: [
-                    "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
-                  ],
-                  popoverContent: [
-                    "bg-white px-3 py-2 border-[1px] border-[#E2E2E2] rounded-2xl shadow",
-                  ],
-                }}
-              >
-                <SelectItem
-                  style={{
-                    fontFamily: "Inter",
-                  }}
-                  className="px-4 data-[hover=true]:bg-[#F6F6F6] spotlight-select-item"
-                  key="Individual"
-                  textValue="Individual"
-                >
-                  <span className="text-lg">Individual</span>
-                </SelectItem>
-                <SelectItem
-                  style={{
-                    fontFamily: "Inter",
-                  }}
-                  key="Studio"
-                  className="px-4 data-[hover=true]:bg-[#F6F6F6] spotlight-select-item"
-                  textValue="Studio"
-                >
-                  <span className="text-lg"> Studio</span>
-                </SelectItem>
-              </Select>
-            )}
-          />
-          <Controller
-            control={control}
-            name="country"
-            render={({ field: { onChange, onBlur, value, name, ref } }) => (
-              <Autocomplete
-                label="Country"
-                labelPlacement="outside"
-                size="lg"
-                className="spotlight-input"
-                onChange={onChange}
-                selectedKeys={[value]}
-                defaultSelectedKeys={
-                  user?.unsafeMetadata?.country
-                    ? [user?.unsafeMetadata?.country]
-                    : []
-                }
-                placeholder="Your country"
-                inputProps={{
-                  classNames: {
-                    inputWrapper: [
+          <div className="grid grid-cols-2 gap-8 w-full">
+            <Input
+              type="text"
+              label="Username"
+              size="lg"
+              disableAnimation
+              labelPlacement="outside"
+              defaultValue={user?.username?.toString()}
+              errorMessage={
+                errors.username &&
+                "Your username must be at least 3 characters long"
+              }
+              startContent={
+                <span className="text-[#ACACAC] text-sm">spotlight.com/@</span>
+              }
+              className="spotlight-input w-full"
+              isInvalid={!!errors.username}
+              classNames={{
+                //   innerWrapper: ["py-6"],
+                inputWrapper: [
+                  "bg-white pl-6 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
+                ],
+                input: [
+                  "font-medium text-sm data-[has-start-content=true]:ps-0",
+                ],
+              }}
+              {...register("username", {
+                required: true,
+                validate: (value) => !!value && value.length >= 3,
+              })}
+            />
+            <Input
+              type="text"
+              label="Display Name"
+              labelPlacement="outside"
+              size="lg"
+              disableAnimation
+              defaultValue={user?.firstName?.toString()}
+              errorMessage={
+                errors.displayName &&
+                "Your display name must be at least 3 characters long"
+              }
+              className="spotlight-input w-full"
+              isInvalid={!!errors.displayName}
+              classNames={{
+                inputWrapper: [
+                  "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
+                ],
+                input: ["font-medium text-sm"],
+              }}
+              {...register("displayName", {
+                required: true,
+                validate: (value) => !!value && value.length >= 3,
+              })}
+            />
+            <Input
+              type="text"
+              label="Website URL"
+              placeholder="https://example.com"
+              labelPlacement="outside"
+              size="lg"
+              disableAnimation
+              defaultValue={user?.unsafeMetadata?.websiteURL?.toString()}
+              errorMessage={
+                errors.displayName &&
+                "Your display name must be at least 3 characters long"
+              }
+              className="spotlight-input w-full"
+              isInvalid={!!errors.displayName}
+              classNames={{
+                inputWrapper: [
+                  "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
+                ],
+                input: [
+                  "font-medium text-sm placeholder:text-[#ACACAC] placeholder:font-normal",
+                ],
+              }}
+              {...register("websiteURL", {
+                required: true,
+                pattern:
+                  /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g,
+              })}
+            />
+            <Controller
+              control={control}
+              name="role"
+              render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                <Select
+                  label="What are you?"
+                  labelPlacement="outside"
+                  size="lg"
+                  className="spotlight-select"
+                  onChange={onChange}
+                  selectedKeys={value ? [value] : []}
+                  placeholder="Your role"
+                  classNames={{
+                    trigger: [
                       "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
                     ],
-                    input: [
-                      "font-medium text-sm placeholder:text-[#ACACAC] placeholder:font-normal",
+                    popoverContent: [
+                      "bg-white px-3 py-2 border-[1px] border-[#E2E2E2] rounded-2xl shadow",
                     ],
-                  },
-                }}
-                classNames={{
-                  popoverContent: [
-                    "bg-white px-3 py-2 border-[1px] border-[#E2E2E2] rounded-2xl shadow",
-                  ],
-                }}
-              >
-                {countries.map((country) => (
-                  <AutocompleteItem
+                  }}
+                >
+                  <SelectItem
                     style={{
                       fontFamily: "Inter",
                     }}
                     className="px-4 data-[hover=true]:bg-[#F6F6F6] spotlight-select-item"
-                    key={country.code}
-                    textValue={country.name}
-                    startContent={
-                      <Avatar
-                        alt={`${country.name} flag`}
-                        className="w-6 h-6"
-                        src={`https://flagcdn.com/${country.code.toLowerCase()}.svg`}
-                      />
-                    }
+                    key="Individual"
+                    textValue="Individual"
                   >
-                    <span className="text-lg">{country.name}</span>
-                  </AutocompleteItem>
-                ))}
-              </Autocomplete>
-            )}
-          />
-          {/* <PhoneInput
-            register={register}
-            countryCode={countryCode}
-            setCountryCode={setCountryCode}
-            countryName={countryName}
-            setCountryName={setCountryName}
-            //@ts-expect-error
-            defaultCountry={user?.unsafeMetadata?.country}
-            //@ts-expect-error
-            defaultPhoneNumberWithCode={user?.unsafeMetadata?.phone_number}
-            //@ts-expect-error
-            hasError={errors.phoneNumber}
-            width="500px"
-          /> */}
+                    <span className="text-lg">Individual</span>
+                  </SelectItem>
+                  <SelectItem
+                    style={{
+                      fontFamily: "Inter",
+                    }}
+                    key="Studio"
+                    className="px-4 data-[hover=true]:bg-[#F6F6F6] spotlight-select-item"
+                    textValue="Studio"
+                  >
+                    <span className="text-lg"> Studio</span>
+                  </SelectItem>
+                </Select>
+              )}
+            />
+            <Controller
+              control={control}
+              name="country"
+              render={({ field: { onChange, onBlur, value, name, ref } }) => (
+                <Autocomplete
+                  label="Country"
+                  labelPlacement="outside"
+                  size="lg"
+                  className="spotlight-input"
+                  onSelectionChange={onChange}
+                  selectedKey={value}
+                  placeholder="Your country"
+                  inputProps={{
+                    classNames: {
+                      inputWrapper: [
+                        "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
+                      ],
+                      input: [
+                        "font-medium text-sm placeholder:text-[#ACACAC] placeholder:font-normal",
+                      ],
+                    },
+                  }}
+                  classNames={{
+                    popoverContent: [
+                      "bg-white px-3 py-2 border-[1px] border-[#E2E2E2] rounded-2xl shadow",
+                    ],
+                  }}
+                >
+                  {countries.map((country) => (
+                    <AutocompleteItem
+                      style={inter.style}
+                      className="px-4 data-[hover=true]:bg-[#F6F6F6] spotlight-select-item"
+                      key={country.name}
+                      textValue={country.name}
+                      startContent={
+                        <Avatar
+                          alt={`${country.name} flag`}
+                          className="w-6 h-6"
+                          src={`https://flagcdn.com/${country.code.toLowerCase()}.svg`}
+                        />
+                      }
+                    >
+                      <span className="text-lg">{country.name}</span>
+                    </AutocompleteItem>
+                  ))}
+                </Autocomplete>
+              )}
+            />
+            <Input
+              type="text"
+              label="Tagline"
+              placeholder="Your tagline"
+              labelPlacement="outside"
+              size="lg"
+              disableAnimation
+              className="spotlight-input w-full"
+              classNames={{
+                inputWrapper: [
+                  "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
+                ],
+                input: [
+                  "font-medium text-sm placeholder:text-[#ACACAC] placeholder:font-normal",
+                ],
+              }}
+              {...register("tagline")}
+            />
+          </div>
 
           <button
             type="submit"
-            className="px-6 py-2 rounded-full bg-white text-black text-sm flex flex-row items-center gap-3"
+            className="mt-4 w-fit place-self-end group rounded-[1.5rem] bg-black relative text-white text-sm flex flex-row items-center gap-3"
           >
-            {loading && (
-              <CircularProgress
-                size="sm"
-                color="default"
-                aria-label="Loading..."
-                classNames={{
-                  svg: "w-4 h-4",
-                }}
-              />
-            )}
-            <span>Save changes</span>
+            <div className="z-[2] flex items-center gap-12 w-full pl-16 pr-3">
+              <span className="z-[1] py-4 text-lg font-medium">Save</span>
+              <div className="bg-white overflow-hidden group-hover:scale-[1.1] transition-transform duration-300 ease-out relative w-10 h-10 rounded-xl z-[1] flex items-center justify-center">
+                {loading ? (
+                  <CircularProgress
+                    size="sm"
+                    color="default"
+                    aria-label="Loading..."
+                    className="z-[1]"
+                    classNames={{
+                      svg: "w-4 h-4",
+                    }}
+                  />
+                ) : (
+                  <>
+                    <svg
+                      width="32%"
+                      viewBox="0 0 11 9"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="absolute transition-transform duration-250 ease-soft-spring group-hover:translate-x-[220%] arrow-default"
+                    >
+                      <path
+                        d="M6.54942 1.17541L9.95703 4.58301M9.95703 4.58301L6.54942 7.99063M9.95703 4.58301L0.870074 4.58301"
+                        stroke="black"
+                        strokeWidth="1.13587"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <svg
+                      width="32%"
+                      viewBox="0 0 11 9"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="absolute translate-x-[-220%] transition-transform duration-250 ease-soft-spring group-hover:translate-x-0 arrow-hover"
+                    >
+                      <path
+                        d="M6.54942 1.17541L9.95703 4.58301M9.95703 4.58301L6.54942 7.99063M9.95703 4.58301L0.870074 4.58301"
+                        stroke="black"
+                        strokeWidth="1.13587"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </>
+                )}
+              </div>
+            </div>
           </button>
           {clerkErrors && (
             <span className="text-sm text-red-500">{clerkErrors}</span>
