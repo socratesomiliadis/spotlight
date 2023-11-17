@@ -14,7 +14,7 @@ export default authMiddleware({
 
     // redirect them to organization selection page
   },
-  publicRoutes: ["/", "/auth(.*)", "/@(.*)", "/subscribe"],
+  publicRoutes: ["/", "/auth(.*)", "/@(.*)", "/subscribe", "/api(.*)"],
   signInUrl: "/auth/sign-in",
 });
 

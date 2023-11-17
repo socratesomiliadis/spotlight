@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { useSignUp, useUser } from "@clerk/nextjs";
-import { useEffect, useMemo, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   Input,
@@ -10,7 +10,7 @@ import {
   AutocompleteItem,
   Avatar,
 } from "@nextui-org/react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 // import PhoneInput from "@/components/PhoneInput";
 import { CircularProgress } from "@nextui-org/react";
 import { countries } from "@/lib/countries";
@@ -31,28 +31,24 @@ export default function ProfileTab() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      username: user?.username?.toString(),
-      displayName: user?.firstName?.toString(),
-      websiteURL: user?.unsafeMetadata?.websiteURL?.toString(),
-      role: user?.unsafeMetadata?.role?.toString(),
-      country: user?.unsafeMetadata?.country?.toString(),
-      tagline: user?.unsafeMetadata?.tagline?.toString(),
+      username: user?.username ?? "",
+      displayName: user?.firstName?.toString() ?? "",
+      websiteURL: user?.unsafeMetadata?.websiteURL ?? "",
+      role: user?.unsafeMetadata?.role ?? "Individual",
+      country: user?.unsafeMetadata?.country ?? "",
+      tagline: user?.unsafeMetadata?.tagline ?? "",
     },
   });
 
-  useEffect(() => {
-    console.log(user?.username);
-  }, [user]);
-
-  if (!isLoaded) {
-    return null;
-  }
-
   const onSubmit = async (data: any, e: any) => {
+    console.log("here");
     e.preventDefault();
+
     if (!isLoaded) {
       return;
     }
+
+    console.log("here loaded");
     setClerkErrors(null);
     setLoading(true);
 
@@ -68,10 +64,6 @@ export default function ProfileTab() {
         },
       });
 
-      // send the email.
-      //   await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // change the UI to our pending section.
       setLoading(false);
     } catch (err: any) {
       setLoading(false);
@@ -171,11 +163,10 @@ export default function ProfileTab() {
               disableAnimation
               defaultValue={user?.unsafeMetadata?.websiteURL?.toString()}
               errorMessage={
-                errors.displayName &&
-                "Your display name must be at least 3 characters long"
+                errors.websiteURL && "Please provide a valid website URL"
               }
               className="spotlight-input w-full"
-              isInvalid={!!errors.displayName}
+              isInvalid={!!errors.websiteURL}
               classNames={{
                 inputWrapper: [
                   "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
@@ -185,7 +176,7 @@ export default function ProfileTab() {
                 ],
               }}
               {...register("websiteURL", {
-                required: true,
+                required: false,
                 pattern:
                   /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g,
               })}
@@ -200,8 +191,10 @@ export default function ProfileTab() {
                   size="lg"
                   className="spotlight-select"
                   onChange={onChange}
-                  selectedKeys={value ? [value] : []}
+                  //@ts-expect-error
+                  selectedKeys={!!value ? [value] : []}
                   placeholder="Your role"
+                  defaultSelectedKeys={["Individual"]}
                   classNames={{
                     trigger: [
                       "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
@@ -244,6 +237,7 @@ export default function ProfileTab() {
                   size="lg"
                   className="spotlight-input"
                   onSelectionChange={onChange}
+                  //@ts-expect-error
                   selectedKey={value}
                   placeholder="Your country"
                   inputProps={{
@@ -301,7 +295,6 @@ export default function ProfileTab() {
               {...register("tagline")}
             />
           </div>
-
           <button
             type="submit"
             className="mt-4 w-fit place-self-end group rounded-[1.5rem] bg-black relative text-white text-sm flex flex-row items-center gap-3"
