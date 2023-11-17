@@ -49,7 +49,7 @@ export default function AuthLayout({
               width={1500 / 4}
               height={2060 / 4}
               alt=""
-              className="w-auto h-[85%] z-0 blur-[200px] transform-gpu absolute rounded-2xl object-cover"
+              className="w-auto h-[85%] z-0 blur-[150px] transform-gpu absolute rounded-2xl object-cover"
             />
           </div>
           <div className="right-side h-full w-1/2 relative flex items-center justify-center">

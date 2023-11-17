@@ -270,7 +270,7 @@ export default function SignUp() {
                 <span className="z-[1] py-6 text-2xl font-medium">
                   Join Spotlight
                 </span>
-                <div className="bg-white relative w-12 h-12 rounded-xl z-[1] flex items-center justify-center">
+                <div className="bg-white overflow-hidden group-hover:scale-[1.1] transition-transform duration-300 ease-out relative w-12 h-12 rounded-xl z-[1] flex items-center justify-center">
                   {loading ? (
                     <CircularProgress
                       size="sm"
@@ -282,20 +282,38 @@ export default function SignUp() {
                       }}
                     />
                   ) : (
-                    <svg
-                      width="32%"
-                      viewBox="0 0 11 9"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6.54942 1.17541L9.95703 4.58301M9.95703 4.58301L6.54942 7.99063M9.95703 4.58301L0.870074 4.58301"
-                        stroke="black"
-                        strokeWidth="1.13587"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <>
+                      <svg
+                        width="32%"
+                        viewBox="0 0 11 9"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="absolute transition-transform duration-250 ease-soft-spring group-hover:translate-x-[220%] arrow-default"
+                      >
+                        <path
+                          d="M6.54942 1.17541L9.95703 4.58301M9.95703 4.58301L6.54942 7.99063M9.95703 4.58301L0.870074 4.58301"
+                          stroke="black"
+                          strokeWidth="1.13587"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <svg
+                        width="32%"
+                        viewBox="0 0 11 9"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="absolute translate-x-[-220%] transition-transform duration-250 ease-soft-spring group-hover:translate-x-0 arrow-hover"
+                      >
+                        <path
+                          d="M6.54942 1.17541L9.95703 4.58301M9.95703 4.58301L6.54942 7.99063M9.95703 4.58301L0.870074 4.58301"
+                          stroke="black"
+                          strokeWidth="1.13587"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </>
                   )}
                 </div>
               </div>

@@ -61,7 +61,7 @@ export default function OnBoarding() {
             ease: "easeOut",
           },
         }}
-        className="bg-white sign-up flex items-center justify-center"
+        className="sign-up flex items-center justify-center"
       >
         <SignUp />
       </motion.div>
