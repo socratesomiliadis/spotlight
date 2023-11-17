@@ -1,5 +1,5 @@
 import AwardItem from "./AwardItem";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import gsap from "gsap";
 import Link from "next/link";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
@@ -10,7 +10,8 @@ export default function ExploreAwards() {
   const { headerTheme, setHeaderTheme } = useHeaderTheme();
   const [showMore, setShowMore] = useState<boolean>(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    setHeaderTheme("light");
     ScrollTrigger.create({
       trigger: ".explore-section",
       start: "top 3%",

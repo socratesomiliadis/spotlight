@@ -7,7 +7,7 @@ interface HeaderThemeContextType {
 }
 
 export const HeaderThemeContext = createContext<HeaderThemeContextType>({
-  headerTheme: "light",
+  headerTheme: "dark",
   setHeaderTheme: () => {},
 });
 
@@ -20,7 +20,7 @@ export default function HeaderThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [headerTheme, setHeaderTheme] = useState<"light" | "dark">("light");
+  const [headerTheme, setHeaderTheme] = useState<"light" | "dark">("dark");
 
   return (
     <HeaderThemeContext.Provider value={{ headerTheme, setHeaderTheme }}>

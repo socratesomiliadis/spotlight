@@ -27,8 +27,7 @@ export interface UserDetails {
   avatar_url?: string | null;
   banner_url?: string | null;
   created_at: string | null;
-  first_name?: string | null;
-  last_name: string | null;
+  display_name?: string | null;
   location?: string | null;
   occupation?: string | null;
   tagline?: string | null;

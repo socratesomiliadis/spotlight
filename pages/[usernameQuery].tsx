@@ -63,8 +63,7 @@ export default function ProfilePage({ profileData }: { profileData: any }) {
             profileImg={profileData?.avatar_url}
             profileLoaded={profileLoaded}
             username={profileData?.username}
-            firstName={profileData?.first_name}
-            lastName={profileData?.last_name}
+            displayName={profileData?.display_name}
             tagline={profileData?.tagline}
             socials={profileData?.socials}
           />

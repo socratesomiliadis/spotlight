@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { useSignIn } from "@clerk/nextjs";
-import { useState, useMemo } from "react";
+import { useSignIn, useUser } from "@clerk/nextjs";
+import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "@nextui-org/react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,6 +10,7 @@ import Link from "next/link";
 
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
+  const { isSignedIn } = useUser();
   const router = useRouter();
   const { signIn, isLoaded, setActive } = useSignIn();
   const [isVisible, setIsVisible] = useState(false);
@@ -29,7 +30,13 @@ export default function SignIn() {
     formState: { errors },
   } = useForm();
 
-  if (!isLoaded) {
+  useEffect(() => {
+    if (isSignedIn) {
+      router.push(redirectURL);
+    }
+  }, [isSignedIn]);
+
+  if (!isLoaded || isSignedIn) {
     return null;
   }
 

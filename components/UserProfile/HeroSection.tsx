@@ -15,8 +15,7 @@ export default function HeroSection({
   profileImg,
   profileLoaded,
   username,
-  firstName,
-  lastName,
+  displayName,
   tagline,
   socials,
 }: {
@@ -25,8 +24,7 @@ export default function HeroSection({
   profileImg: string;
   profileLoaded: boolean;
   username: string;
-  firstName: string;
-  lastName: string;
+  displayName: string;
   tagline: string;
   socials: any;
 }) {
@@ -41,8 +39,7 @@ export default function HeroSection({
           profileImg={profileImg}
           profileLoaded={profileLoaded}
           username={username}
-          firstName={firstName}
-          lastName={lastName}
+          displayName={displayName}
           tagline={tagline}
           socials={socials}
         />

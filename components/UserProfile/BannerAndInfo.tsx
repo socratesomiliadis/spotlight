@@ -9,8 +9,7 @@ export default function BannerAndInfo({
   profileImg,
   profileLoaded,
   username,
-  firstName,
-  lastName,
+  displayName,
   tagline,
   socials,
 }: {
@@ -19,8 +18,7 @@ export default function BannerAndInfo({
   profileImg: string;
   profileLoaded: boolean;
   username: string;
-  firstName: string;
-  lastName: string;
+  displayName: string;
   tagline: string;
   socials: any;
 }) {
@@ -49,7 +47,7 @@ export default function BannerAndInfo({
         <div className="flex flex-col items-center">
           <div className="flex flex-row items-center gap-2">
             <h1 className="text-black text-2xl 3xl:text-3xl font-medium">
-              {firstName} {lastName}
+              {displayName}
             </h1>
             <span className="text-black w-4 -mb-[0.125rem]">
               <svg
