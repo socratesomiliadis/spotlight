@@ -20,6 +20,8 @@ export const upsertUserRecord = async (user: any) => {
     username: user.username,
     avatar_url: user.profile_image_url,
     display_name: user.first_name,
+    country: user.unsafe_metadata?.country,
+    website: user.unsafe_metadata?.websiteURL,
   };
 
   const { error } = await supabaseAdmin.from("profile").upsert([userData]);

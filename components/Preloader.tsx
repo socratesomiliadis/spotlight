@@ -2,12 +2,17 @@ import { usePreloader } from "@/hooks/usePreloader";
 import { useLayoutEffect } from "react";
 
 export default function Preloader() {
-  const { setIsPreloading, setIsInApp } = usePreloader();
+  const { setIsPreloading, setIsInApp, isPreloading } = usePreloader();
 
   useLayoutEffect(() => {
-    const html = document.querySelector("html") as HTMLElement;
-    html.classList?.add("loading");
-  }, []);
+    if (isPreloading) {
+      const html = document.querySelector("html") as HTMLElement;
+      html.classList?.add("loading");
+    } else {
+      const html = document.querySelector("html") as HTMLElement;
+      html.classList?.remove("loading");
+    }
+  }, [isPreloading]);
 
   return (
     <video

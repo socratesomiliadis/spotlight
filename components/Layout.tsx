@@ -18,6 +18,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isInApp && router.asPath === "/") setIsPreloading(true);
     else {
+      const html = document.querySelector("html") as HTMLElement;
+      html.classList?.remove("loading");
       setIsPreloading(false);
       setIsInApp(true);
     }

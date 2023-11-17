@@ -3,8 +3,17 @@
 @tailwind utilities;
 
 .spotlight-input > div,
-.spotlight-input button {
+.spotlight-input div[data-slot="input-wrapper"],
+.spotlight-select button {
   background-color: #fff !important;
+}
+
+.spotlight-select-item:hover {
+  background-color: #f4f4f4 !important;
+}
+
+.spotlight-select-item[data-selected="true"] {  
+  background-color: #f4f4f4 !important;
 }
 
 input:-webkit-autofill,

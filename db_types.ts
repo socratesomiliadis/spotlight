@@ -100,7 +100,7 @@ export interface Database {
           banner_url: string | null;
           created_at: string | null;
           display_name: string | null;
-          location: string | null;
+          country: string | null;
           occupation: string | null;
           tagline: string | null;
           updated_at: string | null;
@@ -113,7 +113,7 @@ export interface Database {
           banner_url?: string | null;
           created_at?: string | null;
           display_name?: string | null;
-          location?: string | null;
+          country?: string | null;
           occupation?: string | null;
           tagline?: string | null;
           updated_at?: string | null;
@@ -126,7 +126,7 @@ export interface Database {
           banner_url?: string | null;
           created_at?: string | null;
           display_name?: string | null;
-          location?: string | null;
+          country?: string | null;
           occupation?: string | null;
           tagline?: string | null;
           updated_at?: string | null;
