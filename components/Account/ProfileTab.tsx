@@ -284,6 +284,7 @@ export default function ProfileTab() {
               size="lg"
               disableAnimation
               className="spotlight-input w-full"
+              defaultValue={user?.unsafeMetadata?.tagline?.toString()}
               classNames={{
                 inputWrapper: [
                   "bg-white pl-5 border-[1px] border-[#E2E2E2] rounded-3xl shadow",
