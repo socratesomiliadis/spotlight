@@ -4,7 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/Header";
 import { Lenis } from "lenis/react";
-
+import { HeroUIProvider } from "@heroui/react";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,9 +27,11 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} font-geist antialiased relative max-w-[100vw]`}
         >
-          <Lenis root />
-          <Header />
-          {children}
+          <HeroUIProvider>
+            <Lenis root />
+            <Header />
+            {children}
+          </HeroUIProvider>
         </body>
       </html>
     </ClerkProvider>

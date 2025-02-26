@@ -2,13 +2,13 @@ import Link from "next/link";
 
 export function SpotlightNavigation() {
   return (
-    <nav className="fixed group z-20 bg-[#ededed]/80 backdrop-blur-lg rounded-3xl overflow-hidden top-4 left-1/2 -translate-x-1/2 w-[40vw]">
+    <nav className="absolute left-1/2 -translate-x-1/2 top-0 group z-20 bg-[#ededed]/80 backdrop-blur-lg rounded-3xl overflow-hidden w-[40vw]">
       <div className="nav-trigger cursor-pointer w-full h-12 flex flex-row items-center justify-between px-6">
         <Link href="/" className="w-20 flex items-center ">
           <svg
             width="100%"
             viewBox="0 0 2158 532"
-            className="text-black"
+            className="text-darkGreen"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -50,7 +50,7 @@ export function SpotlightNavigation() {
             />
           </svg>
         </Link>
-        <span className="nav-indicator w-5 text-black group-hover:rotate-45 transition-transform duration-500 ease-out-expo">
+        <span className="nav-indicator w-5 text-darkGreen group-hover:rotate-45 transition-transform duration-500 ease-out-expo">
           <svg
             width="100%"
             viewBox="0 0 23 23"
@@ -66,7 +66,7 @@ export function SpotlightNavigation() {
           </svg>
         </span>
       </div>
-      <div className="w-full scale-x-0 group-hover:scale-x-100 transition-all duration-500 ease-out-expo h-[1px] bg-black/10"></div>
+      <div className="w-full scale-x-0 group-hover:scale-x-100 transition-all duration-500 ease-out-expo h-[1px] bg-darkGreen/10"></div>
       <div className="nav-content w-full h-0 group-hover:h-64 transition-all duration-500 ease-out-expo">
         <div className="h-64"></div>
       </div>

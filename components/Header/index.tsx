@@ -1,23 +1,13 @@
 import { SpotlightNavigation } from "./Nav";
-import Link from "next/link";
-
-function HeaderLink({ text, href }: { text: string; href: string }) {
-  return (
-    <Link
-      href={href}
-      className="bg-black text-white px-10 py-3 rounded-full tracking-tight text-lg"
-    >
-      {text}
-    </Link>
-  );
-}
+import HeaderLink from "./HeaderLink";
 
 export default function Header() {
   return (
-    <div>
+    <div className="w-screen fixed top-6 px-16 flex flex-row items-center justify-end z-[999]">
       <SpotlightNavigation />
-      <div className="fixed top-6 right-16">
-        <HeaderLink text="Sign In" href="/sign-in" />
+      <div className="flex flex-row gap-3">
+        <HeaderLink text="Sign Up" href="/sign-up" />
+        <HeaderLink text="Subscribe" href="/subscribe" inverted />
       </div>
     </div>
   );
