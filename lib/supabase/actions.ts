@@ -1,8 +1,8 @@
 import "server-only";
-import { createClient } from "./server";
+import { createAdminClient } from "./server";
 
 export async function upsertUser(data: any) {
-  const supabaseServerClient = await createClient();
+  const supabaseServerClient = await createAdminClient();
   const fullName = `${data.first_name} ${data.last_name}`;
   const emails = data.email_addresses;
   const primaryEmailId = data.primary_email_address_id;
@@ -25,7 +25,7 @@ export async function upsertUser(data: any) {
 }
 
 export async function deleteUser(id: string) {
-  const supabaseServerClient = await createClient();
+  const supabaseServerClient = await createAdminClient();
   const { error } = await supabaseServerClient
     .from("profile")
     .delete()
