@@ -3,12 +3,12 @@ import HeaderLink from "./HeaderLink";
 import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import UserBtn from "./UserBtn";
-
+import AuthDrawer from "../AuthDrawer";
 export default async function Header() {
   const { userId } = await auth();
   const user = await currentUser();
   return (
-    <header className="w-screen absolute top-6 px-64 flex flex-row items-center justify-between z-[999]">
+    <header className="w-screen absolute top-6 px-64 flex flex-row items-center justify-between z-50">
       {/* <SpotlightNavigation /> */}
       <Link href="/" className="w-28 flex items-center ">
         <svg
@@ -65,7 +65,7 @@ export default async function Header() {
           </>
         ) : (
           <>
-            <HeaderLink text="Sign Up" href="/sign-up" />
+            <AuthDrawer />
             <HeaderLink text="Submit" href="/submit" inverted />
           </>
         )}

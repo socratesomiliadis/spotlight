@@ -1,28 +1,41 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
-export default function Search() {
+export default function Search({
+  isExpanded,
+  setIsExpanded,
+}: {
+  isExpanded: boolean;
+  setIsExpanded: (isExpanded: boolean) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
+  useLayoutEffect(() => {
+    if (isExpanded) setIsOpen(true);
+  }, [isExpanded]);
+
   return (
-    <div className="w-fit h-fit">
+    <div className="w-fit h-fit mr-1">
       <div
         className={cn(
-          "relative w-10 h-10 flex items-center transition-all duration-400 ease-out-expo rounded-lg overflow-hidden",
+          "relative w-10 h-10 flex items-center transition-all duration-400 ease-out-expo rounded-lg overflow-hidden will-change-[width]",
           isOpen && "bg-white w-72"
         )}
       >
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="absolute size-4 flex items-center justify-center ml-2 z-10 text-[#989898]"
+          onClick={() => {
+            if (isExpanded) return;
+            setIsOpen(!isOpen);
+          }}
+          className="absolute size-4 flex items-center justify-center ml-2 z-10 text-[#989898] will-change-transform"
         >
           <svg
             width="80%"
             className={cn(
               "absolute x-icon translate-x-[-200%] transition-all duration-300 ease-out-expo",
-              isOpen && "translate-x-0"
+              isOpen && !isExpanded && "translate-x-0"
             )}
             viewBox="0 0 16 16"
             fill="none"
@@ -35,13 +48,12 @@ export default function Search() {
               fill="currentColor"
             />
           </svg>
-
           <svg
             width="100%"
             viewBox="0 0 13 13"
             className={cn(
               "absolute search-icon translate-x-0 transition-all duration-300 ease-out-expo",
-              isOpen && "translate-x-[-200%]"
+              isOpen && !isExpanded && "translate-x-[-200%]"
             )}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -57,11 +69,11 @@ export default function Search() {
         <input
           type="text"
           placeholder="Search"
-          className="w-full pr-2 overflow-hidden h-full bg-transparent outline-none ml-9 -mb-1 leading-none placeholder:leading-none"
+          className="w-full will-change-transform pr-2 overflow-hidden h-10 bg-transparent outline-none ml-8 -mb-1 leading-none placeholder:leading-none"
         />
         <button
           className={cn(
-            "mr-1 text-white text-xs py-2 px-4 bg-black rounded-md flex opacity-0 transition-all duration-400 ease-out-expo translate-x-[300%]",
+            "mr-1 text-white text-xs py-2 px-4 bg-[#1E1E1E] rounded-md flex opacity-0 transition-all duration-400 ease-out-expo translate-x-[300%]",
             isOpen && "opacity-100 translate-x-0"
           )}
         >

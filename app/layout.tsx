@@ -31,8 +31,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  auth,
 }: Readonly<{
   children: React.ReactNode;
+  auth: React.ReactNode;
 }>) {
   return (
     <ClerkProvider>
@@ -43,6 +45,7 @@ export default function RootLayout({
           <HeroUIProvider>
             <Lenis root />
             <Header />
+            {auth}
             {children}
             <BottomNav />
           </HeroUIProvider>

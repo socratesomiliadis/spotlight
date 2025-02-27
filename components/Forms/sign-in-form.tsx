@@ -9,7 +9,7 @@ import { useSignIn } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SignUpVerify from "./sign-up-verify";
 import { motion } from "framer-motion";
@@ -40,6 +40,7 @@ export default function SignInForm() {
   const { isLoaded, signIn, setActive } = useSignIn();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const {
     register,
     handleSubmit,
@@ -87,6 +88,7 @@ export default function SignInForm() {
 
   return (
     <motion.div
+      key="sign-in-form"
       exit={{ opacity: 0, x: -100 }}
       className="w-full flex items-center justify-center"
     >
@@ -99,7 +101,7 @@ export default function SignInForm() {
           {...register("emailOrUsername")}
           isInvalid={!!errors.emailOrUsername}
           errorMessage={errors.emailOrUsername?.message}
-          autoComplete="name"
+          autoComplete="username"
         />
 
         <MyInput
@@ -108,7 +110,7 @@ export default function SignInForm() {
           {...register("password")}
           isInvalid={!!errors.password}
           errorMessage={errors.password?.message}
-          autoComplete="new-password"
+          autoComplete="password"
           endContent={
             <button
               aria-label="toggle password visibility"
@@ -134,7 +136,7 @@ export default function SignInForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-black mt-4 tracking-tight">
           Don&apos;t have an account?{" "}
-          <Link className="underline" href="/sign-up">
+          <Link className="underline" href={pathname + "?auth=sign-up"}>
             Sign up
           </Link>
         </p>

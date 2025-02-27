@@ -45,6 +45,7 @@ export default function SignUpVerify() {
 
   return (
     <motion.div
+      key="sign-up-verify"
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       className="w-full flex items-center justify-center"
