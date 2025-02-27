@@ -21,7 +21,7 @@ export default {
         "out-expo": "cubic-bezier(0.175, 0.885, 0.32, 1)",
       },
       fontFamily: {
-        geist: ["var(--font-geist-sans)"],
+        helvetica: ["var(--font-helvetica-neue)"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -30,5 +30,16 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), heroui()],
+  plugins: [
+    require("tailwindcss-animate"),
+    heroui({
+      themes: {
+        light: {
+          colors: {
+            danger: "#FA5A59",
+          },
+        },
+      },
+    }),
+  ],
 } satisfies Config;

@@ -1,13 +1,26 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/Header";
 import { Lenis } from "lenis/react";
 import { HeroUIProvider } from "@heroui/react";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+import localFont from "next/font/local";
+import BottomNav from "@/components/BottomNav";
+const helveticaNeue = localFont({
+  src: [
+    {
+      path: "../fonts/HelveticaNeue-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/HelveticaNeue-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-helvetica-neue",
 });
 
 export const metadata: Metadata = {
@@ -25,12 +38,13 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${geistSans.variable} font-geist antialiased relative max-w-[100vw]`}
+          className={`${helveticaNeue.variable} font-helvetica antialiased relative max-w-[100vw]`}
         >
           <HeroUIProvider>
             <Lenis root />
             <Header />
             {children}
+            <BottomNav />
           </HeroUIProvider>
         </body>
       </html>
