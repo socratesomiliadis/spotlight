@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import BottomNavItem from "./bottom-nav-item";
 import { useOnClickOutside } from "usehooks-ts";
 import Link from "next/link";
-import { XIcon } from "@/components/Icons";
+import { XIcon } from "@/components/icons";
 
 export default function BottomNav() {
   const ref = useRef<HTMLDivElement>(null);

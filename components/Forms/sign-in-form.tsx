@@ -1,10 +1,10 @@
 "use client";
 
 import { Form, Spinner } from "@heroui/react";
-import MyInput from "./components/input";
+import MyInput from "./components/Input";
 import { useState } from "react";
-import { Eye } from "../Icons";
-import { EyeClosed } from "../Icons";
+import { Eye } from "../icons";
+import { EyeClosed } from "../icons";
 import { useSignIn } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
