@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import Header from "@/components/header";
+import Header from "@/components/Header";
 import { HeroUIProvider } from "@heroui/react";
 import localFont from "next/font/local";
-import BottomNav from "@/components/bottom-nav";
+import BottomNav from "@/components/BottomNav";
 import MainLayout from "@/components/main-layout";
 
 const helveticaNeue = localFont({

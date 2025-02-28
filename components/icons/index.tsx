@@ -1,4 +1,5 @@
-import Eye from "./eye";
-import EyeClosed from "./eye-closed";
+import Eye from "./Eye";
+import EyeClosed from "./EyeClosed";
+import XIcon from "./XIcon";
 
-export { Eye, EyeClosed };
+export { Eye, EyeClosed, XIcon };

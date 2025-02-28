@@ -3,8 +3,8 @@
 import { Form, Spinner } from "@heroui/react";
 import MyInput from "./components/input";
 import { useState } from "react";
-import { Eye } from "../icons";
-import { EyeClosed } from "../icons";
+import { Eye } from "../Icons";
+import { EyeClosed } from "../Icons";
 import { useSignUp } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

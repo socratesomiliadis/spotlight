@@ -1,4 +1,4 @@
-import HeaderLink from "@/components/header/header-link";
+import HeaderLink from "@/components/Header/header-link";
 import Lanyard from "@/components/Lanyard/Lanyard";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
