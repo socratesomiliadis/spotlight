@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import TextSplit from "./text-split";
 import { useLenis } from "lenis/react";
-import SignIn from "@/components/auth-pages/sign-in";
-import SignUp from "@/components/auth-pages/sign-up";
+import SignIn from "@/components/AuthPages/sign-in";
+import SignUp from "@/components/AuthPages/sign-up";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
 
