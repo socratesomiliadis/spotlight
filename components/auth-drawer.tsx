@@ -11,7 +11,7 @@ import SignUp from "@/components/AuthPages/sign-up";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
 
-export default function DrawerComp() {
+export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
@@ -40,10 +40,10 @@ export default function DrawerComp() {
 
   useIsomorphicLayoutEffect(() => {
     const target = ref.current as HTMLButtonElement;
-    const normalChars = target.querySelectorAll(
+    const normalChars = target?.querySelectorAll(
       ".normal-chars"
     ) as NodeListOf<HTMLElement>;
-    const hoverChars = target.querySelectorAll(
+    const hoverChars = target?.querySelectorAll(
       ".hover-chars"
     ) as NodeListOf<HTMLElement>;
 
@@ -98,38 +98,40 @@ export default function DrawerComp() {
       }}
     >
       <Drawer.Trigger asChild>
-        <button
-          ref={ref}
-          onClick={() =>
-            router.push(pathname + "?auth=sign-in", { scroll: false })
-          }
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className={cn(
-            "bg-black px-6 py-2 rounded-xl text-white tracking-tight text-lg font-medium relative overflow-hidden flex items-center justify-center"
-          )}
-        >
-          <TextSplit
-            types={"chars"}
-            charsClassName="normal-chars"
-            className="-mb-1"
+        {!userExists ? (
+          <button
+            ref={ref}
+            onClick={() =>
+              router.push(pathname + "?auth=sign-in", { scroll: false })
+            }
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className={cn(
+              "bg-black px-6 py-2 rounded-xl text-white tracking-tight text-lg font-medium relative overflow-hidden flex items-center justify-center"
+            )}
           >
-            Sign In
-          </TextSplit>
-          <TextSplit
-            types={"chars"}
-            charsClassName="hover-chars translate-y-[120%]"
-            className="absolute -mb-1"
-          >
-            Sign In
-          </TextSplit>
-        </button>
+            <TextSplit
+              types={"chars"}
+              charsClassName="normal-chars"
+              className="-mb-1"
+            >
+              Sign In
+            </TextSplit>
+            <TextSplit
+              types={"chars"}
+              charsClassName="hover-chars translate-y-[120%]"
+              className="absolute -mb-1"
+            >
+              Sign In
+            </TextSplit>
+          </button>
+        ) : null}
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Title className="sr-only">Test</Drawer.Title>
         <Drawer.Description className="sr-only">Test</Drawer.Description>
-        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[100]" />
-        <Drawer.Content className="bg-gray-100 h-fit fixed top-0 left-0 right-0 outline-none z-[101]">
+        <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur z-[100]" />
+        <Drawer.Content className="bg-white h-fit fixed top-0 left-0 right-0 outline-none z-[101]">
           {asPath.get("auth") === "sign-in" ? <SignIn /> : <SignUp />}
         </Drawer.Content>
       </Drawer.Portal>

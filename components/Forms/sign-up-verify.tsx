@@ -27,8 +27,9 @@ export default function SignUpVerify() {
       // and redirect the user
       if (signUpAttempt.status === "complete") {
         setIsLoading(false);
-        router.push("/welcome");
         await setActive({ session: signUpAttempt.createdSessionId });
+        router.push("/welcome");
+        router.refresh();
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.

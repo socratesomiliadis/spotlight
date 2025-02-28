@@ -22,23 +22,30 @@ import {
   useSphericalJoint,
 } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
-
+import { useClerk } from "@clerk/nextjs";
 extend({ MeshLineGeometry, MeshLineMaterial });
 useGLTF.preload("/models/tag.glb");
 useTexture.preload("/static/images/lanyard.png");
 
-export default function LanyardWelcome({
-  firstName = "Socrates",
-  lastName = "Omiliadis",
-}) {
+export default function LanyardWelcome({ transparent = true }) {
+  const { user } = useClerk();
+
   return (
-    <Canvas camera={{ position: [0, 0, 13], fov: 25 }}>
+    <Canvas
+      camera={{ position: [0, 0, 13], fov: 25 }}
+      gl={{ alpha: transparent }}
+      onCreated={({ gl }) =>
+        gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)
+      }
+    >
       <ambientLight intensity={Math.PI} />
       <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
-        <Band firstName={firstName} lastName={lastName} />
+        <Band
+          firstName={user?.firstName ?? "John"}
+          lastName={user?.lastName ?? "Doe"}
+        />
       </Physics>
-      <Environment background blur={0.5}>
-        <color attach="background" args={["#1e1e1e"]} />
+      <Environment blur={0.5}>
         <Lightformer
           intensity={2}
           color="white"
@@ -73,8 +80,8 @@ export default function LanyardWelcome({
 }
 
 function Band({
-  firstName,
-  lastName,
+  firstName = "John",
+  lastName = "Doe",
   maxSpeed = 50,
   minSpeed = 10,
 }: {

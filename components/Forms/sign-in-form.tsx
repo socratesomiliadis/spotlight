@@ -69,6 +69,7 @@ export default function SignInForm() {
         setIsLoading(false);
         await setActive({ session: signInAttempt.createdSessionId });
         router.push("/");
+        router.refresh();
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.

@@ -55,18 +55,14 @@ export default async function Header() {
         </svg>
       </Link>
       <div className="flex flex-row gap-3">
-        {userId ? (
+        {userId && (
           <>
             <UserBtn />
             <HeaderLink text="Premium" href="/premium" />
-            <HeaderLink text="Submit" href="/submit" inverted />
-          </>
-        ) : (
-          <>
-            <AuthDrawer />
-            <HeaderLink text="Submit" href="/submit" inverted />
           </>
         )}
+        <AuthDrawer userExists={!!userId} />
+        <HeaderLink text="Submit" href="/submit" inverted />
       </div>
     </header>
   );
