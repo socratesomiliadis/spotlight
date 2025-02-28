@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import Header from "@/components/Header";
-import { Lenis } from "lenis/react";
+import Header from "@/components/header";
 import { HeroUIProvider } from "@heroui/react";
 import localFont from "next/font/local";
-import BottomNav from "@/components/BottomNav";
+import BottomNav from "@/components/bottom-nav";
+import MainLayout from "@/components/main-layout";
+
 const helveticaNeue = localFont({
   src: [
     {
@@ -43,11 +44,12 @@ export default function RootLayout({
           className={`${helveticaNeue.variable} font-helvetica antialiased relative max-w-[100vw]`}
         >
           <HeroUIProvider>
-            <Lenis root />
-            <Header />
-            {auth}
-            {children}
-            <BottomNav />
+            <MainLayout>
+              <Header />
+              {auth}
+              {children}
+              <BottomNav />
+            </MainLayout>
           </HeroUIProvider>
         </body>
       </html>

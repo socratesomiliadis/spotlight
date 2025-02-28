@@ -11,8 +11,8 @@ body {
   color: #000;
 }
 
-body:has(.auth-page) header {
-  display: none;
+body:has(.dark-logo) .header-logo {
+  color: #fff;
 }
 
 @layer base {

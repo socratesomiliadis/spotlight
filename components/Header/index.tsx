@@ -1,20 +1,18 @@
-import { SpotlightNavigation } from "./Nav";
-import HeaderLink from "./HeaderLink";
+import HeaderLink from "./header-link";
 import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import UserBtn from "./UserBtn";
-import AuthDrawer from "../AuthDrawer";
+import { auth } from "@clerk/nextjs/server";
+import UserBtn from "./user-button";
+import AuthDrawer from "../auth-drawer";
+
 export default async function Header() {
   const { userId } = await auth();
-  const user = await currentUser();
+
   return (
     <header className="w-screen absolute top-6 px-64 flex flex-row items-center justify-between z-50">
-      {/* <SpotlightNavigation /> */}
-      <Link href="/" className="w-28 flex items-center ">
+      <Link href="/" className="w-28 header-logo flex items-center text-black">
         <svg
           width="100%"
           viewBox="0 0 2158 532"
-          className="text-black"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >

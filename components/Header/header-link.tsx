@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import TextSplit from "@/components/TextSplit";
+import TextSplit from "@/components/text-split";
 import { useRef, useState } from "react";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
@@ -11,10 +11,12 @@ export default function HeaderLink({
   text,
   href,
   inverted,
+  className,
 }: {
   text: string;
   href: string;
   inverted?: boolean;
+  className?: string;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -77,7 +79,8 @@ export default function HeaderLink({
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "bg-black px-6 py-2 rounded-xl text-white tracking-tight text-lg font-medium relative overflow-hidden flex items-center justify-center",
-        inverted && "bg-white border-2 border-black text-black"
+        inverted && "bg-white border-2 border-black text-black",
+        className
       )}
     >
       <TextSplit

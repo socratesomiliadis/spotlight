@@ -1,7 +1,7 @@
 "use client";
 
 import { Form, Spinner } from "@heroui/react";
-import MyInput from "./components/Input";
+import MyInput from "./components/input";
 import { useState } from "react";
 import { Eye } from "../icons";
 import { EyeClosed } from "../icons";

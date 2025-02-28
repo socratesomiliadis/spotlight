@@ -4,10 +4,10 @@ import { Drawer } from "vaul";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import TextSplit from "./TextSplit";
+import TextSplit from "./text-split";
 import { useLenis } from "lenis/react";
-import SignIn from "@/components/AuthPages/SignIn";
-import SignUp from "@/components/AuthPages/SignUp";
+import SignIn from "@/components/auth-pages/sign-in";
+import SignUp from "@/components/auth-pages/sign-up";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
 

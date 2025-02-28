@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import SignInForm from "@/components/Forms/sign-in-form";
+import SignInForm from "@/components/forms/sign-in-form";
 import { AnimatePresence } from "framer-motion";
 
-export default function SigIn() {
+export default function SignIn() {
   return (
     <main className="w-full h-[95svh] px-64 flex flex-row items-center justify-center py-[10vh] text-darkGreen">
       <div className="w-full h-full rounded-3xl border-black/10 border-[1px] flex flex-row p-4">
