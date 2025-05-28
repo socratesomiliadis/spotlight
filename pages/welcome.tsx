@@ -1,18 +1,13 @@
 import HeaderLink from "@/components/Header/header-link";
 import Lanyard from "@/components/Lanyard/Lanyard";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
-export default async function Welcome() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect("/");
-  }
+export default function Welcome() {
+  const { userId } = useAuth();
 
   return (
     <div className="h-screen w-screen dark-logo relative bg-[#0d0d0d]">
-      <Lanyard />
+      {!!userId && <Lanyard />}
       <HeaderLink
         text="Home"
         href="/"

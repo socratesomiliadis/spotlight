@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import SignInForm from "@/components/Forms/sign-in-form";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
 
 export default function SignIn() {
   return (
