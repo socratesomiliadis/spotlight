@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import SignUpForm from "@/components/Forms/sign-up-form";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
 
 export default function SignUp() {
   return (
