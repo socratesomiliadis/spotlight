@@ -9,9 +9,11 @@ import { useSignIn } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import { useQueryState } from "nuqs";
+import SignUpVerify from "./sign-up-verify";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 // Define validation schema with Zod
 const signInSchema = z.object({
@@ -33,12 +35,12 @@ const signInSchema = z.object({
 type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInForm() {
-  const [auth, setAuth] = useQueryState("auth");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isLoaded, signIn, setActive } = useSignIn();
   const [isLoading, setIsLoading] = useState(false);
-
+  const router = useRouter();
+  const pathname = usePathname();
   const {
     register,
     handleSubmit,
@@ -65,8 +67,9 @@ export default function SignInForm() {
       // and redirect the user
       if (signInAttempt.status === "complete") {
         setIsLoading(false);
-        setAuth(null);
         await setActive({ session: signInAttempt.createdSessionId });
+        router.push("/");
+        router.refresh();
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
@@ -90,10 +93,7 @@ export default function SignInForm() {
       exit={{ opacity: 0, x: -100 }}
       className="w-full flex items-center justify-center"
     >
-      <Form
-        className="w-[90%] max-w-md font-helvetica"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <Form className="w-[90%] max-w-md" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-4xl tracking-tight mb-8">
           Sign in to your account
         </h1>
@@ -137,9 +137,9 @@ export default function SignInForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-black mt-4 tracking-tight">
           Don&apos;t have an account?{" "}
-          <button className="underline" onClick={() => setAuth("sign-up")}>
+          <Link className="underline" href={pathname + "?auth=sign-up"}>
             Sign up
-          </button>
+          </Link>
         </p>
       </Form>
     </motion.div>

@@ -1,10 +1,10 @@
 import { Webhook } from "svix";
+import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { deleteUser } from "@/lib/supabase/actions";
 import { upsertUser } from "@/lib/supabase/actions";
-import type { NextApiRequest, NextApiResponse } from "next";
 
-export async function clerkWebhook(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: Request) {
   const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!CLERK_WEBHOOK_SECRET) {
@@ -17,18 +17,20 @@ export async function clerkWebhook(req: NextApiRequest, res: NextApiResponse) {
   const wh = new Webhook(CLERK_WEBHOOK_SECRET);
 
   // Get headers
-  const headerPayload = req.headers;
-  const svix_id = headerPayload["svix-id"];
-  const svix_timestamp = headerPayload["svix-timestamp"];
-  const svix_signature = headerPayload["svix-signature"];
+  const headerPayload = await headers();
+  const svix_id = headerPayload.get("svix-id");
+  const svix_timestamp = headerPayload.get("svix-timestamp");
+  const svix_signature = headerPayload.get("svix-signature");
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return res.status(400).json({ error: "Missing Svix headers" });
+    return new Response("Error: Missing Svix headers", {
+      status: 400,
+    });
   }
 
   // Get body
-  const payload = req.body;
+  const payload = await req.json();
   const body = JSON.stringify(payload);
 
   let evt: WebhookEvent;
@@ -36,13 +38,15 @@ export async function clerkWebhook(req: NextApiRequest, res: NextApiResponse) {
   // Verify payload with headers
   try {
     evt = wh.verify(body, {
-      "svix-id": svix_id as string,
-      "svix-timestamp": svix_timestamp as string,
-      "svix-signature": svix_signature as string,
+      "svix-id": svix_id,
+      "svix-timestamp": svix_timestamp,
+      "svix-signature": svix_signature,
     }) as WebhookEvent;
   } catch (err) {
     console.error("Error: Could not verify webhook:", err);
-    return res.status(400).json({ error: "Verification error" });
+    return new Response("Error: Verification error", {
+      status: 400,
+    });
   }
 
   // Do something with payload
@@ -53,7 +57,9 @@ export async function clerkWebhook(req: NextApiRequest, res: NextApiResponse) {
   console.log("Webhook payload:", body);
 
   if (!evt.data.id) {
-    return res.status(400).json({ error: "User ID is missing" });
+    return new Response("Error: User ID is missing", {
+      status: 400,
+    });
   }
 
   try {
@@ -70,10 +76,10 @@ export async function clerkWebhook(req: NextApiRequest, res: NextApiResponse) {
     }
   } catch (error) {
     console.log(error);
-    return res
-      .status(400)
-      .json({ error: "Webhook handler failed. View logs." });
+    return new Response("Webhook error: 'Webhook handler failed. View logs.'", {
+      status: 400,
+    });
   }
 
-  return res.status(200).json({ message: "Webhook received" });
+  return new Response("Webhook received", { status: 200 });
 }

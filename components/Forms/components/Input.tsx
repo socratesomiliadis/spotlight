@@ -24,7 +24,6 @@ const MyInput = extendVariants(Input, {
         ],
         input: [
           // <- Input element slot
-          "focus:outline-none",
           "text-black",
           "placeholder:text-[#BFBFBF]",
           "-mb-1",

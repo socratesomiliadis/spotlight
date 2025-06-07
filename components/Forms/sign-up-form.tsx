@@ -1,3 +1,5 @@
+"use client";
+
 import { Form, Spinner } from "@heroui/react";
 import MyInput from "./components/Input";
 import { useState } from "react";
@@ -7,10 +9,11 @@ import { useSignUp } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SignUpVerify from "./sign-up-verify";
-import { motion } from "motion/react";
-import { useQueryState } from "nuqs";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 // Define validation schema with Zod
 const signUpSchema = z.object({
@@ -33,7 +36,8 @@ export default function SignUpForm() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [isLoading, setIsLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [auth, setAuth] = useQueryState("auth");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const {
     register,
@@ -149,9 +153,9 @@ export default function SignUpForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-black mt-4 tracking-tight">
           Already have an account?{" "}
-          <button className="underline" onClick={() => setAuth("sign-in")}>
+          <Link className="underline" href={pathname + "?auth=sign-in"}>
             Sign in
-          </button>
+          </Link>
         </p>
       </Form>
     </motion.div>

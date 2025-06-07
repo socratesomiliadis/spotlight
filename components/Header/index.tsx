@@ -1,11 +1,11 @@
 import HeaderLink from "./header-link";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import UserBtn from "./user-button";
 import AuthDrawer from "../auth-drawer";
 
-export default function Header() {
-  const { userId } = useAuth();
+export default async function Header() {
+  const { userId } = await auth();
 
   return (
     <header className="w-screen absolute top-6 px-64 flex flex-row items-center justify-between z-50">
@@ -61,7 +61,7 @@ export default function Header() {
             <HeaderLink text="Premium" href="/premium" />
           </>
         )}
-        <AuthDrawer />
+        <AuthDrawer userExists={!!userId} />
         <HeaderLink text="Submit" href="/submit" inverted />
       </div>
     </header>

@@ -1,6 +1,6 @@
+"use client";
+
 import { Lenis } from "lenis/react";
-import Header from "./Header";
-import BottomNav from "./BottomNav";
 
 export default function MainLayout({
   children,
@@ -8,11 +8,8 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative max-w-[100vw] layout-wrapper overflow-x-hidden">
-      <Lenis root />
-      <Header />
-      {children}
-      <BottomNav />
+    <div className="relative max-w-[100vw] layout-wrapper">
+      <Lenis root>{children}</Lenis>
     </div>
   );
 }

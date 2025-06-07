@@ -1,5 +1,6 @@
 // components/LanyardWelcome.js
 //@ts-nocheck
+"use client";
 
 import * as THREE from "three";
 import { useEffect, useRef, useState } from "react";

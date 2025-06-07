@@ -1,3 +1,4 @@
+import "server-only";
 import { createAdminClient } from "./server";
 
 export async function upsertUser(data: any) {
