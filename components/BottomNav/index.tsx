@@ -4,7 +4,7 @@ import Search from "./search";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import BottomNavQuickLink from "./bottom-quick-link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import BottomNavItem from "./bottom-nav-item";
 import { useOnClickOutside } from "usehooks-ts";
 import Link from "next/link";
@@ -170,7 +170,7 @@ export default function BottomNav() {
                 }}
                 className="flex flex-row gap-1 mb-0 will-change-transform"
               >
-                <BottomNavQuickLink text="Nominees" href="/" inverted />
+                <BottomNavQuickLink text="Home" href="/" inverted />
                 <BottomNavQuickLink text="Directory" href="/" inverted />
               </motion.div>
             )}
@@ -204,7 +204,7 @@ export default function BottomNav() {
           layoutId="bottomQuickLinks"
           className="absolute left-[calc(100%+0.25rem)] bottom-0 flex flex-row gap-1 will-change-transform"
         >
-          <BottomNavQuickLink text="Nominees" href="/" inverted={isExpanded} />
+          <BottomNavQuickLink text="Home" href="/" inverted={isExpanded} />
           <BottomNavQuickLink text="Directory" href="/" inverted={isExpanded} />
         </motion.div>
       )}

@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import SignUpForm from "@/components/Forms/sign-up-form";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
+import SignUpForm from "../Forms/sign-up-form";
 
-export default function SignUp() {
+export default function SignIn() {
   return (
-    <main className="w-screen auth-page px-64 h-[90svh] flex flex-row items-center justify-center py-[10vh] text-darkGreen">
-      <div className="w-full h-full rounded-3xl border-black/10 border-[1px] flex flex-row p-4">
+    <main className="w-full h-[75svh] flex flex-row items-center justify-center text-darkGreen">
+      <div className="w-full h-full flex flex-row p-4">
         <div className="w-1/2 h-full relative">
           <Link
             href="/"

@@ -12,8 +12,9 @@ import * as z from "zod";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SignUpVerify from "./sign-up-verify";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
 
 // Define validation schema with Zod
 const signUpSchema = z.object({
@@ -31,13 +32,12 @@ const signUpSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm() {
+  const [auth, setAuth] = useQueryState("auth");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isLoaded, signUp, setActive } = useSignUp();
   const [isLoading, setIsLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
 
   const {
     register,
@@ -153,9 +153,9 @@ export default function SignUpForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-black mt-4 tracking-tight">
           Already have an account?{" "}
-          <Link className="underline" href={pathname + "?auth=sign-in"}>
+          <button className="underline" onClick={() => setAuth("sign-in")}>
             Sign in
-          </Link>
+          </button>
         </p>
       </Form>
     </motion.div>

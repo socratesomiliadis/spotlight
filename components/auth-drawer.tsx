@@ -10,25 +10,27 @@ import SignIn from "@/components/AuthPages/sign-in";
 import SignUp from "@/components/AuthPages/sign-up";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
+import { useQueryState } from "nuqs";
+import { useAuth } from "@clerk/nextjs";
 
 export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
-  const pathname = usePathname();
-  const asPath = useSearchParams();
+  const [auth, setAuth] = useQueryState("auth");
   const lenis = useLenis();
+  const { userId } = useAuth();
 
   const authTypes = ["sign-in", "sign-up"];
 
   useEffect(() => {
-    if (authTypes.includes(asPath.get("auth") ?? "")) {
+    if (authTypes?.includes(auth ?? "") && !userId) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
     }
-  }, [asPath]);
+  }, [auth, userId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -94,16 +96,14 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open);
-        if (!open) router.push(pathname, { scroll: false });
+        if (!open) setAuth(null);
       }}
     >
       <Drawer.Trigger asChild>
         {!userExists ? (
           <button
             ref={ref}
-            onClick={() =>
-              router.push(pathname + "?auth=sign-in", { scroll: false })
-            }
+            onClick={() => setAuth("sign-in")}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             className={cn(
@@ -131,8 +131,8 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
         <Drawer.Title className="sr-only">Test</Drawer.Title>
         <Drawer.Description className="sr-only">Test</Drawer.Description>
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur z-[100]" />
-        <Drawer.Content className="bg-white h-fit fixed top-0 left-0 right-0 outline-none z-[101]">
-          {asPath.get("auth") === "sign-in" ? <SignIn /> : <SignUp />}
+        <Drawer.Content className="bg-white rounded-b-3xl w-[75vw] h-fit fixed top-0 left-[12.5%] outline-none z-[101]">
+          {auth === "sign-in" ? <SignIn /> : <SignUp />}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

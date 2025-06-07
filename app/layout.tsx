@@ -7,6 +7,7 @@ import { HeroUIProvider } from "@heroui/react";
 import localFont from "next/font/local";
 import BottomNav from "@/components/BottomNav";
 import MainLayout from "@/components/main-layout";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const helveticaNeue = localFont({
   src: [
@@ -43,14 +44,16 @@ export default function RootLayout({
         <body
           className={`${helveticaNeue.variable} font-helvetica antialiased relative max-w-[100vw]`}
         >
-          <HeroUIProvider>
-            <MainLayout>
-              <Header />
-              {auth}
-              {children}
-              <BottomNav />
-            </MainLayout>
-          </HeroUIProvider>
+          <NuqsAdapter>
+            <HeroUIProvider>
+              <MainLayout>
+                <Header />
+                {auth}
+                {children}
+                <BottomNav />
+              </MainLayout>
+            </HeroUIProvider>
+          </NuqsAdapter>
         </body>
       </html>
     </ClerkProvider>

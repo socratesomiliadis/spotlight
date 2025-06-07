@@ -2,13 +2,16 @@ import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Form, InputOtp, Spinner } from "@heroui/react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useQueryState } from "nuqs";
+
 export default function SignUpVerify() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [code, setCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [auth, setAuth] = useQueryState("auth");
   const router = useRouter();
 
   const handleVerify = async (e: React.FormEvent) => {
@@ -28,8 +31,8 @@ export default function SignUpVerify() {
       if (signUpAttempt.status === "complete") {
         setIsLoading(false);
         await setActive({ session: signUpAttempt.createdSessionId });
+        setAuth(null);
         router.push("/welcome");
-        router.refresh();
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.

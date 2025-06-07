@@ -9,11 +9,10 @@ import { useSignIn } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import SignUpVerify from "./sign-up-verify";
-import { motion } from "framer-motion";
-import Link from "next/link";
+import { motion } from "motion/react";
+import { useQueryState } from "nuqs";
 
 // Define validation schema with Zod
 const signInSchema = z.object({
@@ -35,12 +34,13 @@ const signInSchema = z.object({
 type SignInFormValues = z.infer<typeof signInSchema>;
 
 export default function SignInForm() {
+  const [auth, setAuth] = useQueryState("auth");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isLoaded, signIn, setActive } = useSignIn();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
+
   const {
     register,
     handleSubmit,
@@ -68,7 +68,7 @@ export default function SignInForm() {
       if (signInAttempt.status === "complete") {
         setIsLoading(false);
         await setActive({ session: signInAttempt.createdSessionId });
-        router.push("/");
+        setAuth(null);
         router.refresh();
       } else {
         // If the status is not complete, check why. User may need to
@@ -137,9 +137,9 @@ export default function SignInForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-black mt-4 tracking-tight">
           Don&apos;t have an account?{" "}
-          <Link className="underline" href={pathname + "?auth=sign-up"}>
+          <button className="underline" onClick={() => setAuth("sign-up")}>
             Sign up
-          </Link>
+          </button>
         </p>
       </Form>
     </motion.div>
