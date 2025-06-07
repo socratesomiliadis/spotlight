@@ -1,7 +1,6 @@
 "use client";
 
 import { Drawer } from "vaul";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import TextSplit from "./text-split";
@@ -11,26 +10,23 @@ import SignUp from "@/components/AuthPages/sign-up";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
 import { useQueryState } from "nuqs";
-import { useAuth } from "@clerk/nextjs";
 
 export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
-  const router = useRouter();
   const [auth, setAuth] = useQueryState("auth");
   const lenis = useLenis();
-  const { userId } = useAuth();
 
   const authTypes = ["sign-in", "sign-up"];
 
   useEffect(() => {
-    if (authTypes?.includes(auth ?? "") && !userId) {
+    if (authTypes?.includes(auth ?? "") && !userExists) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
     }
-  }, [auth, userId]);
+  }, [auth, userExists]);
 
   useEffect(() => {
     if (isOpen) {

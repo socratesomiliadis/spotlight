@@ -46,7 +46,7 @@ export default function BottomNav() {
       ref={ref}
       className={cn(
         "fixed left-1/2 -translate-x-1/2 bottom-12 z-[100] flex flex-row items-center gap-1 transition-transform duration-500 ease-out-expo will-change-transform",
-        !isExpanded && "-translate-x-[75%]"
+        !isExpanded && "-translate-x-[72%]"
       )}
     >
       <div
