@@ -15,9 +15,6 @@ export default function BottomNav() {
   const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
 
-  const isAuthRoute =
-    pathname.includes("/sign-in") || pathname.includes("/sign-up");
-
   useEffect(() => {
     //Close on Escape
     const handleEscape = (e: KeyboardEvent) => {
@@ -38,8 +35,6 @@ export default function BottomNav() {
 
   //@ts-expect-error dont care
   useOnClickOutside(ref, handleClickOutside);
-
-  if (isAuthRoute) return null;
 
   return (
     <div className="w-screen fixed bottom-12 left-0 z-[100] flex flex-row items-center justify-center">
@@ -171,7 +166,7 @@ export default function BottomNav() {
                   }}
                   className="flex flex-row gap-1 mb-0 will-change-transform"
                 >
-                  <BottomNavQuickLink text="Nominees" href="/" inverted />
+                  <BottomNavQuickLink text="Home" href="/" inverted />
                   <BottomNavQuickLink text="Directory" href="/" inverted />
                 </motion.div>
               )}
@@ -205,11 +200,7 @@ export default function BottomNav() {
             layoutId="bottomQuickLinks"
             className="absolute left-[calc(100%+0.25rem)] bottom-0 flex flex-row gap-1 will-change-transform"
           >
-            <BottomNavQuickLink
-              text="Nominees"
-              href="/"
-              inverted={isExpanded}
-            />
+            <BottomNavQuickLink text="Home" href="/" inverted={isExpanded} />
             <BottomNavQuickLink
               text="Directory"
               href="/"

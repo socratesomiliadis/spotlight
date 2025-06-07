@@ -17,6 +17,7 @@
     "@heroui/theme": "^2.4.15",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-popover": "^1.1.14",
     "@react-three/drei": "^10.0.8",
     "@react-three/fiber": "^9.1.2",
     "@react-three/rapier": "^2.1.0",

@@ -22,7 +22,7 @@ export default function DrawerComp() {
   const [auth, setAuth] = useQueryState("auth");
 
   useEffect(() => {
-    if (authTypes.includes(auth ?? "") && !userId) {
+    if (authTypes?.includes(auth ?? "") && !userId) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
@@ -128,7 +128,7 @@ export default function DrawerComp() {
         <Drawer.Title className="sr-only">Test</Drawer.Title>
         <Drawer.Description className="sr-only">Test</Drawer.Description>
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur z-[100]" />
-        <Drawer.Content className="bg-white h-fit fixed top-0 left-0 right-0 outline-none z-[101]">
+        <Drawer.Content className="bg-white rounded-b-3xl w-[75vw] h-fit fixed top-0 left-[12.5%] outline-none z-[101]">
           {auth === "sign-in" ? <SignIn /> : <SignUp />}
         </Drawer.Content>
       </Drawer.Portal>
