@@ -3,12 +3,13 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import UserBtn from "./user-button";
 import AuthDrawer from "../auth-drawer";
+import { UserButton } from "@clerk/nextjs";
 
 export default async function Header() {
   const { userId } = await auth();
 
   return (
-    <header className="w-screen absolute top-6 px-64 flex flex-row items-center justify-between z-50">
+    <header className="w-screen absolute top-6 px-[25vw] flex flex-row items-center justify-between z-50">
       <Link href="/" className="w-28 header-logo flex items-center text-black">
         <svg
           width="100%"
@@ -58,6 +59,7 @@ export default async function Header() {
         {userId && (
           <>
             <UserBtn />
+            {/* <UserButton /> */}
             <HeaderLink text="Premium" href="/premium" />
           </>
         )}
