@@ -76,11 +76,11 @@ export default function BottomNavQuickLink({
       // onMouseEnter={() => setIsHovered(true)}
       // onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "bg-[#1E1E1E] px-5 py-4 rounded-xl text-white tracking-tight text-base font-medium relative overflow-hidden flex items-center justify-center",
-        inverted && "bg-white text-black py-2.5 rounded-lg"
+        "bg-[#1E1E1E] px-5 py-3.5 rounded-xl text-white tracking-tight text-base font-medium relative overflow-hidden flex items-center justify-center",
+        inverted && "bg-white text-black py-2 rounded-lg"
       )}
     >
-      <span className="-mb-1">{text}</span>
+      <span>{text}</span>
     </Link>
   );
 }

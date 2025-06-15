@@ -46,12 +46,12 @@ export default function BottomNav() {
       ref={ref}
       className={cn(
         "fixed left-1/2 -translate-x-1/2 bottom-12 z-[100] flex flex-row items-center gap-1 transition-transform duration-500 ease-out-expo will-change-transform",
-        !isExpanded && "-translate-x-[72%]"
+        !isExpanded && "-translate-x-[69%]"
       )}
     >
       <div
         className={cn(
-          "bg-[#1E1E1E] p-0 w-[22vw] rounded-xl flex flex-col transition-all duration-500 ease-out-expo",
+          "bg-[#1E1E1E] p-0 w-[25vw] rounded-xl flex flex-col transition-all duration-500 ease-out-expo",
           isExpanded && "w-[40vw]"
         )}
       >

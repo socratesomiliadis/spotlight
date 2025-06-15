@@ -3,26 +3,30 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import TextSplit from "@/components/text-split";
-import { useRef, useState } from "react";
+import { RefObject, useRef, useState } from "react";
 import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
 
-export default function HeaderLink({
+export default function CustomButton({
   text,
   href,
   inverted,
   className,
+  onClick,
+  type,
 }: {
   text: string;
-  href: string;
+  href?: string;
   inverted?: boolean;
   className?: string;
+  onClick?: () => void;
+  type?: "submit" | "button";
 }) {
-  const ref = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
-    const target = ref.current as HTMLAnchorElement;
+    const target = ref.current as HTMLElement;
     const normalChars = target.querySelectorAll(
       ".normal-chars"
     ) as NodeListOf<HTMLElement>;
@@ -69,34 +73,41 @@ export default function HeaderLink({
     return () => {
       ctx.kill();
     };
-  }, [isHovered]);
+  }, [isHovered, text]);
+
+  const classes = cn(
+    "bg-black px-6 py-2 rounded-xl text-white tracking-tight text-lg relative overflow-hidden flex items-center justify-center font-[550]",
+    inverted &&
+      "bg-white py-[0.4rem] border-[2px] box-border border-black text-black",
+    className
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        ref={ref as RefObject<HTMLAnchorElement>}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={classes}
+      >
+        <span className="normal-chars">{text}</span>
+        <span className="absolute hover-chars">{text}</span>
+      </Link>
+    );
+  }
 
   return (
-    <Link
-      href={href}
-      ref={ref}
+    <button
+      type={type}
+      ref={ref as RefObject<HTMLButtonElement>}
+      onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={cn(
-        "bg-black px-6 py-2 rounded-xl text-white tracking-tight text-lg font-medium relative overflow-hidden flex items-center justify-center",
-        inverted && "bg-white border-2 border-black text-black",
-        className
-      )}
+      className={classes}
     >
-      <TextSplit
-        types={"chars"}
-        charsClassName="normal-chars"
-        className="-mb-1"
-      >
-        {text}
-      </TextSplit>
-      <TextSplit
-        types={"chars"}
-        charsClassName="hover-chars translate-y-[120%]"
-        className="absolute -mb-1"
-      >
-        {text}
-      </TextSplit>
-    </Link>
+      <span className="normal-chars">{text}</span>
+      <span className="absolute hover-chars">{text}</span>
+    </button>
   );
 }

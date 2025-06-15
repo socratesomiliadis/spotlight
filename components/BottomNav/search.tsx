@@ -69,7 +69,7 @@ export default function Search({
         <input
           type="text"
           placeholder="Search"
-          className="w-full will-change-transform pr-2 overflow-hidden h-10 bg-transparent outline-none ml-8 -mb-1 leading-none placeholder:leading-none"
+          className="w-full will-change-transform pr-2 overflow-hidden h-10 bg-transparent outline-none ml-8 leading-none placeholder:leading-none"
         />
         <button
           className={cn(

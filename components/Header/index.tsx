@@ -1,12 +1,31 @@
-import HeaderLink from "./header-link";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import UserBtn from "./user-button";
 import AuthDrawer from "../auth-drawer";
 import { UserButton } from "@clerk/nextjs";
+import CustomButton from "../custom-button";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Header() {
   const { userId } = await auth();
+
+  let user;
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("avatar_url")
+      .eq("user_id", userId)
+      .single();
+
+    if (error) {
+      console.log(error);
+    }
+
+    user = data;
+  } catch (error) {
+    console.log(error);
+  }
 
   return (
     <header className="w-screen absolute top-6 px-[25vw] flex flex-row items-center justify-between z-50">
@@ -55,16 +74,16 @@ export default async function Header() {
           />
         </svg>
       </Link>
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-row gap-2">
         {userId && (
           <>
-            <UserBtn />
+            <UserBtn avatarUrl={user?.avatar_url || ""} />
             {/* <UserButton /> */}
-            <HeaderLink text="Premium" href="/premium" />
+            <CustomButton text="Premium" href="/premium" />
           </>
         )}
         <AuthDrawer userExists={!!userId} />
-        <HeaderLink text="Submit" href="/submit" inverted />
+        <CustomButton text="Submit" href="/submit" inverted />
       </div>
     </header>
   );

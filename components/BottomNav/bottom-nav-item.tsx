@@ -28,7 +28,7 @@ export default function BottomNavItem({
         height={130}
         className="rounded-lg saturate-0 brightness-50 group-hover:brightness-100 group-hover:saturate-100 w-24 group-hover:w-28 will-change-transform transition-all duration-300 ease-out-expo"
       />
-      <span className="text-xl text-white tracking-tight -mb-1">{text}</span>
+      <span className="text-xl text-white tracking-tight">{text}</span>
     </Link>
   );
 }

@@ -9,20 +9,9 @@ import BottomNav from "@/components/BottomNav";
 import MainLayout from "@/components/main-layout";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-const helveticaNeue = localFont({
-  src: [
-    {
-      path: "../fonts/HelveticaNeue-Regular.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../fonts/HelveticaNeue-Bold.woff2",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-helvetica-neue",
+const helveticaNow = localFont({
+  src: "../fonts/HelveticaNowVar.woff2",
+  variable: "--font-helvetica-now",
 });
 
 export const metadata: Metadata = {
@@ -42,7 +31,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${helveticaNeue.variable} font-helvetica antialiased relative max-w-[100vw]`}
+          className={`${helveticaNow.variable} font-helvetica antialiased relative max-w-[100vw]`}
         >
           <NuqsAdapter>
             <HeroUIProvider>
