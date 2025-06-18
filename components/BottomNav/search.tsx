@@ -14,6 +14,7 @@ export default function Search({
 
   useLayoutEffect(() => {
     if (isExpanded) setIsOpen(true);
+    else setIsOpen(false);
   }, [isExpanded]);
 
   return (

@@ -33,3 +33,73 @@ export async function deleteUser(id: string) {
   if (error) throw error;
   console.log(`User deleted: ${id}`);
 }
+
+// Follow functions
+export async function followUser(userId: string, followingId: string) {
+  const supabaseServerClient = await createAdminClient();
+
+  const { error } = await supabaseServerClient.from("follows").insert({
+    user_id: userId,
+    following_id: followingId,
+  });
+
+  if (error) throw error;
+  return { success: true };
+}
+
+export async function unfollowUser(userId: string, followingId: string) {
+  const supabaseServerClient = await createAdminClient();
+
+  const { error } = await supabaseServerClient
+    .from("follows")
+    .delete()
+    .eq("user_id", userId)
+    .eq("following_id", followingId);
+
+  if (error) throw error;
+  return { success: true };
+}
+
+export async function getFollowStatus(userId: string, targetUserId: string) {
+  const supabaseServerClient = await createAdminClient();
+
+  const { data, error } = await supabaseServerClient
+    .from("follows")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("following_id", targetUserId)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    throw error;
+  }
+
+  return { isFollowing: !!data };
+}
+
+export async function getFollowCounts(userId: string) {
+  const supabaseServerClient = await createAdminClient();
+
+  // Get followers count
+  const { count: followersCount, error: followersError } =
+    await supabaseServerClient
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("following_id", userId);
+
+  if (followersError) throw followersError;
+
+  // Get following count
+  const { count: followingCount, error: followingError } =
+    await supabaseServerClient
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+  if (followingError) throw followingError;
+
+  return {
+    followers: followersCount || 0,
+    following: followingCount || 0,
+  };
+}

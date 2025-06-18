@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Form } from "@heroui/react";
+import { Form, user } from "@heroui/react";
 import MyInput from "@/components/Forms/components/Input";
 import CustomButton from "@/components/custom-button";
 import ImageUpload from "./ImageUpload";
@@ -13,11 +13,15 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "motion/react";
+import { Tables } from "@/database.types";
 
 // Define validation schema with social links
 const profileSchema = z.object({
   display_name: z.string().min(1, "Display name is required"),
-  location: z.string().optional(),
+  location: z
+    .string()
+    .max(30, "Location must be less than 30 characters")
+    .optional(),
   website_url: z
     .string()
     .url("Please enter a valid URL")
@@ -46,31 +50,18 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface EditProfileFormProps {
-  user: {
-    banner_url?: string;
-    avatar_url?: string;
-    display_name?: string;
-    username?: string;
-    location?: string;
-    website_url?: string;
-    user_id: string;
-    socials?: {
-      linkedin?: string;
-      instagram?: string;
-      twitter?: string;
-    };
-  };
+  userAndSocials: Tables<"profile"> & { socials: Tables<"socials"> | null };
 }
 
-export default function EditProfileForm({ user }: EditProfileFormProps) {
+export default function EditProfileForm({
+  userAndSocials,
+}: EditProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const { session } = useSession();
   const supabase = createClient({ session });
-
-  const displayName = user.display_name || user.username || "User";
 
   const {
     register,
@@ -81,14 +72,14 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      display_name: user.display_name || "",
-      location: user.location || "",
-      website_url: user.website_url || "",
-      avatar_url: user.avatar_url || "",
-      banner_url: user.banner_url || "",
-      linkedin: user.socials?.linkedin || "",
-      instagram: user.socials?.instagram || "",
-      twitter: user.socials?.twitter || "",
+      display_name: userAndSocials.display_name || "",
+      location: userAndSocials.location || "",
+      website_url: userAndSocials.website_url || "",
+      avatar_url: userAndSocials.avatar_url || "",
+      banner_url: userAndSocials.banner_url || "",
+      linkedin: userAndSocials.socials?.linked_in || "",
+      instagram: userAndSocials.socials?.instagram || "",
+      twitter: userAndSocials.socials?.twitter || "",
     },
   });
 
@@ -111,7 +102,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
           avatar_url: data.avatar_url || null,
           banner_url: data.banner_url || null,
         })
-        .eq("user_id", user.user_id);
+        .eq("user_id", userAndSocials.user_id);
 
       if (profileError) {
         console.log(profileError);
@@ -121,7 +112,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
 
       // Handle social links - upsert a single record with all social links
       const socialLinksData = {
-        user_id: user.user_id,
+        user_id: userAndSocials.user_id,
         linked_in: data.linkedin || null,
         instagram: data.instagram || null,
         twitter: data.twitter || null,
@@ -170,7 +161,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
           bucketName="profile-images"
           folder="banners"
           aspectRatio="aspect-[3/1]"
-          userId={user.user_id}
+          userId={userAndSocials.user_id}
           className="absolute inset-0 h-full"
           displayAreaClassName="rounded-2xl"
           showInfoText={true}
@@ -188,7 +179,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
             bucketName="profile-images"
             folder="avatars"
             aspectRatio="aspect-square"
-            userId={user.user_id}
+            userId={userAndSocials.user_id}
             className="w-40 h-40 rounded-xl overflow-hidden outline outline-[0.7rem] outline-white"
             displayAreaClassName="rounded-xl"
             showRemoveButton={false}
@@ -198,7 +189,7 @@ export default function EditProfileForm({ user }: EditProfileFormProps) {
         <div className="flex flex-row items-center gap-2 mt-24 pointer-events-auto">
           <CustomButton
             text="Cancel"
-            href={`/${user.username}`}
+            href={`/${userAndSocials.username}`}
             inverted
             className="text-[#FA5A59] border-[#FA5A59]"
           />

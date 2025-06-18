@@ -1,17 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useTransition } from "react";
 import CustomButton from "@/components/custom-button";
+import { Tables } from "@/database.types";
+import { toggleFollowAction } from "@/lib/supabase/follow-actions";
 
 interface ProfileHeaderProps {
-  user: {
-    banner_url?: string;
-    avatar_url?: string;
-    display_name?: string;
-    username?: string;
-    location?: string;
-    website_url?: string;
-  };
+  user: Tables<"profile">;
   isOwnProfile: boolean;
+  initialFollowStatus: boolean;
 }
 
 function removeHttpsAndTrailingSlash(url: string) {
@@ -21,8 +20,23 @@ function removeHttpsAndTrailingSlash(url: string) {
 export default function ProfileHeader({
   user,
   isOwnProfile,
+  initialFollowStatus,
 }: ProfileHeaderProps) {
+  const [isFollowing, setIsFollowing] = useState(initialFollowStatus);
+  const [isPending, startTransition] = useTransition();
   const displayName = user.display_name || user.username || "User";
+
+  const handleFollowClick = () => {
+    startTransition(async () => {
+      try {
+        const result = await toggleFollowAction(user.user_id);
+        setIsFollowing(result.isFollowing);
+      } catch (error) {
+        console.error("Error toggling follow status:", error);
+        // Optionally show an error message to the user
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col p-3">
@@ -81,7 +95,16 @@ export default function ProfileHeader({
               href="#"
               className="text-[#FF710C] border-[#FF710C]"
             />
-            <CustomButton text="Follow" href="#" />
+            <CustomButton
+              text={
+                isPending ? "Loading..." : isFollowing ? "Unfollow" : "Follow"
+              }
+              onClick={handleFollowClick}
+              disabled={isPending}
+              className={
+                isFollowing ? "bg-gray-100 text-gray-700 border-gray-300" : ""
+              }
+            />
           </div>
         )}
       </div>

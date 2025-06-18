@@ -9,20 +9,20 @@ import { createClient } from "@/lib/supabase/server";
 export default async function Header() {
   const { userId } = await auth();
 
-  let user;
+  let avatarUrl;
   const supabase = await createClient();
   try {
     const { data, error } = await supabase
       .from("profile")
       .select("avatar_url")
-      .eq("user_id", userId)
+      .eq("user_id", userId as string)
       .single();
 
     if (error) {
       console.log(error);
     }
 
-    user = data;
+    avatarUrl = data?.avatar_url;
   } catch (error) {
     console.log(error);
   }
@@ -77,7 +77,7 @@ export default async function Header() {
       <div className="flex flex-row gap-2">
         {userId && (
           <>
-            <UserBtn avatarUrl={user?.avatar_url || ""} />
+            <UserBtn avatarUrl={avatarUrl || ""} />
             {/* <UserButton /> */}
             <CustomButton text="Premium" href="/premium" />
           </>

@@ -17,7 +17,7 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <button className="rounded-lg text-sm size-12 bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold overflow-hidden">
+        <button className="rounded-lg text-sm size-11 bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold overflow-hidden">
           {avatarUrl ? (
             <Image
               src={avatarUrl}
@@ -41,7 +41,7 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
         <Link
           onClick={() => setIsOpen(false)}
           href="/premium"
-          className="pt-4 py-3 hover:bg-[#72727280]/10 pl-4 pr-12 w-full"
+          className="py-3 hover:bg-[#72727280]/10 pl-4 pr-12 w-full"
         >
           Upgrade to{" "}
           <span className="bg-white ml-1 px-3 py-1 text-black rounded-lg">

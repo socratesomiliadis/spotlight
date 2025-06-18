@@ -71,6 +71,11 @@ body:has(.dark-logo) .header-logo {
   }
 }
 
+::selection {
+  background-color: #000;
+  color: #fff;
+}
+
 /*Custom Scrollbar*/
 ::-webkit-scrollbar {
   width: 8px;

@@ -57,6 +57,7 @@ export default {
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.175, 0.885, 0.32, 1)",
+        spring: "cubic-bezier(0.175, 0.885, 0.36, 1)",
       },
       fontFamily: {
         helvetica: ["var(--font-helvetica-now)"],
