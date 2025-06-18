@@ -103,3 +103,78 @@ export async function getFollowCounts(userId: string) {
     following: followingCount || 0,
   };
 }
+
+// Search functions
+export async function searchUsers(query: string, limit: number = 10) {
+  const supabaseServerClient = await createAdminClient();
+
+  const { data, error } = await supabaseServerClient
+    .from("profile")
+    .select("user_id, username, display_name, avatar_url")
+    .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function searchProjects(query: string, limit: number = 10) {
+  const supabaseServerClient = await createAdminClient();
+
+  const { data, error } = await supabaseServerClient
+    .from("project")
+    .select(
+      `
+      id,
+      title,
+      slug,
+      thumbnail_url,
+      created_at,
+      profile:user_id (
+        username,
+        display_name,
+        avatar_url
+      )
+    `
+    )
+    .ilike("title", `%${query}%`)
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function searchAll(query: string) {
+  const [users, projects] = await Promise.all([
+    searchUsers(query, 5),
+    searchProjects(query, 5),
+  ]);
+
+  return {
+    users,
+    projects,
+  };
+}
+
+// Project creation function
+export async function createProject(projectData: {
+  title: string;
+  slug: string;
+  tools_used: string[];
+  main_img_url: string;
+  thumbnail_url: string;
+  banner_url?: string | null;
+  elements_url?: string[] | null;
+  user_id: string;
+}) {
+  const supabaseServerClient = await createAdminClient();
+
+  const { data, error } = await supabaseServerClient
+    .from("project")
+    .insert(projectData)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

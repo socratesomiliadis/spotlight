@@ -6,29 +6,33 @@ import { UserButton } from "@clerk/nextjs";
 import CustomButton from "../custom-button";
 import { createClient } from "@/lib/supabase/server";
 
+async function getAvatarUrl(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profile")
+    .select("avatar_url")
+    .eq("user_id", userId)
+    .single();
+
+  if (error) {
+    console.log(error);
+    return null;
+  }
+
+  return data?.avatar_url;
+}
+
 export default async function Header() {
   const { userId } = await auth();
 
   let avatarUrl;
-  const supabase = await createClient();
-  try {
-    const { data, error } = await supabase
-      .from("profile")
-      .select("avatar_url")
-      .eq("user_id", userId as string)
-      .single();
 
-    if (error) {
-      console.log(error);
-    }
-
-    avatarUrl = data?.avatar_url;
-  } catch (error) {
-    console.log(error);
+  if (userId) {
+    avatarUrl = await getAvatarUrl(userId);
   }
 
   return (
-    <header className="w-screen absolute top-6 px-[25vw] flex flex-row items-center justify-between z-50">
+    <header className="w-screen absolute top-6 px-[22vw] flex flex-row items-center justify-between z-50">
       <Link href="/" className="w-28 header-logo flex items-center text-black">
         <svg
           width="100%"
@@ -74,7 +78,7 @@ export default async function Header() {
           />
         </svg>
       </Link>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row items-center gap-2">
         {userId && (
           <>
             <UserBtn avatarUrl={avatarUrl || ""} />

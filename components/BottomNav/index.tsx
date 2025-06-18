@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import Search from "./search";
+import Search, { SearchResults } from "./search";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import BottomNavQuickLink from "./bottom-quick-link";
@@ -9,10 +9,16 @@ import BottomNavItem from "./bottom-nav-item";
 import { useOnClickOutside } from "usehooks-ts";
 import Link from "next/link";
 import { XIcon } from "@/components/icons";
+import SearchResultsComponent from "./search-results";
 
 export default function BottomNav() {
   const ref = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResults>({
+    users: [],
+    projects: [],
+  });
+  const [isSearchActive, setIsSearchActive] = useState(false);
   const pathname = usePathname();
 
   const isAuthRoute =
@@ -34,6 +40,7 @@ export default function BottomNav() {
 
   const handleClickOutside = () => {
     setIsExpanded(false);
+    setIsSearchActive(false);
   };
 
   //@ts-expect-error dont care
@@ -63,7 +70,12 @@ export default function BottomNav() {
             )}
           >
             <div className="h-full flex flex-col pb-2 pr-2">
-              <div className="px-4 w-full flex flex-row justify-between pt-4 pb-16">
+              <div
+                className={cn(
+                  "px-4 w-full flex flex-row justify-between pt-4 pb-16",
+                  isSearchActive && "pb-4"
+                )}
+              >
                 <Link href="/" className="w-24 flex items-center text-white">
                   <svg
                     width="100%"
@@ -124,32 +136,48 @@ export default function BottomNav() {
                 data-lenis-prevent
                 className="w-full h-full overflow-y-auto bottom-nav-scroller flex flex-col gap-0 pb-16 relative"
               >
-                <BottomNavItem
-                  imageSRC="/static/images/bottom-nav/web.png"
-                  text="Websites"
-                  href="/"
-                  className="border-t-[1px]"
-                />
-                <BottomNavItem
-                  imageSRC="/static/images/bottom-nav/design.png"
-                  text="Design"
-                  href="/"
-                />
-                <BottomNavItem
-                  imageSRC="/static/images/bottom-nav/startup.png"
-                  text="Start-Ups"
-                  href="/"
-                />
-                <BottomNavItem
-                  imageSRC="/static/images/bottom-nav/crypto.png"
-                  text="Crypto"
-                  href="/"
-                />
-                <BottomNavItem
-                  imageSRC="/static/images/bottom-nav/film.png"
-                  text="Films"
-                  href="/"
-                />
+                {isSearchActive ? (
+                  <div className="px-2 py-2">
+                    <SearchResultsComponent
+                      users={searchResults.users}
+                      projects={searchResults.projects}
+                      isVisible={true}
+                      onResultClick={() => {
+                        setIsExpanded(false);
+                        setIsSearchActive(false);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <BottomNavItem
+                      imageSRC="/static/images/bottom-nav/web.png"
+                      text="Websites"
+                      href="/"
+                      className="border-t-[1px]"
+                    />
+                    <BottomNavItem
+                      imageSRC="/static/images/bottom-nav/design.png"
+                      text="Design"
+                      href="/"
+                    />
+                    <BottomNavItem
+                      imageSRC="/static/images/bottom-nav/startup.png"
+                      text="Start-Ups"
+                      href="/"
+                    />
+                    <BottomNavItem
+                      imageSRC="/static/images/bottom-nav/crypto.png"
+                      text="Crypto"
+                      href="/"
+                    />
+                    <BottomNavItem
+                      imageSRC="/static/images/bottom-nav/film.png"
+                      text="Films"
+                      href="/"
+                    />
+                  </>
+                )}
                 <div
                   className={cn(
                     "w-full h-16 bg-gradient-to-t from-[#1e1e1e] via-[#1e1e1e]/80 to-transparent fixed bottom-[3.6rem] left-0 z-10 pointer-events-none",
@@ -161,7 +189,12 @@ export default function BottomNav() {
           </div>
           <div className="w-full flex flex-row justify-between">
             <div className="min-w-fit flex items-center justify-center p-1.5">
-              <Search isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+              <Search
+                isExpanded={isExpanded}
+                setIsExpanded={setIsExpanded}
+                onSearchResults={setSearchResults}
+                onSearchActive={setIsSearchActive}
+              />
               {isExpanded && (
                 <motion.div
                   layoutId="bottomQuickLinks"
@@ -179,6 +212,9 @@ export default function BottomNav() {
             <button
               onClick={() => {
                 setIsExpanded(!isExpanded);
+                if (isExpanded) {
+                  setIsSearchActive(false);
+                }
               }}
               className="w-full pr-3 flex items-center justify-end gap-1 focus:outline-none p-1.5"
             >

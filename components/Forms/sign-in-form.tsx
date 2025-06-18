@@ -68,8 +68,8 @@ export default function SignInForm() {
       if (signInAttempt.status === "complete") {
         setIsLoading(false);
         await setActive({ session: signInAttempt.createdSessionId });
-        setAuth(null);
         router.refresh();
+        // setAuth(null);
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.

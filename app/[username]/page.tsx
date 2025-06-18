@@ -45,7 +45,7 @@ export default async function UsernamePage({ params }: PageProps) {
   const { isFollowing } = await getFollowStatusAction(user.user_id);
 
   return (
-    <main className="w-screen px-[25vw] py-28">
+    <main className="w-screen px-[22vw] py-28">
       <div className="w-full min-h-screen rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
         <ProfileHeader
           user={user}

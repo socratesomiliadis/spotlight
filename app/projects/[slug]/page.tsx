@@ -1,6 +1,8 @@
 import Image from "next/image";
 import ProjectHeader from "./components/ProjectHeader";
 import ProjectNavigation from "./components/ProjectNavigation";
+import ProjectElements from "./components/ProjectElements";
+import ProjectDetails from "./components/ProjectDetails";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -16,10 +18,17 @@ export default async function ProjectPage({ params }: PageProps) {
     userAvatarUrl: "/static/images/signUp.png",
     userDisplayName: "John Doe",
     userUsername: "john_doe",
+    elementURLs: [
+      "/static/images/signUp.png",
+      "/static/images/signUp.png",
+      "/static/images/signUp.png",
+      "/static/images/signUp.png",
+    ],
+    tools: ["Next.js", "Tailwind CSS", "TypeScript", "Shadcn UI"],
   };
 
   return (
-    <main className="w-screen px-[25vw] py-28">
+    <main className="w-screen px-[22vw] py-28">
       <div className="w-full pb-8 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
         <ProjectHeader
           bannerUrl={testData.bannerUrl}
@@ -39,6 +48,8 @@ export default async function ProjectPage({ params }: PageProps) {
             className="w-full aspect-video object-cover rounded-2xl"
           />
         </div>
+        <ProjectElements elementURLs={testData.elementURLs} />
+        <ProjectDetails tools={testData.tools} />
       </div>
     </main>
   );

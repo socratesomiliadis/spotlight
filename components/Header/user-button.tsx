@@ -17,7 +17,7 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <button className="rounded-lg text-sm size-11 bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold overflow-hidden">
+        <button className="rounded-lg text-sm size-[2.7rem] bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold overflow-hidden">
           {avatarUrl ? (
             <Image
               src={avatarUrl}

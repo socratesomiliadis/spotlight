@@ -10,7 +10,7 @@ export default async function Welcome() {
   }
 
   return (
-    <div className="h-screen w-screen dark-logo relative bg-[#0d0d0d]">
+    <div className="h-screen w-screen relative bg-white">
       <Lanyard />
     </div>
   );

@@ -11,6 +11,11 @@ body {
   color: #000;
 }
 
+a,
+button {
+  user-select: none;
+}
+
 body:has(.dark-logo) .header-logo {
   color: #fff;
 }

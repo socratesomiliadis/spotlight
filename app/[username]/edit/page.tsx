@@ -45,7 +45,7 @@ export default async function EditPage({ params }: PageProps) {
   }
 
   return (
-    <main className="w-screen px-[25vw] py-28">
+    <main className="w-screen px-[22vw] py-28">
       <div className="w-full rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
         <EditProfileForm userAndSocials={user} />
       </div>
