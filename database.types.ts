@@ -90,11 +90,13 @@ export type Database = {
           created_at: string
           elements_url: string[] | null
           id: number
+          is_staff_project: boolean
           main_img_url: string
           slug: string | null
           thumbnail_url: string
           title: string
           tools_used: string[]
+          user_fake: Json | null
           user_id: string
         }
         Insert: {
@@ -102,11 +104,13 @@ export type Database = {
           created_at?: string
           elements_url?: string[] | null
           id?: number
+          is_staff_project?: boolean
           main_img_url: string
           slug?: string | null
           thumbnail_url: string
           title: string
           tools_used: string[]
+          user_fake?: Json | null
           user_id: string
         }
         Update: {
@@ -114,11 +118,13 @@ export type Database = {
           created_at?: string
           elements_url?: string[] | null
           id?: number
+          is_staff_project?: boolean
           main_img_url?: string
           slug?: string | null
           thumbnail_url?: string
           title?: string
           tools_used?: string[]
+          user_fake?: Json | null
           user_id?: string
         }
         Relationships: [

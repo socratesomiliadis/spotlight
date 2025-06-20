@@ -130,6 +130,8 @@ export async function searchProjects(query: string, limit: number = 10) {
       slug,
       thumbnail_url,
       created_at,
+      is_staff_project,
+      user_fake,
       profile:user_id (
         username,
         display_name,

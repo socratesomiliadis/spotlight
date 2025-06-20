@@ -22,7 +22,7 @@ export default function ProfileNavigation({
   return (
     <div className="flex items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] px-8 py-4">
       <div className="flex items-center gap-2 font-medium tracking-tight">
-        <button className="flex items-center gap-2 bg-[#FF76F6] text-black px-4 py-2 rounded-lg">
+        <button className="flex items-center gap-2 bg-[#A4810E] text-white px-4 py-2 rounded-lg">
           <span className="size-4 flex">
             <svg
               width="100%"

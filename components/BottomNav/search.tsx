@@ -24,6 +24,11 @@ export interface Project {
   slug: string | null;
   thumbnail_url: string;
   created_at: string;
+  is_staff_project: boolean;
+  user_fake: {
+    name: string;
+    image_url: string;
+  } | null;
   profile: {
     username: string;
     display_name: string | null;
@@ -73,7 +78,7 @@ export default function Search({
       try {
         const results = await searchAction(searchQuery);
 
-        onSearchResults(results);
+        onSearchResults(results as SearchResults);
       } catch (error) {
         console.error("Search failed:", error);
         const emptyResults = { users: [], projects: [] };

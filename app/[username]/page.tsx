@@ -21,8 +21,9 @@ export default async function UsernamePage({ params }: PageProps) {
   try {
     const { data, error } = await supabase
       .from("profile")
-      .select("*,socials(*)")
+      .select("*,socials(*),project(*)")
       .eq("username", username)
+      .eq("project.is_staff_project", false)
       .single();
 
     if (error) {
@@ -46,7 +47,7 @@ export default async function UsernamePage({ params }: PageProps) {
 
   return (
     <main className="w-screen px-[22vw] py-28">
-      <div className="w-full min-h-screen rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
+      <div className="w-full pb-11 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
         <ProfileHeader
           user={user}
           isOwnProfile={isOwnProfile}
@@ -61,7 +62,7 @@ export default async function UsernamePage({ params }: PageProps) {
           )}
         >
           <ProfileNavigation socialLinks={user.socials || undefined} />
-          <ProjectsGrid />
+          <ProjectsGrid projects={user.project || undefined} />
         </div>
       </div>
     </main>

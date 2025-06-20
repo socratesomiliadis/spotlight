@@ -49,7 +49,7 @@ export default function BottomNav() {
   if (isAuthRoute) return null;
 
   return (
-    <div className="fixed w-screen bottom-12 left-0 z-[100] ">
+    <div className="fixed w-screen bottom-8 left-0 z-[100] ">
       <div
         ref={ref}
         className={cn(
@@ -73,7 +73,7 @@ export default function BottomNav() {
               <div
                 className={cn(
                   "px-4 w-full flex flex-row justify-between pt-4 pb-16",
-                  isSearchActive && "pb-4"
+                  isSearchActive && "pb-16"
                 )}
               >
                 <Link href="/" className="w-24 flex items-center text-white">
@@ -137,7 +137,7 @@ export default function BottomNav() {
                 className="w-full h-full overflow-y-auto bottom-nav-scroller flex flex-col gap-0 pb-16 relative"
               >
                 {isSearchActive ? (
-                  <div className="px-2 py-2">
+                  <div className="px-2 py-2 border-[#282828] border-t-[1px]">
                     <SearchResultsComponent
                       users={searchResults.users}
                       projects={searchResults.projects}

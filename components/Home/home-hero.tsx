@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function HomeHero() {
   return (
-    <div className="w-full h-screen p-4">
+    <div className="w-full p-4">
       <Image
         src="/static/images/hero.png"
         width={1800}

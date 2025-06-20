@@ -14,6 +14,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "motion/react";
 
+const fakeUserSchema = z.object({
+  name: z.string().min(1, "User name is required"),
+  image_url: z.string().min(1, "User image is required"),
+});
+
 // Define validation schema for project submission
 const projectSchema = z.object({
   title: z.string().min(1, "Project title is required"),
@@ -22,19 +27,16 @@ const projectSchema = z.object({
   thumbnail_url: z.string().min(1, "Thumbnail image is required"),
   banner_url: z.string().optional(),
   elements_url: z.array(z.string()).optional(),
+  user: fakeUserSchema,
 });
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
 
 interface NewProjectFormProps {
   userId: string;
-  isStaff?: boolean;
 }
 
-export default function NewProjectForm({
-  userId,
-  isStaff = false,
-}: NewProjectFormProps) {
+export default function NewProjectForm({ userId }: NewProjectFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -58,6 +60,10 @@ export default function NewProjectForm({
       thumbnail_url: "",
       banner_url: "",
       elements_url: [],
+      user: {
+        name: "",
+        image_url: "",
+      },
     },
   });
 
@@ -65,6 +71,7 @@ export default function NewProjectForm({
   const bannerUrl = watch("banner_url");
   const mainImageUrl = watch("main_img_url");
   const thumbnailUrl = watch("thumbnail_url");
+  const userImageUrl = watch("user.image_url");
 
   const onSubmit = async (data: ProjectFormValues) => {
     setIsLoading(true);
@@ -96,6 +103,11 @@ export default function NewProjectForm({
           banner_url: data.banner_url || null,
           elements_url: elementImages.length > 0 ? elementImages : null,
           user_id: userId,
+          is_staff_project: true,
+          user_fake: {
+            name: data.user.name,
+            image_url: data.user.image_url,
+          },
         })
         .select()
         .single();
@@ -163,10 +175,10 @@ export default function NewProjectForm({
 
       {/* Project Details Section */}
       <div className="px-6 py-8 space-y-6 w-full">
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-4 w-full">
           {/* Thumbnail Image */}
-          <div className="space-y-2 w-64">
-            <div className="w-full max-w-sm">
+          <div className="space-y-2 w-1/2">
+            <div className="w-full">
               <ProjectImageUpload
                 label="Thumbnail Image *"
                 currentImages={thumbnailUrl ? [thumbnailUrl] : []}
@@ -174,7 +186,7 @@ export default function NewProjectForm({
                 onImageRemoved={() => setValue("thumbnail_url", "")}
                 bucketName="project-images"
                 folder="thumbnails"
-                aspectRatio="aspect-square"
+                aspectRatio="aspect-video"
                 userId={userId}
                 maxImages={1}
                 uploadAreaText="Drop thumbnail here"
@@ -191,7 +203,7 @@ export default function NewProjectForm({
               </p>
             )}
           </div>
-          <div className="flex flex-col gap-4 mt-8 w-96">
+          <div className="flex flex-col gap-4 mt-8">
             {/* Project Title */}
             <div className="space-y-2">
               <MyInput
@@ -201,6 +213,35 @@ export default function NewProjectForm({
                 isInvalid={!!errors.title}
                 errorMessage={errors.title?.message}
               />
+              <div className="flex flex-row items-end gap-4">
+                <ProjectImageUpload
+                  label="Project User Image"
+                  currentImages={userImageUrl ? [userImageUrl] : []}
+                  onImageAdded={(url) => setValue("user.image_url", url)}
+                  onImageRemoved={() => setValue("user.image_url", "")}
+                  bucketName="project-images"
+                  folder="fake-users"
+                  aspectRatio="aspect-square"
+                  userId={userId}
+                  maxImages={1}
+                  uploadAreaText="Drop user image here"
+                  supportedFormats="PNG, JPG, JPEG"
+                  maxFileSize="5MB"
+                  gridCols={1}
+                  isMultiple={false}
+                  shortInfo={true}
+                  className="w-48"
+                  placeholder="Upload a square user image for your project."
+                />
+                <MyInput
+                  label="Project User Name"
+                  type="text"
+                  placeholder="Enter your project user name"
+                  {...register("user.name")}
+                  isInvalid={!!errors.user?.name}
+                  errorMessage={errors.user?.name?.message}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -239,7 +280,7 @@ export default function NewProjectForm({
               Add additional images to showcase different aspects of your
               project
             </p>
-            <div className="w-full h-[1px] bg-[#EAEAEA] my-3"></div>
+            <div className="w-full h-[1px] bg-[#EAEAEA] my-6"></div>
           </div>
           {/* Tools Used */}
           <div className="space-y-2">
@@ -258,10 +299,10 @@ export default function NewProjectForm({
           <ProjectImageUpload
             currentImages={elementImages}
             onImageAdded={addElementImage}
-            label="Element Images"
             onImageRemoved={(url, index) => removeElementImage(index)}
             bucketName="project-images"
             folder="elements"
+            label="Element Images"
             aspectRatio="aspect-[16/9]"
             userId={userId}
             maxImages={4}
