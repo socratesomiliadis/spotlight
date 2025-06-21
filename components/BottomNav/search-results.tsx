@@ -51,7 +51,7 @@ export default function SearchResults({
       {!hasResults ? (
         <div className="px-2 text-base text-[#ACACAC]">No results found</div>
       ) : (
-        <div className="divide-y divide-[#242424]">
+        <div className="divide-y divide-white/5">
           {/* Users Section */}
           {users.length > 0 && (
             <div className="py-2">

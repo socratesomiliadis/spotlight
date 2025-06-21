@@ -59,7 +59,7 @@ export default function BottomNav() {
       >
         <div
           className={cn(
-            "bg-[#1E1E1E] p-0 w-[25vw] rounded-xl flex flex-col transition-all duration-500 ease-out-expo",
+            "bg-[#1E1E1E]/90 backdrop-blur-xl p-0 w-[25vw] rounded-xl flex flex-col transition-all duration-500 ease-out-expo",
             isExpanded && "w-[40vw]"
           )}
         >
@@ -137,7 +137,7 @@ export default function BottomNav() {
                 className="w-full h-full overflow-y-auto bottom-nav-scroller flex flex-col gap-0 pb-16 relative"
               >
                 {isSearchActive ? (
-                  <div className="px-2 py-2 border-[#282828] border-t-[1px]">
+                  <div className="px-2 py-2 border-white/5 border-t-[1px]">
                     <SearchResultsComponent
                       users={searchResults.users}
                       projects={searchResults.projects}
@@ -178,12 +178,12 @@ export default function BottomNav() {
                     />
                   </>
                 )}
-                <div
+                {/* <div
                   className={cn(
                     "w-full h-16 bg-gradient-to-t from-[#1e1e1e] via-[#1e1e1e]/80 to-transparent fixed bottom-[3.6rem] left-0 z-10 pointer-events-none",
                     !isExpanded && "hidden"
                   )}
-                ></div>
+                ></div> */}
               </div>
             </div>
           </div>
@@ -216,7 +216,7 @@ export default function BottomNav() {
                   setIsSearchActive(false);
                 }
               }}
-              className="w-full pr-3 flex items-center justify-end gap-1 focus:outline-none p-1.5"
+              className="w-full pr-4 flex items-center justify-end gap-1 focus:outline-none p-1.5"
             >
               <span className="ml-3">
                 <span className="size-4 relative flex items-center justify-center">

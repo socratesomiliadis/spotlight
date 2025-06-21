@@ -123,6 +123,15 @@ export default function SignInForm() {
             </button>
           }
         />
+        <p className="text-sm text-black mt-0 tracking-tight">
+          Forgot your password?{" "}
+          <button
+            className="underline"
+            onClick={() => setAuth("reset-password")}
+          >
+            Reset password
+          </button>
+        </p>
 
         <div id="clerk-captcha" />
         <button

@@ -63,6 +63,13 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
         >
           Projects
         </Link>
+        <Link
+          onClick={() => setIsOpen(false)}
+          className="py-2 pl-4 hover:bg-[#72727280]/10"
+          href="/settings"
+        >
+          Settings
+        </Link>
         <span className="w-full h-[1px] bg-[#72727280]/50"></span>
         <button
           className="w-full text-left hover:bg-[#72727280]/10 pl-4 py-3 text-[#FA5A59]"

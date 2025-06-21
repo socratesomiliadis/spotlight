@@ -1,8 +1,8 @@
 import { Tables } from "@/database.types";
 
-export default function ProfileNavigation() {
+export default function HomeNavigation() {
   return (
-    <div className="flex items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] px-8 py-4">
+    <div className="flex items-center justify-between mt-8 mb-12 border-y-[1px] border-[#EAEAEA] px-8 py-4">
       <div className="flex items-center gap-2 font-medium tracking-tight">
         <button className="flex items-center gap-2 bg-transparent text-[#989898] border-[2px] box-border border-[#F6F6F6] px-5 py-2 rounded-lg">
           <span className="size-4 flex">

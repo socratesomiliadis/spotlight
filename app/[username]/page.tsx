@@ -6,6 +6,7 @@ import ProfileHeader from "@/app/[username]/components/ProfileHeader";
 import ProfileNavigation from "@/app/[username]/components/ProfileNavigation";
 import ProjectsGrid from "@/app/[username]/components/ProjectsGrid";
 import { getFollowStatusAction } from "@/lib/supabase/follow-actions";
+import PreviewCursor from "@/components/Home/preview-cursor";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -58,13 +59,14 @@ export default async function UsernamePage({ params }: PageProps) {
         <div
           className={cn(
             "w-full",
-            (!!user.website_url || !!user.location) && "mt-6"
+            (!!user.website_url || !!user.location) && "mt-5"
           )}
         >
           <ProfileNavigation socialLinks={user.socials || undefined} />
           <ProjectsGrid projects={user.project || undefined} />
         </div>
       </div>
+      <PreviewCursor />
     </main>
   );
 }

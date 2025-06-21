@@ -20,6 +20,11 @@ body:has(.dark-logo) .header-logo {
   color: #fff;
 }
 
+.cl-navbar > div:first-child,
+.cl-navbar > div:last-child {
+  display: none;
+}
+
 @layer base {
   :root {
     --radius: 0.5rem;
@@ -97,7 +102,7 @@ body:has(.dark-logo) .header-logo {
 }
 
 .bottom-nav-scroller::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: rgba(255, 255, 255, 0);
 }
 
 .bottom-nav-scroller::-webkit-scrollbar-thumb {

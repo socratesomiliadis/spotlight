@@ -87,7 +87,7 @@ export default async function Header() {
           </>
         )}
         <AuthDrawer userExists={!!userId} />
-        <CustomButton text="Submit" href="/submit" inverted />
+        <CustomButton text="Submit" href="/projects/new" inverted />
       </div>
     </header>
   );

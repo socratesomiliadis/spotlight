@@ -5,13 +5,16 @@ import Link from "next/link";
 
 function ProjectCard({ project }: { project: Tables<"project"> }) {
   return (
-    <Link href={`/projects/${project.slug}`} className="w-full">
+    <Link
+      href={`/projects/${project.slug}`}
+      className="w-full overflow-hidden rounded-2xl group show-preview-cursor"
+    >
       <Image
         src={project.thumbnail_url}
         alt={project.title}
         width={1920}
         height={1080}
-        className="w-full aspect-video object-cover rounded-2xl"
+        className="w-full aspect-[16/9] object-cover rounded-2xl group-hover:scale-[1.02] transition-all duration-500 ease-out-expo will-change-transform"
       />
     </Link>
   );

@@ -8,6 +8,7 @@ import localFont from "next/font/local";
 import BottomNav from "@/components/BottomNav";
 import MainLayout from "@/components/main-layout";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import PageWrapper from "@/components/PageWrapper";
 
 const helveticaNow = localFont({
   src: "../fonts/HelveticaNowVar.woff2",
@@ -28,7 +29,13 @@ export default function RootLayout({
   auth: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          fontFamily: "var(--font-helvetica-now)",
+        },
+      }}
+    >
       <html lang="en">
         <body
           className={`${helveticaNow.variable} font-helvetica antialiased relative max-w-[100vw]`}
@@ -38,7 +45,7 @@ export default function RootLayout({
               <MainLayout>
                 <Header />
                 {auth}
-                {children}
+                <PageWrapper>{children}</PageWrapper>
                 <BottomNav />
               </MainLayout>
             </HeroUIProvider>

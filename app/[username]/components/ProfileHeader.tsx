@@ -111,12 +111,13 @@ export default function ProfileHeader({
 
       {/* Name and Details */}
       <div className="flex flex-col pl-8 mt-4">
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-0">
           <h1 className="text-3xl font-semibold tracking-tight">
             {displayName}
           </h1>
+          <span className="text-lg text-[#989898]">@{user.username}</span>
         </div>
-        <div className="flex flex-row gap-5 text-lg text-[#ACACAC] mt-2">
+        <div className="flex flex-row gap-5 text-lg text-[#ACACAC] mt-6 mb-0">
           {user.location && (
             <div className="flex flex-row items-center gap-1">
               <span className="w-4">

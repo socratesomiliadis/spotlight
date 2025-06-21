@@ -9,13 +9,14 @@ export default async function Home() {
 
   const { data: projects } = await supabase
     .from("project")
-    .select("*")
+    .select("*, user:user_id(username, avatar_url, display_name)")
     .order("created_at", { ascending: false });
 
   return (
     <main className="w-screen px-[22vw] py-28">
       <div className="w-full pb-8 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
-        <HomeHero />
+        {/* @ts-ignore */}
+        <HomeHero project={projects?.[projects.length - 1]} />
         <HomeNavigation />
         <ProjectsGrid projects={projects} />
       </div>

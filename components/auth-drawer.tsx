@@ -11,6 +11,7 @@ import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
 import { gsap } from "@/lib/gsap";
 import { useQueryState } from "nuqs";
 import CustomButton from "./custom-button";
+import ResetPassword from "./AuthPages/reset-password";
 
 export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -19,7 +20,7 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [auth, setAuth] = useQueryState("auth");
   const lenis = useLenis();
 
-  const authTypes = ["sign-in", "sign-up"];
+  const authTypes = ["sign-in", "sign-up", "reset-password"];
 
   useEffect(() => {
     if (authTypes?.includes(auth ?? "") && !userExists) {
@@ -53,14 +54,28 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Title className="sr-only">
-          {auth === "sign-in" ? "Sign In" : "Sign Up"}
+          {auth === "sign-in"
+            ? "Sign In"
+            : auth === "sign-up"
+            ? "Sign Up"
+            : "Reset Password"}
         </Drawer.Title>
         <Drawer.Description className="sr-only">
-          {auth === "sign-in" ? "Sign In" : "Sign Up"}
+          {auth === "sign-in"
+            ? "Sign In"
+            : auth === "sign-up"
+            ? "Sign Up"
+            : "Reset Password"}
         </Drawer.Description>
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur z-[100]" />
         <Drawer.Content className="bg-white rounded-b-3xl w-[75vw] h-fit fixed top-0 left-[12.5%] outline-none z-[101]">
-          {auth === "sign-in" ? <SignIn /> : <SignUp />}
+          {auth === "sign-in" ? (
+            <SignIn />
+          ) : auth === "sign-up" ? (
+            <SignUp />
+          ) : (
+            <ResetPassword />
+          )}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

@@ -68,7 +68,7 @@ export async function POST(req: Request) {
         await upsertUser(evt.data);
         break;
       case "user.updated":
-        await upsertUser(evt.data);
+        await upsertUser(evt.data, true);
         break;
       case "user.deleted":
         await deleteUser(evt.data.id);
