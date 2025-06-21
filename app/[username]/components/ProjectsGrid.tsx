@@ -50,7 +50,7 @@ export default async function ProjectsGrid({
             <span className="text-2xl font-medium tracking-tight">
               Nothing Here Yet
             </span>
-            <p className="text-lg text-[#acacac]">
+            <p className="text-lg text-[#acacac] tracking-tight leading-none">
               This user hasn&apos;t uploaded any projects yet. In the meantime,
               feel free to explore some of our recommended projects below.
             </p>

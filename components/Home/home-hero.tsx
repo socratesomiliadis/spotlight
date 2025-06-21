@@ -42,13 +42,16 @@ export default function HomeHero({
             </p>
           </Link>
         )}
-        <Link href={`/projects/${project?.slug}`} className="w-[38%]">
+        <Link
+          href={`/projects/${project?.slug}`}
+          className="w-[38%] show-preview-cursor overflow-hidden rounded-2xl group"
+        >
           <Image
             src={project?.thumbnail_url || ""}
             alt="Project Thumbnail"
             width={1920}
             height={1080}
-            className="rounded-2xl w-full h-auto object-cover aspect-video"
+            className="rounded-2xl w-full h-auto object-cover aspect-video group-hover:scale-[1.02] transition-all duration-500 ease-out-expo will-change-transform"
           />
         </Link>
       </div>

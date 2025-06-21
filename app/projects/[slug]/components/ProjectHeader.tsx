@@ -39,7 +39,9 @@ export default function ProjectHeader({
         />
       </div>
       <div className="flex flex-col items-center gap-2 py-10">
-        <p className="text-sm text-[#ACACAC] -mb-2">{formatDate(createdAt)}</p>
+        <p className="text-sm text-[#ACACAC] -mb-2 tracking-tight">
+          {formatDate(createdAt)}
+        </p>
         <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
         {isStaffProject ? (
           <div className="flex flex-col items-center gap-2 mt-6">
