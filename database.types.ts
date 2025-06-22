@@ -92,6 +92,7 @@ export type Database = {
           id: number
           is_staff_project: boolean
           main_img_url: string
+          preview_gif_url: string | null
           slug: string | null
           thumbnail_url: string
           title: string
@@ -106,6 +107,7 @@ export type Database = {
           id?: number
           is_staff_project?: boolean
           main_img_url: string
+          preview_gif_url?: string | null
           slug?: string | null
           thumbnail_url: string
           title: string
@@ -120,6 +122,7 @@ export type Database = {
           id?: number
           is_staff_project?: boolean
           main_img_url?: string
+          preview_gif_url?: string | null
           slug?: string | null
           thumbnail_url?: string
           title?: string

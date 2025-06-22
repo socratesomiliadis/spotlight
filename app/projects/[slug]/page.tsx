@@ -5,6 +5,7 @@ import ProjectElements from "./components/ProjectElements";
 import ProjectDetails from "./components/ProjectDetails";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { unstable_ViewTransition as ViewTransition } from "react";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -60,13 +61,15 @@ export default async function ProjectPage({ params }: PageProps) {
         />
         <ProjectNavigation />
         <div className="px-8">
-          <Image
-            src={project.main_img_url}
-            alt="Project Image"
-            width={2560}
-            height={1440}
-            className="w-full aspect-video object-cover rounded-2xl"
-          />
+          <ViewTransition name={`project-img-${project.id}`}>
+            <Image
+              src={project.main_img_url}
+              alt="Project Image"
+              width={2560}
+              height={1440}
+              className="w-full aspect-video object-cover rounded-2xl"
+            />
+          </ViewTransition>
         </div>
         {project.elements_url && project.elements_url.length > 0 && (
           <ProjectElements elementURLs={project.elements_url} />

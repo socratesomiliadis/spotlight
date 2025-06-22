@@ -199,9 +199,10 @@ export default function BottomNav() {
                 />
                 {isExpanded && (
                   <motion.div
+                    layoutDependency={isExpanded}
                     layoutId="bottomQuickLinks"
                     transition={{
-                      duration: 0.5,
+                      duration: 0.4,
                       ease: [0.175, 0.885, 0.32, 1],
                     }}
                     className="flex flex-row gap-1 mb-0 will-change-transform"
@@ -236,8 +237,9 @@ export default function BottomNav() {
           </div>
           {!isExpanded && (
             <motion.div
+              layoutDependency={isExpanded}
               transition={{
-                duration: 0.6,
+                duration: 0.4,
                 ease: [0.175, 0.885, 0.32, 1],
               }}
               layoutId="bottomQuickLinks"

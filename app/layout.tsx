@@ -8,7 +8,6 @@ import localFont from "next/font/local";
 import BottomNav from "@/components/BottomNav";
 import MainLayout from "@/components/main-layout";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import PageWrapper from "@/components/PageWrapper";
 
 const helveticaNow = localFont({
   src: "../fonts/HelveticaNowVar.woff2",
@@ -23,10 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  auth,
 }: Readonly<{
   children: React.ReactNode;
-  auth: React.ReactNode;
 }>) {
   return (
     <ClerkProvider
@@ -44,8 +41,7 @@ export default function RootLayout({
             <HeroUIProvider>
               <MainLayout>
                 <Header />
-                {auth}
-                <PageWrapper>{children}</PageWrapper>
+                {children}
                 <BottomNav />
               </MainLayout>
             </HeroUIProvider>
