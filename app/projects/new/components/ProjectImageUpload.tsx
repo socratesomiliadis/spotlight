@@ -5,13 +5,15 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, Reorder } from "motion/react";
+import SortableList, { SortableItem, SortableKnob } from "react-easy-sort";
 
 interface ProjectImageUploadProps {
   label?: string;
   currentImages?: string[];
   onImageAdded: (url: string) => void;
   onImageRemoved?: (url: string, index: number) => void;
+  onImagesReordered?: (oldIndex: number, newIndex: number) => void;
   bucketName: string;
   folder: string;
   aspectRatio?: string;
@@ -32,6 +34,7 @@ export default function ProjectImageUpload({
   currentImages = [],
   onImageAdded,
   onImageRemoved,
+  onImagesReordered,
   bucketName,
   folder,
   aspectRatio = "aspect-[3/2]",
@@ -109,8 +112,11 @@ export default function ProjectImageUpload({
 
   const processFile = (file: File) => {
     // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please select image files only");
+    if (
+      !file.type.startsWith("image/") &&
+      !file.type.startsWith("video/webm")
+    ) {
+      setError("Please select image or webm video files only");
       return;
     }
 
@@ -251,6 +257,11 @@ export default function ProjectImageUpload({
           {isMultiple && (
             <span className="text-sm text-gray-500">
               {currentImages.length} / {maxImages} images
+              {currentImages.length > 1 && (
+                <span className="ml-2 text-xs text-gray-400">
+                  • Drag to reorder
+                </span>
+              )}
             </span>
           )}
         </div>
@@ -259,7 +270,7 @@ export default function ProjectImageUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*, video/webm"
         multiple={isMultiple}
         onChange={handleFileSelect}
         className="hidden"
@@ -270,54 +281,131 @@ export default function ProjectImageUpload({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={cn("grid gap-4", gridColsClass)}
         >
-          <AnimatePresence>
-            {currentImages.map((url, index) => (
-              <motion.div
-                key={url}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2 }}
-                className="relative group"
-              >
-                <div
-                  className={cn(
-                    "relative overflow-hidden rounded-xl bg-gray-100",
-                    aspectRatio
-                  )}
-                >
-                  <img
-                    src={url}
-                    alt={`Project image ${index + 1}`}
-                    className="object-cover w-full h-full"
-                  />
-                  {onImageRemoved && (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                      <button
-                        onClick={() => handleRemoveImage(url, index)}
-                        className="size-16 hover:scale-90 transition-all duration-300 rounded-full bg-white/20 flex items-center justify-center text-white"
-                        title="Remove image"
-                      >
+          {isMultiple && currentImages.length > 1 && onImagesReordered ? (
+            <SortableList
+              onSortEnd={onImagesReordered}
+              className={cn("grid gap-4", `grid-cols-${gridCols}`)}
+              draggedItemClassName="dragged"
+            >
+              {currentImages.map((url, index) => (
+                <SortableItem key={url}>
+                  <div
+                    className={cn(
+                      "relative group cursor-grab overflow-hidden rounded-xl bg-gray-100 select-none",
+                      aspectRatio
+                    )}
+                  >
+                    <img
+                      src={url}
+                      alt={`Project image ${index + 1}`}
+                      className="object-cover w-full h-full pointer-events-none"
+                    />
+                    {onImageRemoved && (
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => handleRemoveImage(url, index)}
+                          className="size-16 hover:scale-90 transition-all duration-300 rounded-full bg-white/20 flex items-center justify-center text-white pointer-events-auto"
+                          title="Remove image"
+                        >
+                          <svg
+                            width="35%"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M3.68964 18.3144L2.94119 18.3627L3.68964 18.3144ZM16.3104 18.3144L17.0588 18.3627V18.3627L16.3104 18.3144ZM0.75 3C0.335786 3 0 3.33579 0 3.75C0 4.16421 0.335786 4.5 0.75 4.5V3ZM19.25 4.5C19.6642 4.5 20 4.16421 20 3.75C20 3.33579 19.6642 3 19.25 3V4.5ZM8.5 8.75C8.5 8.33579 8.16421 8 7.75 8C7.33579 8 7 8.33579 7 8.75H8.5ZM7 14.25C7 14.6642 7.33579 15 7.75 15C8.16421 15 8.5 14.6642 8.5 14.25H7ZM13 8.75C13 8.33579 12.6642 8 12.25 8C11.8358 8 11.5 8.33579 11.5 8.75H13ZM11.5 14.25C11.5 14.6642 11.8358 15 12.25 15C12.6642 15 13 14.6642 13 14.25H11.5ZM13.1477 3.93694C13.2509 4.33808 13.6598 4.57957 14.0609 4.47633C14.4621 4.37308 14.7036 3.9642 14.6003 3.56306L13.1477 3.93694ZM2.00156 3.79829L2.94119 18.3627L4.43808 18.2661L3.49844 3.70171L2.00156 3.79829ZM4.68756 20H15.3124V18.5H4.68756V20ZM17.0588 18.3627L17.9984 3.79829L16.5016 3.70171L15.5619 18.2661L17.0588 18.3627ZM17.25 3H2.75V4.5H17.25V3ZM0.75 4.5H2.75V3H0.75V4.5ZM17.25 4.5H19.25V3H17.25V4.5ZM15.3124 20C16.2352 20 16.9994 19.2835 17.0588 18.3627L15.5619 18.2661C15.5534 18.3976 15.4443 18.5 15.3124 18.5V20ZM2.94119 18.3627C3.0006 19.2835 3.76481 20 4.68756 20V18.5C4.55574 18.5 4.44657 18.3976 4.43808 18.2661L2.94119 18.3627ZM7 8.75V14.25H8.5V8.75H7ZM11.5 8.75V14.25H13V8.75H11.5ZM10 1.5C11.5134 1.5 12.7868 2.53504 13.1477 3.93694L14.6003 3.56306C14.0731 1.51451 12.2144 0 10 0V1.5ZM6.85237 3.93694C7.21319 2.53504 8.48668 1.5 10 1.5V0C7.78568 0 5.92697 1.51451 5.39971 3.56306L6.85237 3.93694Z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                    {/* Drag indicator */}
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div className="size-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                         <svg
-                          width="35%"
-                          viewBox="0 0 20 20"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
                           fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
+                          className="text-white"
                         >
                           <path
-                            d="M3.68964 18.3144L2.94119 18.3627L3.68964 18.3144ZM16.3104 18.3144L17.0588 18.3627V18.3627L16.3104 18.3144ZM0.75 3C0.335786 3 0 3.33579 0 3.75C0 4.16421 0.335786 4.5 0.75 4.5V3ZM19.25 4.5C19.6642 4.5 20 4.16421 20 3.75C20 3.33579 19.6642 3 19.25 3V4.5ZM8.5 8.75C8.5 8.33579 8.16421 8 7.75 8C7.33579 8 7 8.33579 7 8.75H8.5ZM7 14.25C7 14.6642 7.33579 15 7.75 15C8.16421 15 8.5 14.6642 8.5 14.25H7ZM13 8.75C13 8.33579 12.6642 8 12.25 8C11.8358 8 11.5 8.33579 11.5 8.75H13ZM11.5 14.25C11.5 14.6642 11.8358 15 12.25 15C12.6642 15 13 14.6642 13 14.25H11.5ZM13.1477 3.93694C13.2509 4.33808 13.6598 4.57957 14.0609 4.47633C14.4621 4.37308 14.7036 3.9642 14.6003 3.56306L13.1477 3.93694ZM2.00156 3.79829L2.94119 18.3627L4.43808 18.2661L3.49844 3.70171L2.00156 3.79829ZM4.68756 20H15.3124V18.5H4.68756V20ZM17.0588 18.3627L17.9984 3.79829L16.5016 3.70171L15.5619 18.2661L17.0588 18.3627ZM17.25 3H2.75V4.5H17.25V3ZM0.75 4.5H2.75V3H0.75V4.5ZM17.25 4.5H19.25V3H17.25V4.5ZM15.3124 20C16.2352 20 16.9994 19.2835 17.0588 18.3627L15.5619 18.2661C15.5534 18.3976 15.4443 18.5 15.3124 18.5V20ZM2.94119 18.3627C3.0006 19.2835 3.76481 20 4.68756 20V18.5C4.55574 18.5 4.44657 18.3976 4.43808 18.2661L2.94119 18.3627ZM7 8.75V14.25H8.5V8.75H7ZM11.5 8.75V14.25H13V8.75H11.5ZM10 1.5C11.5134 1.5 12.7868 2.53504 13.1477 3.93694L14.6003 3.56306C14.0731 1.51451 12.2144 0 10 0V1.5ZM6.85237 3.93694C7.21319 2.53504 8.48668 1.5 10 1.5V0C7.78568 0 5.92697 1.51451 5.39971 3.56306L6.85237 3.93694Z"
-                            fill="currentColor"
+                            d="M8 6H8.01M8 12H8.01M8 18H8.01M16 6H16.01M16 12H16.01M16 18H16.01"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
-                      </button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                  </div>
+                </SortableItem>
+              ))}
+            </SortableList>
+          ) : (
+            <div className={cn("grid gap-4", `grid-cols-${gridCols}`)}>
+              <AnimatePresence>
+                {currentImages.map((url, index) => (
+                  <motion.div
+                    key={url}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.2 }}
+                    className="relative group"
+                  >
+                    <div
+                      className={cn(
+                        "relative overflow-hidden rounded-xl bg-gray-100",
+                        aspectRatio
+                      )}
+                    >
+                      {url.endsWith(".webm") ? (
+                        <video
+                          src={url}
+                          autoPlay
+                          muted
+                          loop
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <img
+                          src={url}
+                          alt={`Project image ${index + 1}`}
+                          className="object-cover w-full h-full"
+                        />
+                      )}
+                      {onImageRemoved && (
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                          <button
+                            onClick={() => handleRemoveImage(url, index)}
+                            className="size-16 hover:scale-90 transition-all duration-300 rounded-full bg-white/20 flex items-center justify-center text-white"
+                            title="Remove image"
+                          >
+                            <svg
+                              width="35%"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M3.68964 18.3144L2.94119 18.3627L3.68964 18.3144ZM16.3104 18.3144L17.0588 18.3627V18.3627L16.3104 18.3144ZM0.75 3C0.335786 3 0 3.33579 0 3.75C0 4.16421 0.335786 4.5 0.75 4.5V3ZM19.25 4.5C19.6642 4.5 20 4.16421 20 3.75C20 3.33579 19.6642 3 19.25 3V4.5ZM8.5 8.75C8.5 8.33579 8.16421 8 7.75 8C7.33579 8 7 8.33579 7 8.75H8.5ZM7 14.25C7 14.6642 7.33579 15 7.75 15C8.16421 15 8.5 14.6642 8.5 14.25H7ZM13 8.75C13 8.33579 12.6642 8 12.25 8C11.8358 8 11.5 8.33579 11.5 8.75H13ZM11.5 14.25C11.5 14.6642 11.8358 15 12.25 15C12.6642 15 13 14.6642 13 14.25H11.5ZM13.1477 3.93694C13.2509 4.33808 13.6598 4.57957 14.0609 4.47633C14.4621 4.37308 14.7036 3.9642 14.6003 3.56306L13.1477 3.93694ZM2.00156 3.79829L2.94119 18.3627L4.43808 18.2661L3.49844 3.70171L2.00156 3.79829ZM4.68756 20H15.3124V18.5H4.68756V20ZM17.0588 18.3627L17.9984 3.79829L16.5016 3.70171L15.5619 18.2661L17.0588 18.3627ZM17.25 3H2.75V4.5H17.25V3ZM0.75 4.5H2.75V3H0.75V4.5ZM17.25 4.5H19.25V3H17.25V4.5ZM15.3124 20C16.2352 20 16.9994 19.2835 17.0588 18.3627L15.5619 18.2661C15.5534 18.3976 15.4443 18.5 15.3124 18.5V20ZM2.94119 18.3627C3.0006 19.2835 3.76481 20 4.68756 20V18.5C4.55574 18.5 4.44657 18.3976 4.43808 18.2661L2.94119 18.3627ZM7 8.75V14.25H8.5V8.75H7ZM11.5 8.75V14.25H13V8.75H11.5ZM10 1.5C11.5134 1.5 12.7868 2.53504 13.1477 3.93694L14.6003 3.56306C14.0731 1.51451 12.2144 0 10 0V1.5ZM6.85237 3.93694C7.21319 2.53504 8.48668 1.5 10 1.5V0C7.78568 0 5.92697 1.51451 5.39971 3.56306L6.85237 3.93694Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
         </motion.div>
       )}
 

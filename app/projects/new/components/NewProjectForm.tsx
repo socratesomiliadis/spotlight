@@ -13,12 +13,14 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "motion/react";
+import { arrayMoveImmutable } from "array-move";
 
 // Define validation schema for project submission
 const projectSchema = z.object({
   title: z.string().min(1, "Project title is required"),
   tools_used: z.string().min(1, "Please add at least one tool"),
   main_img_url: z.string().min(1, "Main project image is required"),
+  preview_gif_url: z.string().optional(),
   thumbnail_url: z.string().min(1, "Thumbnail image is required"),
   banner_url: z.string().optional(),
   elements_url: z.array(z.string()).optional(),
@@ -51,10 +53,12 @@ export default function NewProjectForm({
     formState: { errors },
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
+    shouldFocusError: false,
     defaultValues: {
       title: "",
       tools_used: "",
       main_img_url: "",
+      preview_gif_url: "",
       thumbnail_url: "",
       banner_url: "",
       elements_url: [],
@@ -65,6 +69,7 @@ export default function NewProjectForm({
   const bannerUrl = watch("banner_url");
   const mainImageUrl = watch("main_img_url");
   const thumbnailUrl = watch("thumbnail_url");
+  const previewGifUrl = watch("preview_gif_url");
 
   const onSubmit = async (data: ProjectFormValues) => {
     setIsLoading(true);
@@ -92,6 +97,7 @@ export default function NewProjectForm({
           slug: slug,
           tools_used: toolsArray,
           main_img_url: data.main_img_url,
+          preview_gif_url: data.preview_gif_url || null,
           thumbnail_url: data.thumbnail_url,
           banner_url: data.banner_url || null,
           elements_url: elementImages.length > 0 ? elementImages : null,
@@ -124,9 +130,11 @@ export default function NewProjectForm({
   };
 
   const addElementImage = (url: string) => {
-    const newElements = [...elementImages, url];
-    setElementImages(newElements);
-    setValue("elements_url", newElements);
+    setElementImages((prev) => {
+      const newElements = [...prev, url];
+      setValue("elements_url", newElements);
+      return newElements;
+    });
   };
 
   const removeElementImage = (index: number) => {
@@ -163,10 +171,21 @@ export default function NewProjectForm({
 
       {/* Project Details Section */}
       <div className="px-6 py-8 space-y-6 w-full">
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-4 mt-8 w-96">
+          {/* Project Title */}
+
+          <MyInput
+            label="Project Title"
+            type="text"
+            {...register("title")}
+            isInvalid={!!errors.title}
+            errorMessage={errors.title?.message}
+          />
+        </div>
+        <div className="w-full flex flex-row gap-4">
           {/* Thumbnail Image */}
-          <div className="space-y-2 w-64">
-            <div className="w-full max-w-sm">
+          <div className="space-y-2 w-1/2">
+            <div className="w-full">
               <ProjectImageUpload
                 label="Thumbnail Image *"
                 currentImages={thumbnailUrl ? [thumbnailUrl] : []}
@@ -174,7 +193,7 @@ export default function NewProjectForm({
                 onImageRemoved={() => setValue("thumbnail_url", "")}
                 bucketName="project-images"
                 folder="thumbnails"
-                aspectRatio="aspect-square"
+                aspectRatio="aspect-video"
                 userId={userId}
                 maxImages={1}
                 uploadAreaText="Drop thumbnail here"
@@ -182,7 +201,7 @@ export default function NewProjectForm({
                 maxFileSize="5MB"
                 gridCols={1}
                 isMultiple={false}
-                placeholder="Upload a square thumbnail for your project."
+                placeholder="Upload a thumbnail for your project."
               />
             </div>
             {errors.thumbnail_url && (
@@ -191,17 +210,32 @@ export default function NewProjectForm({
               </p>
             )}
           </div>
-          <div className="flex flex-col gap-4 mt-8 w-96">
-            {/* Project Title */}
-            <div className="space-y-2">
-              <MyInput
-                label="Project Title"
-                type="text"
-                {...register("title")}
-                isInvalid={!!errors.title}
-                errorMessage={errors.title?.message}
+          {/* Preview Video */}
+          <div className="space-y-2 w-1/2">
+            <div className="w-full">
+              <ProjectImageUpload
+                label="Preview Video *"
+                currentImages={previewGifUrl ? [previewGifUrl] : []}
+                onImageAdded={(url) => setValue("preview_gif_url", url)}
+                onImageRemoved={() => setValue("preview_gif_url", "")}
+                bucketName="project-images"
+                folder="previews"
+                aspectRatio="aspect-video"
+                userId={userId}
+                maxImages={1}
+                uploadAreaText="Drop preview video here"
+                supportedFormats="MP4, WEBM, GIF"
+                maxFileSize="5MB"
+                gridCols={1}
+                isMultiple={false}
+                placeholder="Upload a preview video for your project."
               />
             </div>
+            {errors.preview_gif_url && (
+              <p className="text-sm text-red-500">
+                {errors.preview_gif_url.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -260,6 +294,12 @@ export default function NewProjectForm({
             onImageAdded={addElementImage}
             label="Element Images"
             onImageRemoved={(url, index) => removeElementImage(index)}
+            onImagesReordered={(oldIndex: number, newIndex: number) => {
+              setElementImages((array) =>
+                arrayMoveImmutable(array, oldIndex, newIndex)
+              );
+              setValue("elements_url", elementImages);
+            }}
             bucketName="project-images"
             folder="elements"
             aspectRatio="aspect-[16/9]"

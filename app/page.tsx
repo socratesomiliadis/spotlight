@@ -12,11 +12,17 @@ export default async function Home() {
     .select("*, user:user_id(username, avatar_url, display_name)")
     .order("created_at", { ascending: false });
 
+  const { data: sotd } = await supabase
+    .from("sotdtemp")
+    .select("*, project:project_id(*)")
+    .eq("id", "sotd")
+    .single();
+
   return (
     <main className="w-screen px-[22vw] py-28">
       <div className="w-full pb-8 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
         {/* @ts-ignore */}
-        <HomeHero project={projects?.[projects.length - 1]} />
+        <HomeHero project={sotd?.project} />
         <HomeNavigation />
         <ProjectsGrid projects={projects} />
       </div>

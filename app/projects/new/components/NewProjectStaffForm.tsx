@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "motion/react";
+import { arrayMoveImmutable } from "array-move";
 
 const fakeUserSchema = z.object({
   name: z.string().min(1, "User name is required"),
@@ -27,6 +28,7 @@ const projectSchema = z.object({
   thumbnail_url: z.string().min(1, "Thumbnail image is required"),
   banner_url: z.string().optional(),
   elements_url: z.array(z.string()).optional(),
+  preview_gif_url: z.string().optional(),
   user: fakeUserSchema,
 });
 
@@ -53,10 +55,12 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
     formState: { errors },
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
+    shouldFocusError: false,
     defaultValues: {
       title: "",
       tools_used: "",
       main_img_url: "",
+      preview_gif_url: "",
       thumbnail_url: "",
       banner_url: "",
       elements_url: [],
@@ -72,6 +76,7 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
   const mainImageUrl = watch("main_img_url");
   const thumbnailUrl = watch("thumbnail_url");
   const userImageUrl = watch("user.image_url");
+  const previewGifUrl = watch("preview_gif_url");
 
   const onSubmit = async (data: ProjectFormValues) => {
     setIsLoading(true);
@@ -99,6 +104,7 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
           slug: slug,
           tools_used: toolsArray,
           main_img_url: data.main_img_url,
+          preview_gif_url: data.preview_gif_url || null,
           thumbnail_url: data.thumbnail_url,
           banner_url: data.banner_url || null,
           elements_url: elementImages.length > 0 ? elementImages : null,
@@ -136,9 +142,11 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
   };
 
   const addElementImage = (url: string) => {
-    const newElements = [...elementImages, url];
-    setElementImages(newElements);
-    setValue("elements_url", newElements);
+    setElementImages((prev) => {
+      const newElements = [...prev, url];
+      setValue("elements_url", newElements);
+      return newElements;
+    });
   };
 
   const removeElementImage = (index: number) => {
@@ -175,6 +183,48 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
 
       {/* Project Details Section */}
       <div className="px-6 py-8 space-y-6 w-full">
+        <div className="flex flex-col gap-4 mt-8 w-fit">
+          {/* Project Title */}
+          <div className="space-y-2">
+            <MyInput
+              label="Project Title"
+              type="text"
+              {...register("title")}
+              isInvalid={!!errors.title}
+              errorMessage={errors.title?.message}
+            />
+            <div className="flex flex-row items-end gap-4">
+              <div className="w-48">
+                <ProjectImageUpload
+                  label="Project User Image"
+                  currentImages={userImageUrl ? [userImageUrl] : []}
+                  onImageAdded={(url) => setValue("user.image_url", url)}
+                  onImageRemoved={() => setValue("user.image_url", "")}
+                  bucketName="project-images"
+                  folder="fake-users"
+                  aspectRatio="aspect-square"
+                  userId={userId}
+                  maxImages={1}
+                  uploadAreaText="Drop user image here"
+                  supportedFormats="PNG, JPG, JPEG"
+                  maxFileSize="5MB"
+                  gridCols={1}
+                  isMultiple={false}
+                  shortInfo={true}
+                  placeholder="Upload a square user image for your project."
+                />
+              </div>
+              <MyInput
+                label="Project User Name"
+                type="text"
+                placeholder="Enter your project user name"
+                {...register("user.name")}
+                isInvalid={!!errors.user?.name}
+                errorMessage={errors.user?.name?.message}
+              />
+            </div>
+          </div>
+        </div>
         <div className="flex flex-row gap-4 w-full">
           {/* Thumbnail Image */}
           <div className="space-y-2 w-1/2">
@@ -203,46 +253,32 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
               </p>
             )}
           </div>
-          <div className="flex flex-col gap-4 mt-8">
-            {/* Project Title */}
-            <div className="space-y-2">
-              <MyInput
-                label="Project Title"
-                type="text"
-                {...register("title")}
-                isInvalid={!!errors.title}
-                errorMessage={errors.title?.message}
+          {/* Preview Video */}
+          <div className="space-y-2 w-1/2">
+            <div className="w-full">
+              <ProjectImageUpload
+                label="Preview Video *"
+                currentImages={previewGifUrl ? [previewGifUrl] : []}
+                onImageAdded={(url) => setValue("preview_gif_url", url)}
+                onImageRemoved={() => setValue("preview_gif_url", "")}
+                bucketName="project-images"
+                folder="previews"
+                aspectRatio="aspect-video"
+                userId={userId}
+                maxImages={1}
+                uploadAreaText="Drop preview video here"
+                supportedFormats="MP4, WEBM, GIF"
+                maxFileSize="5MB"
+                gridCols={1}
+                isMultiple={false}
+                placeholder="Upload a preview video for your project."
               />
-              <div className="flex flex-row items-end gap-4">
-                <ProjectImageUpload
-                  label="Project User Image"
-                  currentImages={userImageUrl ? [userImageUrl] : []}
-                  onImageAdded={(url) => setValue("user.image_url", url)}
-                  onImageRemoved={() => setValue("user.image_url", "")}
-                  bucketName="project-images"
-                  folder="fake-users"
-                  aspectRatio="aspect-square"
-                  userId={userId}
-                  maxImages={1}
-                  uploadAreaText="Drop user image here"
-                  supportedFormats="PNG, JPG, JPEG"
-                  maxFileSize="5MB"
-                  gridCols={1}
-                  isMultiple={false}
-                  shortInfo={true}
-                  className="w-48"
-                  placeholder="Upload a square user image for your project."
-                />
-                <MyInput
-                  label="Project User Name"
-                  type="text"
-                  placeholder="Enter your project user name"
-                  {...register("user.name")}
-                  isInvalid={!!errors.user?.name}
-                  errorMessage={errors.user?.name?.message}
-                />
-              </div>
             </div>
+            {errors.preview_gif_url && (
+              <p className="text-sm text-red-500">
+                {errors.preview_gif_url.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -300,6 +336,12 @@ export default function NewProjectForm({ userId }: NewProjectFormProps) {
             currentImages={elementImages}
             onImageAdded={addElementImage}
             onImageRemoved={(url, index) => removeElementImage(index)}
+            onImagesReordered={(oldIndex: number, newIndex: number) => {
+              setElementImages((array) =>
+                arrayMoveImmutable(array, oldIndex, newIndex)
+              );
+              setValue("elements_url", elementImages);
+            }}
             bucketName="project-images"
             folder="elements"
             label="Element Images"

@@ -172,6 +172,32 @@ export type Database = {
           },
         ]
       }
+      sotdtemp: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "SOTD Temp_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "project"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
