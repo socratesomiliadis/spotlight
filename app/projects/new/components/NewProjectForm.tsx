@@ -2,21 +2,18 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useSession } from "@clerk/nextjs"
-import { Form } from "@heroui/react"
+import { Form, SelectItem } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { arrayMoveImmutable } from "array-move"
-import { AnimatePresence, motion } from "motion/react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
 import { createProject } from "@/lib/supabase/actions/projects"
-import { createClient } from "@/lib/supabase/client"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 import MultiSelectCombobox from "@/components/Forms/components/MultiSelectCombobox"
-import ImageUpload from "@/app/[username]/edit/components/ImageUpload"
+import MySelect from "@/components/Forms/components/Select"
 
 import ProjectImageUpload from "./ProjectImageUpload"
 import UnclaimedUserSelector from "./UnclaimedUserSelector"
@@ -113,16 +110,14 @@ export default function NewProjectForm({
   const [isLoading, setIsLoading] = useState(false)
   const [elementImages, setElementImages] = useState<string[]>([])
   const [selectedUserId, setSelectedUserId] = useState<string>("")
-  const [selectedUsername, setSelectedUsername] = useState<string>("")
   const router = useRouter()
-  const { session } = useSession()
-  const supabase = createClient({ session })
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -144,7 +139,7 @@ export default function NewProjectForm({
   const bannerUrl = watch("banner_url")
   const mainImageUrl = watch("main_img_url")
   const previewUrl = watch("preview_url")
-  const toolsUsed = watch("tags")
+  const tags = watch("tags")
 
   async function insertProject(data: ProjectFormValues) {
     try {
@@ -165,6 +160,7 @@ export default function NewProjectForm({
         elements_url: elementImages.length > 0 ? elementImages : null,
         user_id: isStaff && selectedUserId ? selectedUserId : userId,
         slug: slug,
+        category: data.category,
       })
 
       // Redirect to the new project page after successful creation
@@ -235,11 +231,10 @@ export default function NewProjectForm({
 
       {/* Staff User Selection Section */}
       {isStaff && (
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 w-full">
           <UnclaimedUserSelector
-            onUserSelected={(userId, username) => {
+            onUserSelected={(userId) => {
               setSelectedUserId(userId)
-              setSelectedUsername(username)
             }}
             selectedUserId={selectedUserId}
           />
@@ -250,14 +245,54 @@ export default function NewProjectForm({
       <div className="px-6 py-8 space-y-6 w-full">
         <div className="flex flex-col gap-2 w-full">
           <span className="text-black text-xl">Project Details</span>
-          {/* Project Title */}
-          <MyInput
-            label="Project Title *"
-            type="text"
-            {...register("title")}
-            isInvalid={!!errors.title}
-            errorMessage={errors.title?.message}
-          />
+          {/* Project Title and Category */}
+          <div className="w-full flex flex-row gap-4">
+            <MyInput
+              label="Project Title *"
+              type="text"
+              {...register("title")}
+              isInvalid={!!errors.title}
+              errorMessage={errors.title?.message}
+            />
+            <div className="w-full">
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <MySelect
+                    label="Category"
+                    selectedKeys={field.value ? [field.value] : []}
+                    onSelectionChange={(keys) => {
+                      const selectedKey = Array.from(keys)[0] as string
+                      field.onChange(selectedKey)
+                    }}
+                    isInvalid={!!errors.category}
+                    errorMessage={errors.category?.message}
+                    className="w-full"
+                  >
+                    <SelectItem key="websites" textValue="Websites">
+                      Websites
+                    </SelectItem>
+                    <SelectItem key="design" textValue="Design">
+                      Design
+                    </SelectItem>
+                    <SelectItem key="films" textValue="Films">
+                      Films
+                    </SelectItem>
+                    <SelectItem key="crypto" textValue="Crypto">
+                      Crypto
+                    </SelectItem>
+                    <SelectItem key="startups" textValue="Startups">
+                      Startups
+                    </SelectItem>
+                    <SelectItem key="ai" textValue="AI">
+                      AI
+                    </SelectItem>
+                  </MySelect>
+                )}
+              />
+            </div>
+          </div>
         </div>
         <div className="w-full flex flex-row gap-4">
           {/* Main Project Image */}
@@ -327,18 +362,14 @@ export default function NewProjectForm({
           {/* Tools Used */}
           <div className="space-y-2">
             <MultiSelectCombobox
-              label="Tools Used"
-              placeholder="Search and select tools..."
-              value={toolsUsed}
+              label="Tags"
+              placeholder="Search and select tags..."
+              value={tags}
               onChange={(value) => setValue("tags", value)}
               options={COMMON_TOOLS}
               isInvalid={!!errors.tags}
               errorMessage={errors.tags?.message}
             />
-            <p className="text-sm text-gray-500">
-              Select from common tools or add custom ones by typing and pressing
-              Enter
-            </p>
           </div>
           <ProjectImageUpload
             currentImages={elementImages}

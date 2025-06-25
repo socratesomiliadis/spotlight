@@ -34,7 +34,7 @@ interface UnclaimedUser {
 }
 
 interface UnclaimedUserSelectorProps {
-  onUserSelected: (userId: string, username: string) => void
+  onUserSelected: (userId: string) => void
   selectedUserId?: string
 }
 
@@ -115,7 +115,7 @@ export default function UnclaimedUserSelector({
       }
 
       setUnclaimedUsers((prev) => [newUnclaimedUser, ...prev])
-      onUserSelected(newUser.id, data.username)
+      onUserSelected(newUser.id)
 
       // Reset form and switch back to select mode
       reset()
@@ -131,7 +131,7 @@ export default function UnclaimedUserSelector({
   }
 
   const handleUserSelect = (user: UnclaimedUser) => {
-    onUserSelected(user.user_id, user.username)
+    onUserSelected(user.user_id)
   }
 
   const selectedUser = unclaimedUsers.find(
@@ -298,21 +298,43 @@ export default function UnclaimedUserSelector({
             className="space-y-4"
           >
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <MyInput
-                  label="First Name *"
-                  type="text"
-                  {...register("first_name")}
-                  isInvalid={!!errors.first_name}
-                  errorMessage={errors.first_name?.message}
-                />
-                <MyInput
-                  label="Last Name *"
-                  type="text"
-                  {...register("last_name")}
-                  isInvalid={!!errors.last_name}
-                  errorMessage={errors.last_name?.message}
-                />
+              <div className="flex flex-row gap-4 items-end">
+                {/* Avatar Upload */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">
+                    Profile Picture *
+                  </label>
+                  <ImageUpload
+                    label="Profile Picture"
+                    currentImageUrl={avatarUrl}
+                    onImageUploaded={(url: string) =>
+                      setValue("avatar_url", url)
+                    }
+                    onImageRemoved={() => setValue("avatar_url", "")}
+                    bucketName="unclaimed-profiles"
+                    folder="avatars"
+                    aspectRatio="aspect-square"
+                    className="size-32 rounded-xl"
+                    displayAreaClassName="rounded-xl"
+                    userId={user.id}
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 w-96">
+                  <MyInput
+                    label="First Name *"
+                    type="text"
+                    {...register("first_name")}
+                    isInvalid={!!errors.first_name}
+                    errorMessage={errors.first_name?.message}
+                  />
+                  <MyInput
+                    label="Last Name *"
+                    type="text"
+                    {...register("last_name")}
+                    isInvalid={!!errors.last_name}
+                    errorMessage={errors.last_name?.message}
+                  />
+                </div>
               </div>
 
               <MyInput
@@ -331,24 +353,6 @@ export default function UnclaimedUserSelector({
                 errorMessage={errors.username?.message}
                 placeholder="e.g. johnsmith"
               />
-
-              {/* Avatar Upload */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-900">
-                  Profile Picture *
-                </label>
-                <ImageUpload
-                  label="Profile Picture"
-                  currentImageUrl={avatarUrl}
-                  onImageUploaded={(url: string) => setValue("avatar_url", url)}
-                  onImageRemoved={() => setValue("avatar_url", "")}
-                  bucketName="unclaimed-profiles"
-                  folder="avatars"
-                  aspectRatio="aspect-square"
-                  className="w-24 h-24"
-                  userId={user.id}
-                />
-              </div>
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-start gap-2">

@@ -1,5 +1,5 @@
-import { heroui } from "@heroui/theme";
-import type { Config } from "tailwindcss";
+import { heroui } from "@heroui/theme"
+import type { Config } from "tailwindcss"
 
 export default {
   darkMode: ["class"],
@@ -7,7 +7,7 @@ export default {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@heroui/theme/dist/components/(button|input|ripple|spinner|form).js",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -81,4 +81,4 @@ export default {
       },
     }),
   ],
-} satisfies Config;
+} satisfies Config

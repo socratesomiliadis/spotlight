@@ -117,3 +117,104 @@ export async function getFollowCounts(userId: string) {
     following: followingCount || 0,
   }
 }
+
+// Award functions
+export async function createAward(
+  projectId: string,
+  awardType: "otd" | "otm" | "oty" | "honorable",
+  awardedAt?: string
+) {
+  const supabaseServerClient = await createAdminClient()
+
+  const { data, error } = await supabaseServerClient
+    .from("award")
+    .insert({
+      project_id: projectId,
+      award_type: awardType,
+      awarded_at: awardedAt || new Date().toISOString(),
+    })
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function removeAward(
+  projectId: string,
+  awardType: "otd" | "otm" | "oty" | "honorable"
+) {
+  const supabaseServerClient = await createAdminClient()
+
+  const { error } = await supabaseServerClient
+    .from("award")
+    .delete()
+    .eq("project_id", projectId)
+    .eq("award_type", awardType)
+
+  if (error) throw error
+  return { success: true }
+}
+
+export async function getProjectAwards(projectId: string) {
+  const supabaseServerClient = await createAdminClient()
+
+  const { data, error } = await supabaseServerClient
+    .from("award")
+    .select("*")
+    .eq("project_id", projectId)
+
+  if (error) throw error
+  return data || []
+}
+
+export async function getAllProjectsWithAwards() {
+  const supabaseServerClient = await createAdminClient()
+
+  const { data, error } = await supabaseServerClient
+    .from("project")
+    .select(
+      `
+      *,
+      user:user_id(username, avatar_url, display_name),
+      award(award_type, awarded_at, created_at)
+    `
+    )
+    .order("created_at", { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
+export async function getTodaysSiteOfTheDay() {
+  const supabaseServerClient = await createAdminClient()
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]
+  const startOfDay = `${today}T00:00:00.000Z`
+  const endOfDay = `${today}T23:59:59.999Z`
+
+  const { data, error } = await supabaseServerClient
+    .from("project")
+    .select(
+      `
+      *,
+      user:user_id(username, avatar_url, display_name),
+      award!inner(award_type, awarded_at, created_at)
+    `
+    )
+    .eq("award.award_type", "otd")
+    .gte("award.awarded_at", startOfDay)
+    .lte("award.awarded_at", endOfDay)
+    .single()
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      // No site of the day for today
+      return null
+    }
+    throw error
+  }
+
+  return data
+}
