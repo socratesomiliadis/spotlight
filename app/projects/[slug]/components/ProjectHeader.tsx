@@ -1,12 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
+  })
 }
 
 export default function ProjectHeader({
@@ -16,15 +16,13 @@ export default function ProjectHeader({
   userAvatarUrl,
   userDisplayName,
   userUsername,
-  isStaffProject,
 }: {
-  bannerUrl: string | null;
-  title: string;
-  createdAt: string;
-  userAvatarUrl: string | null;
-  userDisplayName: string | null;
-  userUsername: string;
-  isStaffProject: boolean;
+  bannerUrl: string | null
+  title: string
+  createdAt: string
+  userAvatarUrl: string | null
+  userDisplayName: string | null
+  userUsername: string
 }) {
   return (
     <div className="flex flex-col p-3">
@@ -43,35 +41,23 @@ export default function ProjectHeader({
           {formatDate(createdAt)}
         </p>
         <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
-        {isStaffProject ? (
-          <div className="flex flex-col items-center gap-2 mt-6">
-            <Image
-              src={userAvatarUrl || ""}
-              alt="User Avatar"
-              width={40}
-              height={40}
-              className="rounded-full size-10"
-            />
-            <p className="text-sm text-[#ACACAC]">By {userDisplayName}</p>
-          </div>
-        ) : (
-          <Link
-            href={`/${userUsername}`}
-            className="flex flex-col items-center gap-2 mt-6"
-          >
-            <Image
-              src={userAvatarUrl || ""}
-              alt="User Avatar"
-              width={40}
-              height={40}
-              className="rounded-full size-10"
-            />
-            <p className="text-sm text-[#ACACAC]">
-              By <span className="underline">{userDisplayName}</span>
-            </p>
-          </Link>
-        )}
+
+        <Link
+          href={`/${userUsername}`}
+          className="flex flex-col items-center gap-2 mt-6"
+        >
+          <Image
+            src={userAvatarUrl || ""}
+            alt="User Avatar"
+            width={40}
+            height={40}
+            className="rounded-full size-10"
+          />
+          <p className="text-sm text-[#ACACAC]">
+            By <span className="underline">{userDisplayName}</span>
+          </p>
+        </Link>
       </div>
     </div>
-  );
+  )
 }

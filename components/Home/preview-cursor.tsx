@@ -1,50 +1,51 @@
-"use client";
+"use client"
 
-import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
-import { gsap } from "@/lib/gsap";
-import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useRef, useState } from "react"
+
+import { gsap } from "@/lib/gsap"
+import { cn } from "@/lib/utils"
+import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect"
 
 export default function PreviewCursor() {
-  const [isVisible, setIsVisible] = useState(false);
-  const cursorRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false)
+  const cursorRef = useRef<HTMLDivElement>(null)
 
   useIsomorphicLayoutEffect(() => {
-    if (!cursorRef.current) return;
+    if (!cursorRef.current) return
     const showPreviewCursorElements = document.querySelectorAll(
       ".show-preview-cursor"
-    );
+    )
 
     const handleMouseMove = (e: MouseEvent) => {
       gsap.to(cursorRef.current, {
         left: e.clientX,
         top: e.clientY,
-      });
-    };
+      })
+    }
 
     showPreviewCursorElements.forEach((element) => {
       element.addEventListener("mouseenter", () => {
-        setIsVisible(true);
-      });
+        setIsVisible(true)
+      })
       element.addEventListener("mouseleave", () => {
-        setIsVisible(false);
-      });
-    });
+        setIsVisible(false)
+      })
+    })
 
-    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove)
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove)
       showPreviewCursorElements.forEach((element) => {
         element.removeEventListener("mouseenter", () => {
-          setIsVisible(true);
-        });
+          setIsVisible(true)
+        })
         element.removeEventListener("mouseleave", () => {
-          setIsVisible(false);
-        });
-      });
-    };
-  }, []);
+          setIsVisible(false)
+        })
+      })
+    }
+  }, [])
 
   return (
     <div
@@ -56,5 +57,5 @@ export default function PreviewCursor() {
     >
       Preview
     </div>
-  );
+  )
 }

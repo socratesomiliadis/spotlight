@@ -1,31 +1,22 @@
-import ProjectsGrid from "@/components/Home/projects-grid";
-import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import Image from "next/image";
-import SetSotd from "./components/set-sotd";
+import Image from "next/image"
+import { redirect } from "next/navigation"
+import { currentUser } from "@clerk/nextjs/server"
+
+import { createClient } from "@/lib/supabase/server"
 
 export default async function DashboardPage() {
-  const user = await currentUser();
-  const userRole = user?.publicMetadata.role as string;
+  const user = await currentUser()
+  const userRole = user?.publicMetadata.role as string
 
   if (!user || userRole !== "staff") {
-    redirect("/");
+    redirect("/")
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient()
   const { data: projects } = await supabase
     .from("project")
     .select("*, user:user_id(username, avatar_url, display_name), sotdtemp(*)")
-    .order("created_at", { ascending: false });
-
-  const { data: sotd } = await supabase
-    .from("sotdtemp")
-    .select("*")
-    .eq("id", "sotd")
-    .single();
-
-  console.log(sotd);
+    .order("created_at", { ascending: false })
 
   return (
     <main className="w-screen px-[22vw] py-28">
@@ -39,7 +30,7 @@ export default async function DashboardPage() {
             >
               <div className="flex flex-row gap-4 items-center">
                 <Image
-                  src={project.thumbnail_url}
+                  src={project.main_img_url}
                   alt={project.title}
                   width={720}
                   height={405}
@@ -49,14 +40,10 @@ export default async function DashboardPage() {
                   {project.title}
                 </h2>
               </div>
-              <SetSotd
-                projectId={project.id}
-                isSotd={sotd?.project_id === project.id}
-              />
             </div>
           ))}
         </div>
       </div>
     </main>
-  );
+  )
 }

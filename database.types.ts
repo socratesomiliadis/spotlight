@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      award: {
+        Row: {
+          award_type: Database["public"]["Enums"]["awards"]
+          awarded_at: string
+          created_at: string
+          id: string
+          project_id: string
+        }
+        Insert: {
+          award_type: Database["public"]["Enums"]["awards"]
+          awarded_at: string
+          created_at?: string
+          id?: string
+          project_id: string
+        }
+        Update: {
+          award_type?: Database["public"]["Enums"]["awards"]
+          awarded_at?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "award_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "project"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
@@ -50,7 +82,9 @@ export type Database = {
           created_at: string
           display_name: string | null
           email: string
+          is_unclaimed: boolean
           location: string | null
+          public_metadata: Json | null
           updated_at: string
           user_id: string
           username: string
@@ -63,7 +97,9 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email: string
+          is_unclaimed?: boolean
           location?: string | null
+          public_metadata?: Json | null
           updated_at?: string
           user_id: string
           username: string
@@ -76,7 +112,9 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string
+          is_unclaimed?: boolean
           location?: string | null
+          public_metadata?: Json | null
           updated_at?: string
           user_id?: string
           username?: string
@@ -86,48 +124,45 @@ export type Database = {
       }
       project: {
         Row: {
-          banner_url: string | null
+          banner_url: string
+          category: Database["public"]["Enums"]["category"]
           created_at: string
           elements_url: string[] | null
-          id: number
-          is_staff_project: boolean
+          id: string
+          live_url: string | null
           main_img_url: string
-          preview_gif_url: string | null
-          slug: string | null
-          thumbnail_url: string
+          preview_url: string | null
+          slug: string
+          tags: string[]
           title: string
-          tools_used: string[]
-          user_fake: Json | null
           user_id: string
         }
         Insert: {
-          banner_url?: string | null
+          banner_url: string
+          category: Database["public"]["Enums"]["category"]
           created_at?: string
           elements_url?: string[] | null
-          id?: number
-          is_staff_project?: boolean
+          id?: string
+          live_url?: string | null
           main_img_url: string
-          preview_gif_url?: string | null
-          slug?: string | null
-          thumbnail_url: string
+          preview_url?: string | null
+          slug: string
+          tags: string[]
           title: string
-          tools_used: string[]
-          user_fake?: Json | null
           user_id: string
         }
         Update: {
-          banner_url?: string | null
+          banner_url?: string
+          category?: Database["public"]["Enums"]["category"]
           created_at?: string
           elements_url?: string[] | null
-          id?: number
-          is_staff_project?: boolean
+          id?: string
+          live_url?: string | null
           main_img_url?: string
-          preview_gif_url?: string | null
-          slug?: string | null
-          thumbnail_url?: string
+          preview_url?: string | null
+          slug?: string
+          tags?: string[]
           title?: string
-          tools_used?: string[]
-          user_fake?: Json | null
           user_id?: string
         }
         Relationships: [
@@ -172,32 +207,6 @@ export type Database = {
           },
         ]
       }
-      sotdtemp: {
-        Row: {
-          created_at: string
-          id: string
-          project_id: number | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          project_id?: number | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          project_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "SOTD Temp_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "project"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -221,7 +230,8 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      awards: "otd" | "otm" | "oty" | "honorable"
+      category: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -336,6 +346,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      awards: ["otd", "otm", "oty", "honorable"],
+      category: ["websites", "design", "films", "crypto", "startups", "ai"],
+    },
   },
 } as const

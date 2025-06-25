@@ -1,47 +1,40 @@
-import { auth } from "@clerk/nextjs/server";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import EditProfileForm from "./components/EditProfileForm";
+import { notFound, redirect } from "next/navigation"
+import { auth } from "@clerk/nextjs/server"
+
+import { getProfileAndSocials } from "@/lib/supabase/actions/profile"
+import { createClient } from "@/lib/supabase/server"
+
+import EditProfileForm from "./components/EditProfileForm"
 
 interface PageProps {
-  params: Promise<{ username: string }>;
+  params: Promise<{ username: string }>
 }
 
 export default async function EditPage({ params }: PageProps) {
-  const { username } = await params;
-  const { userId } = await auth();
+  const { username } = await params
+  const { userId } = await auth()
 
   if (!userId) {
-    redirect("/");
+    redirect("/")
   }
 
   // Get user by username with socials
-  let user;
-  const supabase = await createClient();
+  let user
   try {
-    const { data, error } = await supabase
-      .from("profile")
-      .select("*,socials(*)")
-      .eq("username", username)
-      .single();
+    const data = await getProfileAndSocials(username)
 
-    if (error) {
-      console.log(error);
-      notFound();
-    }
-
-    user = data;
+    user = data
   } catch (error) {
-    notFound();
+    notFound()
   }
 
   if (!user) {
-    notFound();
+    notFound()
   }
 
   // Only allow users to edit their own profile
   if (userId !== user.user_id) {
-    redirect(`/${username}`);
+    redirect(`/${username}`)
   }
 
   return (
@@ -50,5 +43,5 @@ export default async function EditPage({ params }: PageProps) {
         <EditProfileForm userAndSocials={user} />
       </div>
     </main>
-  );
+  )
 }

@@ -1,32 +1,26 @@
-import HomeHero from "@/components/Home/home-hero";
-import HomeNavigation from "@/components/Home/home-navigation";
-import ProjectsGrid from "@/components/Home/projects-grid";
-import PreviewCursor from "@/components/Home/preview-cursor";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server"
+import HomeHero from "@/components/Home/home-hero"
+import HomeNavigation from "@/components/Home/home-navigation"
+import PreviewCursor from "@/components/Home/preview-cursor"
+import ProjectsGrid from "@/components/Home/projects-grid"
 
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = await createClient()
 
   const { data: projects } = await supabase
     .from("project")
     .select("*, user:user_id(username, avatar_url, display_name)")
-    .order("created_at", { ascending: false });
-
-  const { data: sotd } = await supabase
-    .from("sotdtemp")
-    .select("*, project:project_id(*)")
-    .eq("id", "sotd")
-    .single();
+    .order("created_at", { ascending: false })
 
   return (
     <main className="w-screen px-[22vw] py-28">
       <div className="w-full pb-8 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
         {/* @ts-ignore */}
-        <HomeHero project={sotd?.project} />
+        <HomeHero project={projects[0]} />
         <HomeNavigation />
         <ProjectsGrid projects={projects} />
       </div>
       <PreviewCursor />
     </main>
-  );
+  )
 }

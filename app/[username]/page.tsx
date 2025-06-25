@@ -1,50 +1,40 @@
-import { auth } from "@clerk/nextjs/server";
-import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { cn } from "@/lib/utils";
-import ProfileHeader from "@/app/[username]/components/ProfileHeader";
-import ProfileNavigation from "@/app/[username]/components/ProfileNavigation";
-import ProjectsGrid from "@/app/[username]/components/ProjectsGrid";
-import { getFollowStatusAction } from "@/lib/supabase/follow-actions";
-import PreviewCursor from "@/components/Home/preview-cursor";
+import { notFound } from "next/navigation"
+import { auth } from "@clerk/nextjs/server"
+
+import { getProfileFull } from "@/lib/supabase/actions/profile"
+import { getFollowStatusAction } from "@/lib/supabase/follow-actions"
+import { cn } from "@/lib/utils"
+import PreviewCursor from "@/components/Home/preview-cursor"
+import ProfileHeader from "@/app/[username]/components/ProfileHeader"
+import ProfileNavigation from "@/app/[username]/components/ProfileNavigation"
+import ProjectsGrid from "@/app/[username]/components/ProjectsGrid"
 
 interface PageProps {
-  params: Promise<{ username: string }>;
+  params: Promise<{ username: string }>
 }
 
 export default async function UsernamePage({ params }: PageProps) {
-  const { username } = await params;
-  const { userId } = await auth();
+  const { username } = await params
+  const { userId } = await auth()
 
   // Get user by username
-  let user;
-  const supabase = await createClient();
+  let user
   try {
-    const { data, error } = await supabase
-      .from("profile")
-      .select("*,socials(*),project(*)")
-      .eq("username", username)
-      .eq("project.is_staff_project", false)
-      .single();
+    const data = await getProfileFull(username)
 
-    if (error) {
-      console.log(error);
-      notFound();
-    }
-
-    user = data;
+    user = data
   } catch (error) {
-    notFound();
+    notFound()
   }
 
   if (!user) {
-    notFound();
+    notFound()
   }
 
-  const isOwnProfile = userId === user.user_id;
+  const isOwnProfile = userId === user.user_id
 
   // Get initial follow status
-  const { isFollowing } = await getFollowStatusAction(user.user_id);
+  const { isFollowing } = await getFollowStatusAction(user.user_id)
 
   return (
     <main className="w-screen px-[22vw] py-28">
@@ -68,5 +58,5 @@ export default async function UsernamePage({ params }: PageProps) {
       </div>
       <PreviewCursor />
     </main>
-  );
+  )
 }

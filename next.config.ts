@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
       use: {
         loader: "file-loader",
       },
-    });
-    return config;
+    })
+    return config
   },
   reactStrictMode: false,
   images: {
@@ -22,15 +22,8 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "img.clerk.com",
       },
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-      },
     ],
   },
-  experimental: {
-    viewTransition: true,
-  },
-};
+}
 
-export default nextConfig;
+export default nextConfig

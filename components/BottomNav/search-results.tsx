@@ -1,39 +1,15 @@
-"use client";
+"use client"
 
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
-interface User {
-  user_id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-}
-
-interface Project {
-  id: number;
-  title: string;
-  slug: string | null;
-  thumbnail_url: string;
-  created_at: string;
-  is_staff_project: boolean;
-  user_fake: {
-    name: string;
-    image_url: string;
-  } | null;
-  profile: {
-    username: string;
-    display_name: string | null;
-    avatar_url: string | null;
-  } | null;
-}
+import { Project, User } from "./search"
 
 interface SearchResultsProps {
-  users: User[];
-  projects: Project[];
-  isVisible: boolean;
-  onResultClick: () => void;
+  users: User[]
+  projects: Project[]
+  isVisible: boolean
+  onResultClick: () => void
 }
 
 export default function SearchResults({
@@ -42,9 +18,9 @@ export default function SearchResults({
   isVisible,
   onResultClick,
 }: SearchResultsProps) {
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
-  const hasResults = users.length > 0 || projects.length > 0;
+  const hasResults = users.length > 0 || projects.length > 0
 
   return (
     <>
@@ -110,9 +86,9 @@ export default function SearchResults({
                   onClick={onResultClick}
                   className="flex items-center gap-3 p-2 rounded-md hover:bg-white/5 transition-colors"
                 >
-                  {project.thumbnail_url ? (
+                  {project.main_img_url ? (
                     <Image
-                      src={project.thumbnail_url}
+                      src={project.main_img_url}
                       alt={project.title}
                       width={256}
                       height={144}
@@ -129,15 +105,9 @@ export default function SearchResults({
                     <p className="text-base font-medium text-white truncate">
                       {project.title}
                     </p>
-                    {project.is_staff_project ? (
-                      <p className="text-sm text-[#989898] truncate -mt-1">
-                        By {project.user_fake?.name}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-[#989898] truncate -mt-1">
-                        By {project.profile?.display_name}
-                      </p>
-                    )}
+                    <p className="text-sm text-[#989898] truncate -mt-1">
+                      By {project.profile?.display_name}
+                    </p>
                   </div>
                 </Link>
               ))}
@@ -146,5 +116,5 @@ export default function SearchResults({
         </div>
       )}
     </>
-  );
+  )
 }

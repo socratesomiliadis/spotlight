@@ -1,32 +1,33 @@
-"use client";
+"use client"
 
-import { useState, useRef } from "react";
-import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
-import { useSession } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
-import { AnimatePresence, motion, Reorder } from "motion/react";
-import SortableList, { SortableItem, SortableKnob } from "react-easy-sort";
+import { useRef, useState } from "react"
+import Image from "next/image"
+import { useSession } from "@clerk/nextjs"
+import { AnimatePresence, motion, Reorder } from "motion/react"
+import SortableList, { SortableItem, SortableKnob } from "react-easy-sort"
+
+import { createClient } from "@/lib/supabase/client"
+import { cn } from "@/lib/utils"
 
 interface ProjectImageUploadProps {
-  label?: string;
-  currentImages?: string[];
-  onImageAdded: (url: string) => void;
-  onImageRemoved?: (url: string, index: number) => void;
-  onImagesReordered?: (oldIndex: number, newIndex: number) => void;
-  bucketName: string;
-  folder: string;
-  aspectRatio?: string;
-  className?: string;
-  userId: string;
-  maxImages?: number;
-  uploadAreaText?: string;
-  supportedFormats?: string;
-  maxFileSize?: string;
-  gridCols?: number;
-  isMultiple?: boolean;
-  placeholder?: string;
-  shortInfo?: boolean;
+  label?: string
+  currentImages?: string[]
+  onImageAdded: (url: string) => void
+  onImageRemoved?: (url: string, index: number) => void
+  onImagesReordered?: (oldIndex: number, newIndex: number) => void
+  bucketName: string
+  folder: string
+  aspectRatio?: string
+  className?: string
+  userId: string
+  maxImages?: number
+  uploadAreaText?: string
+  supportedFormats?: string
+  maxFileSize?: string
+  gridCols?: number
+  isMultiple?: boolean
+  placeholder?: string
+  shortInfo?: boolean
 }
 
 export default function ProjectImageUpload({
@@ -49,66 +50,66 @@ export default function ProjectImageUpload({
   placeholder = "No images uploaded yet",
   shortInfo = false,
 }: ProjectImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<{
-    [key: string]: number;
-  }>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { session } = useSession();
-  const supabase = createClient({ session });
+    [key: string]: number
+  }>({})
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { session } = useSession()
+  const supabase = createClient({ session })
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
 
     if (isMultiple) {
-      processMultipleFiles(files);
+      processMultipleFiles(files)
     } else {
-      processFile(files[0]);
+      processFile(files[0])
     }
 
     // Reset input to allow re-uploading the same file
-    e.target.value = "";
-  };
+    e.target.value = ""
+  }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
+    e.preventDefault()
+    setIsDragging(false)
 
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length === 0) return;
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length === 0) return
 
     if (isMultiple) {
-      processMultipleFiles(files);
+      processMultipleFiles(files)
     } else {
-      processFile(files[0]);
+      processFile(files[0])
     }
-  };
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+    e.preventDefault()
+    setIsDragging(true)
+  }
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
+    e.preventDefault()
+    setIsDragging(false)
+  }
 
   const processMultipleFiles = (files: File[]) => {
     // Check if adding these files would exceed the limit
-    const remainingSlots = maxImages - currentImages.length;
+    const remainingSlots = maxImages - currentImages.length
     if (files.length > remainingSlots) {
       setError(
         `You can only upload ${remainingSlots} more image(s). Maximum is ${maxImages}.`
-      );
-      return;
+      )
+      return
     }
 
-    files.forEach((file) => processFile(file));
-  };
+    files.forEach((file) => processFile(file))
+  }
 
   const processFile = (file: File) => {
     // Validate file type
@@ -116,44 +117,44 @@ export default function ProjectImageUpload({
       !file.type.startsWith("image/") &&
       !file.type.startsWith("video/webm")
     ) {
-      setError("Please select image or webm video files only");
-      return;
+      setError("Please select image or webm video files only")
+      return
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError(
         `File "${file.name}" is too large. Maximum size is ${maxFileSize}.`
-      );
-      return;
+      )
+      return
     }
 
     // Upload file
-    uploadImage(file);
-  };
+    uploadImage(file)
+  }
 
   const uploadImage = async (file: File) => {
-    setIsUploading(true);
-    setError(null);
+    setIsUploading(true)
+    setError(null)
 
-    const fileId = `${file.name}-${Date.now()}`;
-    setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }));
+    const fileId = `${file.name}-${Date.now()}`
+    setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }))
 
     try {
       // Generate unique filename
-      const timestamp = Date.now();
-      const fileExtension = file.name.split(".").pop();
+      const timestamp = Date.now()
+      const fileExtension = file.name.split(".").pop()
       const filename = `${userId}/${folder}/${timestamp}-${Math.random()
         .toString(36)
-        .substring(7)}.${fileExtension}`;
+        .substring(7)}.${fileExtension}`
 
       // Simulate upload progress (since Supabase doesn't provide real progress)
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => ({
           ...prev,
           [fileId]: Math.min((prev[fileId] || 0) + Math.random() * 30, 90),
-        }));
-      }, 200);
+        }))
+      }, 200)
 
       // Upload to Supabase storage
       const { data, error: uploadError } = await supabase.storage
@@ -161,93 +162,93 @@ export default function ProjectImageUpload({
         .upload(filename, file, {
           cacheControl: "3600",
           upsert: false,
-        });
+        })
 
-      clearInterval(progressInterval);
+      clearInterval(progressInterval)
 
       if (uploadError) {
-        throw uploadError;
+        throw uploadError
       }
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from(bucketName)
-        .getPublicUrl(filename);
+        .getPublicUrl(filename)
 
       if (publicUrlData?.publicUrl) {
-        setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }));
+        setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }))
         setTimeout(() => {
           setUploadProgress((prev) => {
-            const newProgress = { ...prev };
-            delete newProgress[fileId];
-            return newProgress;
-          });
-        }, 500);
+            const newProgress = { ...prev }
+            delete newProgress[fileId]
+            return newProgress
+          })
+        }, 500)
 
-        onImageAdded(publicUrlData.publicUrl);
-        setError(null);
+        onImageAdded(publicUrlData.publicUrl)
+        setError(null)
       } else {
-        throw new Error("Failed to get public URL");
+        throw new Error("Failed to get public URL")
       }
     } catch (err: any) {
-      console.error("Upload error:", err);
-      setError(err.message || `Failed to upload "${file.name}"`);
+      console.error("Upload error:", err)
+      setError(err.message || `Failed to upload "${file.name}"`)
       setUploadProgress((prev) => {
-        const newProgress = { ...prev };
-        delete newProgress[fileId];
-        return newProgress;
-      });
+        const newProgress = { ...prev }
+        delete newProgress[fileId]
+        return newProgress
+      })
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   const handleButtonClick = () => {
-    if (!isMultiple && currentImages.length >= 1) return;
-    if (isMultiple && currentImages.length >= maxImages) return;
-    fileInputRef.current?.click();
-  };
+    if (!isMultiple && currentImages.length >= 1) return
+    if (isMultiple && currentImages.length >= maxImages) return
+    fileInputRef.current?.click()
+  }
 
   const handleRemoveImage = async (url: string, index: number) => {
-    if (!onImageRemoved) return;
+    if (!onImageRemoved) return
 
     try {
       // Extract filename from URL and delete from storage
-      const filename = extractFilenameFromUrl(url);
+      const filename = extractFilenameFromUrl(url)
       if (filename) {
         const { error: deleteError } = await supabase.storage
           .from(bucketName)
-          .remove([filename]);
+          .remove([filename])
 
         if (deleteError) {
-          console.error("Error deleting file:", deleteError);
+          console.error("Error deleting file:", deleteError)
         }
       }
 
-      onImageRemoved(url, index);
+      onImageRemoved(url, index)
     } catch (err: any) {
-      console.error("Error removing image:", err);
-      setError("Failed to remove image");
+      console.error("Error removing image:", err)
+      setError("Failed to remove image")
     }
-  };
+  }
 
   const extractFilenameFromUrl = (url: string): string | null => {
     try {
-      const urlParts = url.split("/");
-      const bucketIndex = urlParts.findIndex((part) => part === bucketName);
+      const urlParts = url.split("/")
+      const bucketIndex = urlParts.findIndex((part) => part === bucketName)
       if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
-        return urlParts.slice(bucketIndex + 1).join("/");
+        return urlParts.slice(bucketIndex + 1).join("/")
       }
-      return null;
+      return null
     } catch {
-      return null;
+      return null
     }
-  };
+  }
 
   const canUploadMore = isMultiple
     ? currentImages.length < maxImages
-    : currentImages.length === 0;
-  const gridColsClass = `grid-cols-${gridCols}`;
+    : currentImages.length === 0
+  const gridColsClass = `grid-cols-${gridCols}`
 
   return (
     <div className={`w-full relative flex flex-col gap-2 ${className}`}>
@@ -411,9 +412,7 @@ export default function ProjectImageUpload({
 
       {/* Upload Area */}
       {canUploadMore && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className={cn(
             "relative w-full border-2 border-dashed border-gray-300 rounded-xl transition-all duration-300 cursor-pointer hover:border-gray-400 hover:bg-black/5",
             isDragging && "border-black bg-black/5",
@@ -424,6 +423,29 @@ export default function ProjectImageUpload({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
+          {/* Upload Progress */}
+          {Object.keys(uploadProgress).length > 0 && (
+            <div className="space-y-2 absolute top-0 left-0 w-full h-full">
+              {Object.entries(uploadProgress).map(([fileId, progress]) => (
+                <div key={fileId} className="p-3 border-b-[1px]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-[#505050] tracking-tight">
+                      Uploading...
+                    </span>
+                    <span className="text-sm text-[#505050]">
+                      {Math.round(progress)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-black h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-6 text-center">
             <div className="size-10">
               <svg
@@ -462,30 +484,6 @@ export default function ProjectImageUpload({
               </p>
             )}
           </div>
-        </motion.div>
-      )}
-
-      {/* Upload Progress */}
-      {Object.keys(uploadProgress).length > 0 && (
-        <div className="space-y-2">
-          {Object.entries(uploadProgress).map(([fileId, progress]) => (
-            <div key={fileId} className="bg-[#acacac]/10 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#505050] tracking-tight">
-                  Uploading...
-                </span>
-                <span className="text-sm text-[#505050]">
-                  {Math.round(progress)}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-black h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          ))}
         </div>
       )}
 
@@ -523,5 +521,5 @@ export default function ProjectImageUpload({
         </div>
       )}
     </div>
-  );
+  )
 }

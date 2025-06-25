@@ -1,29 +1,32 @@
-import type { Metadata } from "next";
+import type { Metadata } from "next"
 
-import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-import Header from "@/components/Header";
-import { HeroUIProvider } from "@heroui/react";
-import localFont from "next/font/local";
-import BottomNav from "@/components/BottomNav";
-import MainLayout from "@/components/main-layout";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
+import "./globals.css"
+
+import localFont from "next/font/local"
+import { ClerkProvider } from "@clerk/nextjs"
+import { HeroUIProvider } from "@heroui/react"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
+import { Toaster } from "sonner"
+
+import BottomNav from "@/components/BottomNav"
+import Header from "@/components/Header"
+import MainLayout from "@/components/main-layout"
 
 const helveticaNow = localFont({
   src: "../fonts/HelveticaNowVar.woff2",
   variable: "--font-helvetica-now",
-});
+})
 
 export const metadata: Metadata = {
   title: "Spotlight",
   description:
     "Spotlight Awards is a platform for celebrating the best in design, web and motion.",
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <ClerkProvider
@@ -41,6 +44,7 @@ export default function RootLayout({
             <HeroUIProvider>
               <MainLayout>
                 <Header />
+                <Toaster richColors />
                 {children}
                 <BottomNav />
               </MainLayout>
@@ -49,5 +53,5 @@ export default function RootLayout({
         </body>
       </html>
     </ClerkProvider>
-  );
+  )
 }

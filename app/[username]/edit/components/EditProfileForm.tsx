@@ -1,19 +1,22 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { Form, user } from "@heroui/react";
-import MyInput from "@/components/Forms/components/Input";
-import CustomButton from "@/components/custom-button";
-import ImageUpload from "./ImageUpload";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { useSession } from "@clerk/nextjs";
-import { AnimatePresence, motion } from "motion/react";
-import { Tables } from "@/database.types";
+import { useEffect, useState } from "react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { Tables } from "@/database.types"
+import { useSession } from "@clerk/nextjs"
+import { Form, user } from "@heroui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { AnimatePresence, motion } from "motion/react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
+
+import { createClient } from "@/lib/supabase/client"
+import CustomButton from "@/components/custom-button"
+import MyInput from "@/components/Forms/components/Input"
+
+import ImageUpload from "./ImageUpload"
 
 // Define validation schema with social links
 const profileSchema = z.object({
@@ -45,23 +48,23 @@ const profileSchema = z.object({
     .url("Please enter a valid Twitter URL")
     .optional()
     .or(z.literal("")),
-});
+})
 
-type ProfileFormValues = z.infer<typeof profileSchema>;
+type ProfileFormValues = z.infer<typeof profileSchema>
 
 interface EditProfileFormProps {
-  userAndSocials: Tables<"profile"> & { socials: Tables<"socials"> | null };
+  userAndSocials: Tables<"profile"> & { socials: Tables<"socials"> | null }
 }
 
 export default function EditProfileForm({
   userAndSocials,
 }: EditProfileFormProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const router = useRouter();
-  const { session } = useSession();
-  const supabase = createClient({ session });
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  const router = useRouter()
+  const { session } = useSession()
+  const supabase = createClient({ session })
 
   const {
     register,
@@ -81,16 +84,9 @@ export default function EditProfileForm({
       instagram: userAndSocials.socials?.instagram || "",
       twitter: userAndSocials.socials?.twitter || "",
     },
-  });
+  })
 
-  // Watch the image URLs to update the preview
-  const bannerUrl = watch("banner_url");
-  const avatarUrl = watch("avatar_url");
-
-  const onSubmit = async (data: ProfileFormValues) => {
-    setIsLoading(true);
-    setError(null);
-
+  async function updateProfile(data: ProfileFormValues) {
     try {
       // Update profile data
       const { error: profileError } = await supabase
@@ -102,12 +98,11 @@ export default function EditProfileForm({
           avatar_url: data.avatar_url || null,
           banner_url: data.banner_url || null,
         })
-        .eq("user_id", userAndSocials.user_id);
+        .eq("user_id", userAndSocials.user_id)
 
       if (profileError) {
-        console.log(profileError);
-        setError(profileError.message);
-        throw profileError;
+        console.log(profileError)
+        throw profileError
       }
 
       // Handle social links - upsert a single record with all social links
@@ -116,38 +111,43 @@ export default function EditProfileForm({
         linked_in: data.linkedin || null,
         instagram: data.instagram || null,
         twitter: data.twitter || null,
-      };
+      }
 
       const { error: socialsError } = await supabase
         .from("socials")
         .upsert(socialLinksData, {
           onConflict: "user_id",
-        });
+        })
 
       if (socialsError) {
-        console.log(socialsError);
-        setError(socialsError.message);
-        throw socialsError;
+        console.log(socialsError)
+        throw socialsError
       }
 
-      setSuccess(true);
       // Redirect back to profile page after successful update
       setTimeout(() => {
-        setSuccess(false);
-        setError(null);
-        router.refresh();
-      }, 3000);
+        router.refresh()
+      }, 3000)
     } catch (err: any) {
-      console.error("Error updating profile:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while updating your profile"
-      );
+      console.error("Error updating profile:", err)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
+
+  // Watch the image URLs to update the preview
+  const bannerUrl = watch("banner_url")
+  const avatarUrl = watch("avatar_url")
+
+  const onSubmit = async (data: ProfileFormValues) => {
+    setIsLoading(true)
+    setError(null)
+    toast.promise(updateProfile(data), {
+      loading: "Updating profile...",
+      success: "Profile updated successfully!",
+      error: "Failed to update profile. Please try again.",
+    })
+  }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-3 pb-10">
@@ -257,31 +257,6 @@ export default function EditProfileForm({
           />
         </div>
       </div>
-
-      {/* Success/Error Messages */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 100, x: "-50%", scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed bottom-32 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl z-50"
-          >
-            <p className="text-red-800">{error}</p>
-          </motion.div>
-        )}
-        {success && (
-          <motion.div
-            initial={{ opacity: 0, y: 100, x: "-50%", scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
-            exit={{ opacity: 0, y: 100, x: "-50%", scale: 0.9 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed bottom-32 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-green-50 border border-green-200 rounded-xl z-50"
-          >
-            <p className="text-green-800">Profile updated successfully!</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </Form>
-  );
+  )
 }

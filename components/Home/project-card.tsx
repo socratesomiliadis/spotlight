@@ -1,21 +1,22 @@
-"use client";
+"use client"
 
-import { Tables } from "@/database.types";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Tables } from "@/database.types"
+
+import { cn } from "@/lib/utils"
 
 export default function ProjectCard({
   project,
   className,
 }: {
-  project: Tables<"project">;
-  className?: string;
+  project: Tables<"project">
+  className?: string
 }) {
-  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false)
 
-  const hasPreview = !!project?.preview_gif_url;
+  const hasPreview = !!project?.preview_url
 
   return (
     <Link
@@ -30,7 +31,7 @@ export default function ProjectCard({
     >
       {hasPreview && isPreviewing && (
         <video
-          src={project.preview_gif_url || ""}
+          src={project.preview_url || ""}
           autoPlay
           muted
           loop
@@ -38,7 +39,7 @@ export default function ProjectCard({
         />
       )}
       <Image
-        src={project.thumbnail_url}
+        src={project.main_img_url}
         alt={project.title}
         width={1920}
         height={1080}
@@ -48,5 +49,5 @@ export default function ProjectCard({
         )}
       />
     </Link>
-  );
+  )
 }

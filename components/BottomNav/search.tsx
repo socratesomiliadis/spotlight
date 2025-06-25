@@ -1,51 +1,47 @@
-"use client";
+"use client"
 
-import { cn } from "@/lib/utils";
 import {
-  useLayoutEffect,
-  useState,
   useCallback,
-  useRef,
   useEffect,
-} from "react";
-import { searchAction } from "@/lib/supabase/search-actions";
-import { useDebounceValue } from "usehooks-ts";
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react"
+import { useDebounceValue } from "usehooks-ts"
+
+import { handleSearch } from "@/lib/supabase/actions/search"
+import { cn } from "@/lib/utils"
 
 export interface User {
-  user_id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
+  user_id: string
+  username: string
+  display_name: string | null
+  avatar_url: string | null
 }
 
 export interface Project {
-  id: number;
-  title: string;
-  slug: string | null;
-  thumbnail_url: string;
-  created_at: string;
-  is_staff_project: boolean;
-  user_fake: {
-    name: string;
-    image_url: string;
-  } | null;
+  id: string
+  title: string
+  slug: string
+  created_at: string
+  main_img_url: string
   profile: {
-    username: string;
-    display_name: string | null;
-    avatar_url: string | null;
-  } | null;
+    username: string
+    display_name: string | null
+    avatar_url: string | null
+  } | null
 }
 
 export interface SearchResults {
-  users: User[];
-  projects: Project[];
+  users: User[]
+  projects: Project[]
 }
 
-interface SearchProps {
-  isExpanded: boolean;
-  setIsExpanded: (isExpanded: boolean) => void;
-  onSearchResults: (results: SearchResults) => void;
-  onSearchActive: (active: boolean) => void;
+export interface SearchProps {
+  isExpanded: boolean
+  setIsExpanded: (isExpanded: boolean) => void
+  onSearchResults: (results: SearchResults) => void
+  onSearchActive: (active: boolean) => void
 }
 
 export default function Search({
@@ -54,78 +50,78 @@ export default function Search({
   onSearchResults,
   onSearchActive,
 }: SearchProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [debouncedQuery, setQuery] = useDebounceValue("", 300);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const [debouncedQuery, setQuery] = useDebounceValue("", 300)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useLayoutEffect(() => {
-    if (isExpanded) setIsOpen(true);
-    else setIsOpen(false);
-  }, [isExpanded]);
+    if (isExpanded) setIsOpen(true)
+    else setIsOpen(false)
+  }, [isExpanded])
 
   const performSearch = useCallback(
     async (searchQuery: string) => {
       if (!searchQuery.trim() || searchQuery.length < 2) {
-        const emptyResults = { users: [], projects: [] };
+        const emptyResults = { users: [], projects: [] }
 
-        onSearchResults(emptyResults);
-        onSearchActive(false);
-        return;
+        onSearchResults(emptyResults)
+        onSearchActive(false)
+        return
       }
 
-      setIsExpanded(true);
-      onSearchActive(true);
+      setIsExpanded(true)
+      onSearchActive(true)
       try {
-        const results = await searchAction(searchQuery);
+        const results = await handleSearch(searchQuery)
 
-        onSearchResults(results as SearchResults);
+        onSearchResults(results as SearchResults)
       } catch (error) {
-        console.error("Search failed:", error);
-        const emptyResults = { users: [], projects: [] };
+        console.error("Search failed:", error)
+        const emptyResults = { users: [], projects: [] }
 
-        onSearchResults(emptyResults);
+        onSearchResults(emptyResults)
       }
     },
     [onSearchResults, onSearchActive]
-  );
+  )
 
   useLayoutEffect(() => {
-    console.log("debouncedQuery", debouncedQuery);
+    console.log("debouncedQuery", debouncedQuery)
     if (debouncedQuery) {
-      performSearch(debouncedQuery);
+      performSearch(debouncedQuery)
     } else {
-      const emptyResults = { users: [], projects: [] };
+      const emptyResults = { users: [], projects: [] }
 
-      onSearchResults(emptyResults);
-      onSearchActive(false);
+      onSearchResults(emptyResults)
+      onSearchActive(false)
     }
-  }, [debouncedQuery, performSearch, onSearchResults, onSearchActive]);
+  }, [debouncedQuery, performSearch, onSearchResults, onSearchActive])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-  };
+    setQuery(e.target.value)
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
-      handleCloseClick();
+      handleCloseClick()
     }
-  };
+  }
 
   const handleSearchClick = () => {
-    if (isExpanded) return;
-    setIsOpen(!isOpen);
+    if (isExpanded) return
+    setIsOpen(!isOpen)
     if (!isOpen) {
       setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
+        inputRef.current?.focus()
+      }, 100)
     }
-  };
+  }
 
   const handleCloseClick = () => {
-    setQuery("");
-    setIsOpen(false);
-    onSearchActive(false);
-  };
+    setQuery("")
+    setIsOpen(false)
+    onSearchActive(false)
+  }
 
   return (
     <div className="w-fit h-fit mr-1 relative">
@@ -149,8 +145,8 @@ export default function Search({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             onClick={(e) => {
-              e.stopPropagation();
-              handleCloseClick();
+              e.stopPropagation()
+              handleCloseClick()
             }}
           >
             <path
@@ -189,5 +185,5 @@ export default function Search({
         />
       </div>
     </div>
-  );
+  )
 }
