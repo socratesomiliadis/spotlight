@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Tables } from "@/database.types"
+import { useMediaQuery } from "usehooks-ts"
 
 import { cn } from "@/lib/utils"
 
@@ -14,9 +15,22 @@ export default function ProjectCard({
   project: Tables<"project">
   className?: string
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const isMobile = useMediaQuery("(max-width: 1023px)")
+  const hasPreview = project.preview_url !== null
   const [isPreviewing, setIsPreviewing] = useState(false)
 
-  const hasPreview = !!project?.preview_url
+  useEffect(() => {
+    if (isMobile || !hasPreview) return
+
+    if (videoRef.current && isPreviewing) {
+      videoRef.current.currentTime = 0
+      videoRef.current.play()
+    } else {
+      videoRef.current?.pause()
+      videoRef.current?.load()
+    }
+  }, [isPreviewing, isMobile, hasPreview])
 
   return (
     <Link
@@ -25,19 +39,23 @@ export default function ProjectCard({
       href={`/projects/${project.slug}`}
       key={project.id}
       className={cn(
-        "w-full overflow-hidden rounded-xl lg:rounded-2xl group show-preview-cursor relative",
+        "w-full aspect-video overflow-hidden rounded-xl group show-preview-cursor relative",
         className
       )}
     >
-      {hasPreview && isPreviewing && (
-        <video
-          src={project.preview_url || ""}
-          autoPlay
-          muted
-          loop
-          className="absolute top-0 left-0 w-full aspect-video object-cover z-10"
-        />
-      )}
+      <video
+        ref={videoRef}
+        muted
+        loop
+        playsInline
+        preload="none"
+        poster={project.main_img_url}
+        className="w-full aspect-video object-cover rounded-xl"
+      >
+        {/* @ts-expect-error */}
+        <source src={project.preview_url || null} type="video/mp4" />
+      </video>
+      {/* 
       <Image
         src={project.main_img_url}
         alt={project.title}
@@ -47,7 +65,7 @@ export default function ProjectCard({
           "w-full aspect-video object-cover rounded-xl lg:rounded-2xl group-hover:scale-[1.02] transition-all duration-500 ease-out-expo will-change-transform",
           hasPreview && "group-hover:scale-100"
         )}
-      />
+      /> */}
     </Link>
   )
 }

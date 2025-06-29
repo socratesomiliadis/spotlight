@@ -1,28 +1,43 @@
-import { Tables } from "@/database.types"
+"use client"
+
+import FilterDialog, { useFilters } from "./FilterDialog"
 
 export default function HomeNavigation() {
+  const { hasActiveFilters, activeFilterCount } = useFilters()
+
   return (
-    <div className="flex items-center justify-between mt-6 lg:mt-8 mb-12 border-y-[1px] border-[#EAEAEA] px-4 lg:px-8 py-3 lg:py-4">
+    <div className="flex items-center justify-between mt-6 lg:mt-8 mb-8 lg:mb-12 border-y-[1px] border-[#EAEAEA] px-4 lg:px-8 py-3 lg:py-4">
       <div className="flex items-center gap-2 font-medium tracking-tight">
-        <button className="flex items-center gap-2 bg-transparent text-[#989898] border-[2px] box-border border-[#F6F6F6] px-5 py-2 rounded-lg">
-          <span className="size-4 flex">
-            <svg
-              width="100%"
-              viewBox="0 0 11 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.45426 0.671875V4.75932M8.45426 4.75932C7.48679 4.75932 6.7025 5.54362 6.70249 6.51109V7.09501C6.70249 8.06248 7.48679 8.84677 8.45426 8.84677C9.42173 8.84677 10.206 8.06248 10.206 7.09501V6.51109C10.206 5.54362 9.42173 4.75932 8.45426 4.75932ZM2.61505 8.26285L2.61505 11.1825M8.45426 10.5985V11.1825M2.61505 0.671875L2.61505 2.42364M2.61505 2.42364C1.64757 2.42364 0.863281 3.20793 0.863281 4.1754L0.863281 4.75932C0.863281 5.7268 1.64757 6.51109 2.61505 6.51109C3.58252 6.51109 4.36681 5.7268 4.36681 4.75932V4.1754C4.36681 3.20793 3.58252 2.42364 2.61505 2.42364Z"
-                stroke="currentColor"
-                strokeWidth="1.16784"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
-          <span>Filter</span>
-        </button>
+        <FilterDialog>
+          <button
+            className={`flex items-center gap-2 border-[2px] box-border px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors relative 
+                bg-transparent text-[#989898] border-[#F6F6F6]
+            }`}
+          >
+            <span className="size-4 flex">
+              <svg
+                width="100%"
+                viewBox="0 0 11 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.45426 0.671875V4.75932M8.45426 4.75932C7.48679 4.75932 6.7025 5.54362 6.70249 6.51109V7.09501C6.70249 8.06248 7.48679 8.84677 8.45426 8.84677C9.42173 8.84677 10.206 8.06248 10.206 7.09501V6.51109C10.206 5.54362 9.42173 4.75932 8.45426 4.75932ZM2.61505 8.26285L2.61505 11.1825M8.45426 10.5985V11.1825M2.61505 0.671875L2.61505 2.42364M2.61505 2.42364C1.64757 2.42364 0.863281 3.20793 0.863281 4.1754L0.863281 4.75932C0.863281 5.7268 1.64757 6.51109 2.61505 6.51109C3.58252 6.51109 4.36681 5.7268 4.36681 4.75932V4.1754C4.36681 3.20793 3.58252 2.42364 2.61505 2.42364Z"
+                  stroke="currentColor"
+                  strokeWidth="1.16784"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span>Filter</span>
+            {hasActiveFilters && (
+              <span className="absolute -top-2 -right-2 bg-[#f6f6f6] text-[#989898] text-xs rounded-full size-5 flex items-center justify-center font-medium">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+        </FilterDialog>
         <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
           <span className="size-4 flex">
             <svg

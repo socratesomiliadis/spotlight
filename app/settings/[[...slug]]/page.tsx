@@ -6,9 +6,9 @@ export default function SettingsPage() {
   return (
     <PageWrapper
       wrapperClassName="h-[100svh] py-20 overflow-hidden lg:py-0 flex items-center justify-center"
-      className="w-full h-full flex items-center justify-center pb-0 lg:-mt-16"
+      className="w-full h-full lg:h-fit flex items-center justify-center pb-0 lg:-mt-16"
     >
-      <div data-lenis-prevent className="w-full h-full">
+      <div data-lenis-prevent className="w-full h-full lg:h-fit">
         <UserProfile
           path="/settings"
           appearance={{

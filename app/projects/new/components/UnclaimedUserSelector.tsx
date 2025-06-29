@@ -148,13 +148,13 @@ export default function UnclaimedUserSelector({
       </div>
 
       {/* Mode Toggle */}
-      <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 border border-[#EAEAEA] rounded-xl w-fit">
         <button
           type="button"
           onClick={() => setMode("select")}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             mode === "select"
-              ? "bg-white text-black shadow-sm"
+              ? "bg-black text-white"
               : "text-gray-600 hover:text-black"
           }`}
         >
@@ -163,9 +163,9 @@ export default function UnclaimedUserSelector({
         <button
           type="button"
           onClick={() => setMode("create")}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             mode === "create"
-              ? "bg-white text-black shadow-sm"
+              ? "bg-black text-white"
               : "text-gray-600 hover:text-black"
           }`}
         >

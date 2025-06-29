@@ -10,7 +10,7 @@ export default function ResetPassword() {
   return (
     <main className="w-full h-fit lg:h-[75svh] flex flex-row items-center justify-center text-darkGreen">
       <div className="w-full h-full flex flex-col lg:flex-row p-4">
-        <div className="w-full lg:w-1/2 h-[25vh] lg:h-full relative">
+        <div className="w-full lg:w-1/2 h-[25vh] lg:h-full relative hidden lg:block">
           <Link
             href="/"
             className="w-24 text-black flex items-center absolute top-5 left-5 z-20"

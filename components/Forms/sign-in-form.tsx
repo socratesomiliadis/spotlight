@@ -90,12 +90,9 @@ export default function SignInForm() {
     <motion.div
       key="sign-in-form"
       exit={{ opacity: 0, x: -100 }}
-      className="w-full flex items-center justify-center py-6 lg:py-0"
+      className="w-full flex items-center justify-center px-2 lg:px-0 py-4 lg:py-0"
     >
-      <Form
-        className="w-full lg:w-[90%] max-w-md"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <Form className="w-full lg:w-[90%]" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-3xl lg:text-4xl tracking-tight mb-4 lg:mb-8">
           Sign in to your account
         </h1>
@@ -125,7 +122,7 @@ export default function SignInForm() {
             </button>
           }
         />
-        <p className="text-sm text-black mt-0 tracking-tight">
+        <p className="text-sm text-[#787878] mt-0 tracking-tight">
           Forgot your password?{" "}
           <button
             className="underline"
@@ -146,7 +143,7 @@ export default function SignInForm() {
           <span className={cn("-mb-1", isLoading && "opacity-0")}>Sign In</span>
         </button>
         {error && <p className="text-danger">{error}</p>}
-        <p className="text-sm text-black lg:mt-4 tracking-tight">
+        <p className="text-sm text-[#787878] lg:mt-4 tracking-tight">
           Don&apos;t have an account?{" "}
           <button className="underline" onClick={() => setAuth("sign-up")}>
             Sign up

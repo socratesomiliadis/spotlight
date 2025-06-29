@@ -72,7 +72,7 @@ export default function ProfileHeader({
             href={`/${user.username}/edit`}
           />
         ) : (
-          <div className="flex flex-row gap-2 buttons mt-24">
+          <div className="flex flex-row gap-2 buttons mt-14 lg:mt-24">
             <CustomButton
               text="Hire"
               inverted

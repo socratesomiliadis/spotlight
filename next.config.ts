@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
         hostname: "img.clerk.com",
       },
     ],
+    formats: ["image/avif", "image/webp"],
   },
 }
 

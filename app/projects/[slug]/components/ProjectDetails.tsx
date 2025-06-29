@@ -1,6 +1,6 @@
 export default function ProjectElements({ tags }: { tags: string[] }) {
   return (
-    <div className="w-full flex flex-col px-8 tracking-tight mt-12">
+    <div className="w-full flex flex-col px-4 lg:px-8 tracking-tight mt-12">
       <span className="text-black text-xl">Details</span>
       <p className="text-[#ACACAC] text-xl">Technologies and tools used</p>
       <div className="w-full h-[1px] bg-[#EAEAEA] my-6"></div>

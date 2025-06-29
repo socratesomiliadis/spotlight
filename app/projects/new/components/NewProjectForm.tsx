@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 
 import { createProject } from "@/lib/supabase/actions/projects"
+import tagsJSON from "@/lib/tags.json"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 import MultiSelectCombobox from "@/components/Forms/components/MultiSelectCombobox"
@@ -30,71 +31,6 @@ const projectSchema = z.object({
   description: z.string().optional(),
   category: z.enum(["websites", "design", "films", "crypto", "startups", "ai"]),
 })
-
-// Predefined tools list for the combobox
-const COMMON_TOOLS = [
-  "React",
-  "TypeScript",
-  "JavaScript",
-  "Next.js",
-  "Vue.js",
-  "Angular",
-  "Svelte",
-  "Node.js",
-  "Python",
-  "Django",
-  "Flask",
-  "Ruby on Rails",
-  "PHP",
-  "Laravel",
-  "Express.js",
-  "HTML",
-  "CSS",
-  "Sass",
-  "Less",
-  "Tailwind CSS",
-  "Bootstrap",
-  "Material UI",
-  "Chakra UI",
-  "Styled Components",
-  "Emotion",
-  "GraphQL",
-  "Apollo",
-  "REST API",
-  "MongoDB",
-  "PostgreSQL",
-  "MySQL",
-  "SQLite",
-  "Redis",
-  "Firebase",
-  "Supabase",
-  "AWS",
-  "Vercel",
-  "Netlify",
-  "Docker",
-  "Kubernetes",
-  "Git",
-  "GitHub",
-  "GitLab",
-  "Figma",
-  "Adobe XD",
-  "Sketch",
-  "Photoshop",
-  "Illustrator",
-  "After Effects",
-  "Premiere Pro",
-  "Blender",
-  "Unity",
-  "Unreal Engine",
-  "Three.js",
-  "WebGL",
-  "Canvas",
-  "D3.js",
-  "Chart.js",
-  "Framer Motion",
-  "GSAP",
-  "Lottie",
-]
 
 type ProjectFormValues = z.infer<typeof projectSchema>
 
@@ -140,6 +76,7 @@ export default function NewProjectForm({
   const mainImageUrl = watch("main_img_url")
   const previewUrl = watch("preview_url")
   const tags = watch("tags")
+  const category = watch("category")
 
   async function insertProject(data: ProjectFormValues) {
     try {
@@ -294,9 +231,9 @@ export default function NewProjectForm({
             </div>
           </div>
         </div>
-        <div className="w-full flex flex-row gap-4">
+        <div className="w-full grid grid-cols-2 gap-4">
           {/* Main Project Image */}
-          <div className="space-y-2 w-1/2">
+          <div className="space-y-2 w-full">
             <ProjectImageUpload
               label="Main Project Image *"
               currentImages={mainImageUrl ? [mainImageUrl] : []}
@@ -321,7 +258,7 @@ export default function NewProjectForm({
             )}
           </div>
           {/* Preview Video */}
-          <div className="space-y-2 w-1/2">
+          <div className="space-y-2 w-full">
             <div className="w-full">
               <ProjectImageUpload
                 label="Preview Video *"
@@ -366,7 +303,7 @@ export default function NewProjectForm({
               placeholder="Search and select tags..."
               value={tags}
               onChange={(value) => setValue("tags", value)}
-              options={COMMON_TOOLS}
+              options={tagsJSON.categories[category]}
               isInvalid={!!errors.tags}
               errorMessage={errors.tags?.message}
             />

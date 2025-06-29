@@ -4,7 +4,13 @@ interface ProfileNavigationProps {
   socialLinks?: Tables<"socials">
 }
 
-function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
+export function SocialLink({
+  href,
+  icon,
+}: {
+  href: string
+  icon: React.ReactNode
+}) {
   return (
     <a
       href={href}

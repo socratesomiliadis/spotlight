@@ -50,7 +50,7 @@ export default function PreviewCursor() {
   return (
     <div
       className={cn(
-        "fixed left-0 top-0 z-[100] -translate-x-[80%] -translate-y-[80%] px-6 py-2 bg-black/10 text-white backdrop-blur-md rounded-md pointer-events-none transition-opacity duration-300",
+        "fixed hidden lg:block left-0 top-0 z-[100] -translate-x-[80%] -translate-y-[80%] px-6 py-2 bg-black/10 text-white backdrop-blur-md rounded-md pointer-events-none transition-opacity duration-300",
         isVisible ? "opacity-100" : "opacity-0"
       )}
       ref={cursorRef}

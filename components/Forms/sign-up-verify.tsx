@@ -1,64 +1,65 @@
-import { useSignUp } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Form, InputOtp, Spinner } from "@heroui/react";
-import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
-import { useQueryState } from "nuqs";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useSignUp } from "@clerk/nextjs"
+import { Form, InputOtp, Spinner } from "@heroui/react"
+import { motion } from "motion/react"
+import { useQueryState } from "nuqs"
+
+import { cn } from "@/lib/utils"
 
 export default function SignUpVerify() {
-  const { isLoaded, signUp, setActive } = useSignUp();
-  const [code, setCode] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [auth, setAuth] = useQueryState("auth");
-  const router = useRouter();
+  const { isLoaded, signUp, setActive } = useSignUp()
+  const [code, setCode] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [auth, setAuth] = useQueryState("auth")
+  const router = useRouter()
 
   const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!isLoaded) return;
-    setIsLoading(true);
+    if (!isLoaded) return
+    setIsLoading(true)
 
     try {
       // Use the code the user provided to attempt verification
       const signUpAttempt = await signUp.attemptEmailAddressVerification({
         code: code || "",
-      });
+      })
 
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === "complete") {
-        router.prefetch("/welcome");
-        setIsLoading(false);
+        router.prefetch("/welcome")
+        setIsLoading(false)
         await setActive({
           session: signUpAttempt.createdSessionId,
           redirectUrl: "/welcome",
-        });
-        router.refresh();
+        })
+        router.refresh()
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
-        console.error(JSON.stringify(signUpAttempt, null, 2));
-        setIsLoading(false);
+        console.error(JSON.stringify(signUpAttempt, null, 2))
+        setIsLoading(false)
       }
     } catch (err: any) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      console.error("Error:", JSON.stringify(err, null, 2));
-      setIsLoading(false);
+      console.error("Error:", JSON.stringify(err, null, 2))
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <motion.div
       key="sign-up-verify"
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
-      className="w-full flex items-center justify-center"
+      className="w-full flex items-center justify-center px-2 lg:px-0 py-4 lg:py-0"
     >
-      <Form className="w-[90%] max-w-md" onSubmit={handleVerify}>
-        <h1 className="text-4xl tracking-tight mb-3">
+      <Form className="w-[90%]" onSubmit={handleVerify}>
+        <h1 className="text-3xl lg:text-4xl tracking-tight mb-3">
           Verify your email to
           <br />
           unleash your dreams.
@@ -104,5 +105,5 @@ export default function SignUpVerify() {
         {error && <p className="text-danger">{error}</p>}
       </Form>
     </motion.div>
-  );
+  )
 }

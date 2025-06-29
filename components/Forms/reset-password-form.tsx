@@ -142,11 +142,11 @@ export default function ResetPasswordForm() {
     <motion.div
       key="reset-password-form"
       exit={{ opacity: 0, x: -100 }}
-      className="w-full flex items-center justify-center"
+      className="w-full flex items-center justify-center px-2 lg:px-0 py-4 lg:py-0"
     >
       {step === "email" ? (
         <Form
-          className="w-full lg:w-[90%] py-6 lg:py-0"
+          className="w-full lg:w-[90%]"
           onSubmit={emailForm.handleSubmit(onEmailSubmit)}
         >
           <h1 className="text-3xl lg:text-4xl tracking-tight">
@@ -179,7 +179,7 @@ export default function ResetPasswordForm() {
 
           {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
 
-          <p className="text-sm text-black lg:mt-4 tracking-tight">
+          <p className="text-sm text-[#787878] lg:mt-4 tracking-tight">
             Remember your password?{" "}
             <button className="underline" onClick={() => setAuth("sign-in")}>
               Sign in
@@ -188,7 +188,7 @@ export default function ResetPasswordForm() {
         </Form>
       ) : (
         <Form
-          className="w-full lg:w-[90%] relative py-6 lg:py-0"
+          className="w-full lg:w-[90%] relative"
           onSubmit={resetForm.handleSubmit(onResetSubmit)}
         >
           <h1 className="text-3xl lg:text-4xl tracking-tight lg:mb-4">
@@ -267,7 +267,7 @@ export default function ResetPasswordForm() {
           {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
 
           <div className="flex flex-col gap-2 lg:mt-4">
-            <p className="text-sm text-black tracking-tight">
+            <p className="text-sm text-[#787878] tracking-tight">
               Remember your password?{" "}
               <button className="underline" onClick={() => setAuth("sign-in")}>
                 Sign in

@@ -93,12 +93,9 @@ export default function SignUpForm() {
     <motion.div
       key="sign-up-form"
       exit={{ opacity: 0, x: -100 }}
-      className="w-full flex items-center justify-center"
+      className="w-full flex items-center justify-center px-2 lg:px-0 py-4 lg:py-0"
     >
-      <Form
-        className="w-full lg:w-[90%] py-6 lg:py-0"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <Form className="w-full lg:w-[90%]" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-3xl lg:text-4xl tracking-tight mb-4 lg:mb-8">
           Create your account to
           <br />
@@ -155,7 +152,7 @@ export default function SignUpForm() {
           <span className={cn("-mb-1", isLoading && "opacity-0")}>Sign Up</span>
         </button>
         {error && <p className="text-danger">{error}</p>}
-        <p className="text-sm text-black lg:mt-4 tracking-tight">
+        <p className="text-sm text-[#787878] lg:mt-4 tracking-tight">
           Already have an account?{" "}
           <button className="underline" onClick={() => setAuth("sign-in")}>
             Sign in

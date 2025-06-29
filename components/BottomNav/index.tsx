@@ -54,7 +54,7 @@ export default function BottomNav() {
 
   return (
     <>
-      <div className="fixed w-screen bottom-4 lg:bottom-8 left-0 z-[100] ">
+      <div className="fixed w-screen bottom-4 lg:bottom-8 left-0 z-[100]">
         <div
           ref={ref}
           className={cn(
@@ -71,7 +71,7 @@ export default function BottomNav() {
             <div
               className={cn(
                 "w-full h-0 transition-all duration-500 ease-out-expo overflow-hidden",
-                isExpanded && "h-[20rem]"
+                isExpanded && "h-[20rem] lg:h-[30rem]"
               )}
             >
               <div className="h-full flex flex-col pb-2 pr-2">
@@ -148,28 +148,33 @@ export default function BottomNav() {
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/web.png"
                         text="Websites"
-                        href="/"
+                        href="/?category=websites"
                         className="border-t-[1px]"
                       />
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/design.png"
                         text="Design"
-                        href="/"
+                        href="/?category=design"
                       />
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/startup.png"
                         text="Start-Ups"
-                        href="/"
+                        href="/?category=startups"
                       />
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/crypto.png"
                         text="Crypto"
-                        href="/"
+                        href="/?category=crypto"
                       />
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/film.png"
                         text="Films"
-                        href="/"
+                        href="/?category=films"
+                      />
+                      <BottomNavItem
+                        imageSRC="/static/images/bottom-nav/ai.png"
+                        text="AI"
+                        href="/?category=ai"
                       />
                     </>
                   )}

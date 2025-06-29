@@ -127,7 +127,7 @@ export default function Search({
     <div className="w-fit h-fit mr-1 relative">
       <div
         className={cn(
-          "relative w-10 h-10 flex items-center transition-all duration-400 ease-out-expo rounded-lg overflow-hidden will-change-[width]",
+          "relative w-10 h-9 lg:h-10 flex items-center transition-all duration-400 ease-out-expo rounded-lg overflow-hidden will-change-[width]",
           isOpen && "bg-white w-64 lg:w-72"
         )}
       >
