@@ -1,7 +1,7 @@
-import { Tables } from "@/database.types";
+import { Tables } from "@/database.types"
 
 interface ProfileNavigationProps {
-  socialLinks?: Tables<"socials">;
+  socialLinks?: Tables<"socials">
 }
 
 function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
@@ -13,15 +13,15 @@ function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
     >
       {icon}
     </a>
-  );
+  )
 }
 
 export default function ProfileNavigation({
   socialLinks,
 }: ProfileNavigationProps) {
   return (
-    <div className="flex items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] pl-11 pr-9 py-6">
-      <div className="flex items-center gap-2 font-medium tracking-tight">
+    <div className="flex flex-col lg:flex-row gap-3 lg:gap-0 lg:items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] pl-4 lg:pl-11 pr-3 lg:pr-9 py-3 lg:py-6">
+      <div className="flex items-center gap-2 font-medium tracking-tight text-sm lg:text-base">
         <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
           <span className="size-4 flex">
             <svg
@@ -41,7 +41,7 @@ export default function ProfileNavigation({
           </span>
           <span>Awards</span>
         </button>
-        <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
+        <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-4 lg:px-5 py-2 rounded-lg">
           <span className="size-[1.1rem] flex">
             <svg
               width="100%"
@@ -128,5 +128,5 @@ export default function ProfileNavigation({
         )}
       </div>
     </div>
-  );
+  )
 }

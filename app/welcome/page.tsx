@@ -1,17 +1,18 @@
-import Lanyard from "@/components/Lanyard/Lanyard";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
+import { auth } from "@clerk/nextjs/server"
+
+import Lanyard from "@/components/Lanyard/Lanyard"
 
 export default async function Welcome() {
-  const { userId } = await auth();
+  const { userId } = await auth()
 
   if (!userId) {
-    redirect("/");
+    redirect("/")
   }
 
   return (
-    <div className="h-screen w-screen relative bg-white">
+    <div className="h-screen w-full relative bg-white">
       <Lanyard />
     </div>
-  );
+  )
 }

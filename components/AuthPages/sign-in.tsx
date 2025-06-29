@@ -1,13 +1,14 @@
-import Image from "next/image";
-import Link from "next/link";
-import SignInForm from "@/components/Forms/sign-in-form";
-import { AnimatePresence } from "motion/react";
+import Image from "next/image"
+import Link from "next/link"
+import { AnimatePresence } from "motion/react"
+
+import SignInForm from "@/components/Forms/sign-in-form"
 
 export default function SignIn() {
   return (
-    <main className="w-full h-[75svh] flex flex-row items-center justify-center text-darkGreen">
-      <div className="w-full h-full flex flex-row p-4">
-        <div className="w-1/2 h-full relative">
+    <main className="w-full h-fit lg:h-[75svh] flex flex-row items-center justify-center text-darkGreen">
+      <div className="w-full h-full flex flex-col lg:flex-row p-4">
+        <div className="w-full lg:w-1/2 h-[25vh] lg:h-full relative">
           <Link
             href="/"
             className="w-24 text-black flex items-center absolute top-5 left-5 z-20"
@@ -56,7 +57,7 @@ export default function SignIn() {
               />
             </svg>
           </Link>
-          <p className="text-base tracking-tight leading-[1.2] absolute left-5 bottom-5 z-20 text-white">
+          <p className="text-sm lg:text-base tracking-tight leading-[1.2] absolute left-5 bottom-5 z-20 text-white">
             By signing up, you agree to Spotlight&apos;s <br />
             <Link href="/terms-of-service" className="underline">
               Terms of Service
@@ -75,12 +76,12 @@ export default function SignIn() {
             className="w-full h-full object-cover rounded-2xl relative z-10"
           />
         </div>
-        <div className="w-1/2 h-full flex flex-col items-center justify-center">
+        <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center">
           <AnimatePresence mode="popLayout">
             <SignInForm />
           </AnimatePresence>
         </div>
       </div>
     </main>
-  );
+  )
 }

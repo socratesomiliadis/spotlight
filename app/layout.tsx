@@ -42,12 +42,12 @@ export default function RootLayout({
         >
           <NuqsAdapter>
             <HeroUIProvider>
+              <Header />
               <MainLayout>
-                <Header />
                 <Toaster richColors />
                 {children}
-                <BottomNav />
               </MainLayout>
+              <BottomNav />
             </HeroUIProvider>
           </NuqsAdapter>
         </body>

@@ -1,12 +1,14 @@
-import { UserProfile } from "@clerk/nextjs";
+import { UserProfile } from "@clerk/nextjs"
+
+import PageWrapper from "@/components/page-wrapper"
 
 export default function SettingsPage() {
   return (
-    <main className="w-screen px-[22vw] h-[100svh] flex items-center justify-center">
-      <div
-        data-lenis-prevent
-        className="w-full rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col overflow-hidden -mt-8"
-      >
+    <PageWrapper
+      wrapperClassName="h-[100svh] py-20 overflow-hidden lg:py-0 flex items-center justify-center"
+      className="w-full h-full flex items-center justify-center pb-0 lg:-mt-16"
+    >
+      <div data-lenis-prevent className="w-full h-full">
         <UserProfile
           path="/settings"
           appearance={{
@@ -20,6 +22,6 @@ export default function SettingsPage() {
           }}
         />
       </div>
-    </main>
-  );
+    </PageWrapper>
+  )
 }

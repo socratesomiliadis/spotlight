@@ -4,7 +4,7 @@ export default function ProjectElements({ tags }: { tags: string[] }) {
       <span className="text-black text-xl">Details</span>
       <p className="text-[#ACACAC] text-xl">Technologies and tools used</p>
       <div className="w-full h-[1px] bg-[#EAEAEA] my-6"></div>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row flex-wrap gap-2">
         {tags.map((tag, index) => (
           <span
             key={index}

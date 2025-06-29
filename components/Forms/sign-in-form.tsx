@@ -1,18 +1,19 @@
-"use client";
+"use client"
 
-import { Form, Spinner } from "@heroui/react";
-import MyInput from "./components/Input";
-import { useState } from "react";
-import { Eye } from "../icons";
-import { EyeClosed } from "../icons";
-import { useSignIn } from "@clerk/nextjs";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import { useQueryState } from "nuqs";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useSignIn } from "@clerk/nextjs"
+import { Form, Spinner } from "@heroui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { motion } from "motion/react"
+import { useQueryState } from "nuqs"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+
+import { cn } from "@/lib/utils"
+
+import { Eye, EyeClosed } from "../icons"
+import MyInput from "./components/Input"
 
 // Define validation schema with Zod
 const signInSchema = z.object({
@@ -29,17 +30,17 @@ const signInSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
-});
+})
 
-type SignInFormValues = z.infer<typeof signInSchema>;
+type SignInFormValues = z.infer<typeof signInSchema>
 
 export default function SignInForm() {
-  const [auth, setAuth] = useQueryState("auth");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { isLoaded, signIn, setActive } = useSignIn();
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [auth, setAuth] = useQueryState("auth")
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const { isLoaded, signIn, setActive } = useSignIn()
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const {
     register,
@@ -51,50 +52,51 @@ export default function SignInForm() {
       emailOrUsername: "",
       password: "",
     },
-  });
+  })
 
   const onSubmit = async (data: SignInFormValues) => {
-    if (!isLoaded) return;
-    setIsLoading(true);
+    if (!isLoaded) return
+    setIsLoading(true)
     // Start the sign-in process using the email and password provided
     try {
       const signInAttempt = await signIn.create({
         identifier: data.emailOrUsername,
         password: data.password,
-      });
+      })
 
       // If sign-in process is complete, set the created session as active
       // and redirect the user
       if (signInAttempt.status === "complete") {
-        setIsLoading(false);
-        await setActive({ session: signInAttempt.createdSessionId });
-        router.refresh();
+        setIsLoading(false)
+        await setActive({ session: signInAttempt.createdSessionId })
+        router.refresh()
         // setAuth(null);
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
-        setIsLoading(false);
-        console.error(JSON.stringify(signInAttempt, null, 2));
+        setIsLoading(false)
+        console.error(JSON.stringify(signInAttempt, null, 2))
       }
     } catch (err: any) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
-      setIsLoading(false);
-      console.error(JSON.stringify(err, null, 2));
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
+      setIsLoading(false)
+      console.error(JSON.stringify(err, null, 2))
+      setError(err instanceof Error ? err.message : "An unknown error occurred")
     }
-  };
+  }
 
   return (
     <motion.div
       key="sign-in-form"
       exit={{ opacity: 0, x: -100 }}
-      className="w-full flex items-center justify-center"
+      className="w-full flex items-center justify-center py-6 lg:py-0"
     >
-      <Form className="w-[90%] max-w-md" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-4xl tracking-tight mb-8">
+      <Form
+        className="w-full lg:w-[90%] max-w-md"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <h1 className="text-3xl lg:text-4xl tracking-tight mb-4 lg:mb-8">
           Sign in to your account
         </h1>
         <MyInput
@@ -136,7 +138,7 @@ export default function SignInForm() {
         <div id="clerk-captcha" />
         <button
           type="submit"
-          className="w-full mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"
+          className="w-full mt-2 lg:mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"
         >
           {isLoading && (
             <Spinner className="absolute" color="white" size="sm" />
@@ -144,7 +146,7 @@ export default function SignInForm() {
           <span className={cn("-mb-1", isLoading && "opacity-0")}>Sign In</span>
         </button>
         {error && <p className="text-danger">{error}</p>}
-        <p className="text-sm text-black mt-4 tracking-tight">
+        <p className="text-sm text-black lg:mt-4 tracking-tight">
           Don&apos;t have an account?{" "}
           <button className="underline" onClick={() => setAuth("sign-up")}>
             Sign up
@@ -152,5 +154,5 @@ export default function SignInForm() {
         </p>
       </Form>
     </motion.div>
-  );
+  )
 }

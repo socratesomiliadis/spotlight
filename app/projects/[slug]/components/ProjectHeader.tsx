@@ -26,25 +26,27 @@ export default function ProjectHeader({
 }) {
   return (
     <div className="flex flex-col p-3">
-      <div className="w-full aspect-[3/1] bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
+      <div className="w-full aspect-[3/1.5] lg:aspect-[3/1] bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
         <Image
           src={bannerUrl || ""}
           alt="Project Banner"
           width={3000}
           height={1000}
           priority
-          className="w-full aspect-[3/1] object-cover object-center"
+          className="w-full aspect-[3/1.5] lg:aspect-[3/1] object-cover object-center"
         />
       </div>
-      <div className="flex flex-col items-center gap-2 py-10">
-        <p className="text-sm text-[#ACACAC] -mb-2 tracking-tight">
+      <div className="flex flex-col items-center gap-2 py-6 lg:py-10">
+        <p className="text-xs lg:text-sm text-[#ACACAC] -mb-2 tracking-tight">
           {formatDate(createdAt)}
         </p>
-        <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
+        <h1 className="text-2xl lg:text-4xl font-bold tracking-tight">
+          {title}
+        </h1>
 
         <Link
           href={`/${userUsername}`}
-          className="flex flex-col items-center gap-2 mt-6"
+          className="flex flex-col items-center gap-2 mt-4 lg:mt-6"
         >
           <Image
             src={userAvatarUrl || ""}

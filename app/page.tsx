@@ -4,6 +4,7 @@ import HomeHero from "@/components/Home/home-hero"
 import HomeNavigation from "@/components/Home/home-navigation"
 import PreviewCursor from "@/components/Home/preview-cursor"
 import ProjectsGrid from "@/components/Home/projects-grid"
+import PageWrapper from "@/components/page-wrapper"
 
 export default async function Home() {
   const supabase = await createClient()
@@ -21,14 +22,12 @@ export default async function Home() {
   const featuredProject = siteOfTheDay || projects?.[0]
 
   return (
-    <main className="w-screen px-[22vw] py-28">
-      <div className="w-full pb-8 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
-        {/* @ts-ignore */}
-        <HomeHero project={featuredProject} />
-        <HomeNavigation />
-        <ProjectsGrid projects={projects} />
-      </div>
+    <PageWrapper className="flex flex-col pb-3 lg:pb-8">
+      {/* @ts-ignore */}
+      <HomeHero project={featuredProject} />
+      <HomeNavigation />
+      <ProjectsGrid projects={projects} />
       <PreviewCursor />
-    </main>
+    </PageWrapper>
   )
 }

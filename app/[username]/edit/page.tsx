@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 
 import { getProfileAndSocials } from "@/lib/supabase/actions/profile"
 import { createClient } from "@/lib/supabase/server"
+import PageWrapper from "@/components/page-wrapper"
 
 import EditProfileForm from "./components/EditProfileForm"
 
@@ -38,10 +39,8 @@ export default async function EditPage({ params }: PageProps) {
   }
 
   return (
-    <main className="w-screen px-[22vw] py-28">
-      <div className="w-full rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
-        <EditProfileForm userAndSocials={user} />
-      </div>
-    </main>
+    <PageWrapper className="w-full flex flex-col pb-0">
+      <EditProfileForm userAndSocials={user} />
+    </PageWrapper>
   )
 }

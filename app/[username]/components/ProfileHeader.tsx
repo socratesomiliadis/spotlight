@@ -1,20 +1,21 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import Link from "next/link";
-import { useState, useTransition } from "react";
-import CustomButton from "@/components/custom-button";
-import { Tables } from "@/database.types";
-import { toggleFollowAction } from "@/lib/supabase/follow-actions";
+import { useState, useTransition } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Tables } from "@/database.types"
+
+import { toggleFollowAction } from "@/lib/supabase/follow-actions"
+import CustomButton from "@/components/custom-button"
 
 interface ProfileHeaderProps {
-  user: Tables<"profile">;
-  isOwnProfile: boolean;
-  initialFollowStatus: boolean;
+  user: Tables<"profile">
+  isOwnProfile: boolean
+  initialFollowStatus: boolean
 }
 
 function removeHttpsAndTrailingSlash(url: string) {
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "")
 }
 
 export default function ProfileHeader({
@@ -22,21 +23,21 @@ export default function ProfileHeader({
   isOwnProfile,
   initialFollowStatus,
 }: ProfileHeaderProps) {
-  const [isFollowing, setIsFollowing] = useState(initialFollowStatus);
-  const [isPending, startTransition] = useTransition();
-  const displayName = user.display_name || user.username || "User";
+  const [isFollowing, setIsFollowing] = useState(initialFollowStatus)
+  const [isPending, startTransition] = useTransition()
+  const displayName = user.display_name || user.username || "User"
 
   const handleFollowClick = () => {
     startTransition(async () => {
       try {
-        const result = await toggleFollowAction(user.user_id);
-        setIsFollowing(result.isFollowing);
+        const result = await toggleFollowAction(user.user_id)
+        setIsFollowing(result.isFollowing)
       } catch (error) {
-        console.error("Error toggling follow status:", error);
+        console.error("Error toggling follow status:", error)
         // Optionally show an error message to the user
       }
-    });
-  };
+    })
+  }
 
   return (
     <div className="flex flex-col p-3">
@@ -55,19 +56,19 @@ export default function ProfileHeader({
       </div>
 
       {/* Profile Image and Buttons */}
-      <div className="w-full flex flex-row justify-between items-start -mt-20 pl-8 pr-6">
+      <div className="w-full flex flex-row justify-between items-start -mt-12 lg:-mt-20 pl-4 lg:pl-8 pr-3 lg:pr-6">
         <Image
           src={user.avatar_url || ""}
           alt={displayName}
           width={256}
           height={256}
           priority
-          className="rounded-xl size-40 aspect-square object-cover outline outline-[0.7rem] outline-white"
+          className="rounded-xl size-24 lg:size-40 aspect-square object-cover outline outline-[0.4rem] lg:outline-[0.7rem] outline-white"
         />
         {isOwnProfile ? (
           <CustomButton
             text="Edit Profile"
-            className="mt-24"
+            className="mt-14 lg:mt-24"
             href={`/${user.username}/edit`}
           />
         ) : (
@@ -93,17 +94,19 @@ export default function ProfileHeader({
       </div>
 
       {/* Name and Details */}
-      <div className="flex flex-col pl-8 mt-4">
+      <div className="flex flex-col pl-4 lg:pl-8 mt-4">
         <div className="flex flex-col gap-0">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight">
             {displayName}
           </h1>
-          <span className="text-lg text-[#989898]">@{user.username}</span>
+          <span className="text-base lg:text-lg text-[#989898]">
+            @{user.username}
+          </span>
         </div>
-        <div className="flex flex-row gap-5 text-lg text-[#ACACAC] mt-6 mb-0">
+        <div className="flex flex-col lg:flex-row gap-2 lg:gap-5 text-base lg:text-lg text-[#ACACAC] mt-6 mb-0">
           {user.location && (
             <div className="flex flex-row items-center gap-1">
-              <span className="w-4">
+              <span className="w-3 lg:w-4">
                 <svg
                   width="100%"
                   viewBox="0 0 16 19"
@@ -129,7 +132,7 @@ export default function ProfileHeader({
               className="flex flex-row items-center gap-1"
               target="_blank"
             >
-              <span className="w-4">
+              <span className="w-3 lg:w-4">
                 <svg
                   width="100%"
                   viewBox="0 0 18 18"
@@ -153,5 +156,5 @@ export default function ProfileHeader({
         </div>
       </div>
     </div>
-  );
+  )
 }

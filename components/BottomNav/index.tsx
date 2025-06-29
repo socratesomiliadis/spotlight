@@ -1,81 +1,84 @@
-"use client";
-import { cn } from "@/lib/utils";
-import Search, { SearchResults } from "./search";
-import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import BottomNavQuickLink from "./bottom-quick-link";
-import { AnimatePresence, motion } from "motion/react";
-import BottomNavItem from "./bottom-nav-item";
-import { useOnClickOutside } from "usehooks-ts";
-import Link from "next/link";
-import { XIcon } from "@/components/icons";
-import SearchResultsComponent from "./search-results";
-import GooeySvgFilter from "../gooey-filter";
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { AnimatePresence, motion } from "motion/react"
+import { useOnClickOutside } from "usehooks-ts"
+
+import { cn } from "@/lib/utils"
+import { XIcon } from "@/components/icons"
+
+import GooeySvgFilter from "../gooey-filter"
+import BottomNavItem from "./bottom-nav-item"
+import BottomNavQuickLink from "./bottom-quick-link"
+import Search, { SearchResults } from "./search"
+import SearchResultsComponent from "./search-results"
 
 export default function BottomNav() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const ref = useRef<HTMLDivElement>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [searchResults, setSearchResults] = useState<SearchResults>({
     users: [],
     projects: [],
-  });
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const pathname = usePathname();
+  })
+  const [isSearchActive, setIsSearchActive] = useState(false)
+  const pathname = usePathname()
 
   const isAuthRoute =
-    pathname.includes("/sign-in") || pathname.includes("/sign-up");
+    pathname.includes("/sign-in") || pathname.includes("/sign-up")
 
   useEffect(() => {
     //Close on Escape
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setIsExpanded(false);
+        setIsExpanded(false)
       }
-    };
-    window.addEventListener("keydown", handleEscape);
+    }
+    window.addEventListener("keydown", handleEscape)
 
     return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
+      window.removeEventListener("keydown", handleEscape)
+    }
+  }, [])
 
   const handleClickOutside = () => {
-    setIsExpanded(false);
-    setIsSearchActive(false);
-  };
+    setIsExpanded(false)
+    setIsSearchActive(false)
+  }
 
   //@ts-expect-error dont care
-  useOnClickOutside(ref, handleClickOutside);
+  useOnClickOutside(ref, handleClickOutside)
 
-  if (isAuthRoute) return null;
+  if (isAuthRoute) return null
 
   return (
     <>
-      <div className="fixed w-screen bottom-8 left-0 z-[100] ">
+      <div className="fixed w-screen bottom-4 lg:bottom-8 left-0 z-[100] ">
         <div
           ref={ref}
           className={cn(
             "absolute bottom-0 z-[100] left-1/2 -translate-x-1/2 flex flex-row items-center gap-1 transition-transform duration-500 ease-out-expo will-change-transform",
-            !isExpanded && "-translate-x-[71%]"
+            !isExpanded && "-translate-x-1/2 lg:-translate-x-[71%]"
           )}
         >
           <div
             className={cn(
-              "bg-[#1E1E1E]/90 backdrop-blur-xl p-0 w-[25vw] rounded-xl flex flex-col transition-all duration-500 ease-out-expo",
-              isExpanded && "w-[40vw]"
+              "bg-[#1E1E1E]/90 backdrop-blur-xl p-0 w-[calc(100vw-1.75rem)] lg:w-[25vw] rounded-xl flex flex-col transition-all duration-500 ease-out-expo",
+              isExpanded && "lg:w-[40vw]"
             )}
           >
             <div
               className={cn(
                 "w-full h-0 transition-all duration-500 ease-out-expo overflow-hidden",
-                isExpanded && "h-[30rem]"
+                isExpanded && "h-[20rem]"
               )}
             >
               <div className="h-full flex flex-col pb-2 pr-2">
                 <div
                   className={cn(
-                    "px-4 w-full flex flex-row justify-between pt-4 pb-16",
-                    isSearchActive && "pb-16"
+                    "px-4 w-full flex flex-row justify-between pt-4 pb-8 lg:pb-16",
+                    isSearchActive && "pb-8 lg:pb-16"
                   )}
                 >
                   <Link href="/" className="w-24 flex items-center text-white">
@@ -123,16 +126,6 @@ export default function BottomNav() {
                       />
                     </svg>
                   </Link>
-                  {/* <button
-                    onClick={() => {
-                      setIsExpanded(!isExpanded);
-                    }}
-                    className="bg-[#242424] flex flex-row items-center gap-2 rounded-md px-2 py-1 text-white"
-                  >
-                    <span className="text-xs -mb-0.5">ESC</span>
-                    <span className="w-[1px] h-[60%] bg-[#989898] -mt-0.5"></span>
-                    <XIcon className="w-2" />
-                  </button> */}
                 </div>
                 <div
                   data-lenis-prevent
@@ -145,8 +138,8 @@ export default function BottomNav() {
                         projects={searchResults.projects}
                         isVisible={true}
                         onResultClick={() => {
-                          setIsExpanded(false);
-                          setIsSearchActive(false);
+                          setIsExpanded(false)
+                          setIsSearchActive(false)
                         }}
                       />
                     </div>
@@ -205,7 +198,7 @@ export default function BottomNav() {
                       duration: 0.4,
                       ease: [0.175, 0.885, 0.32, 1],
                     }}
-                    className="flex flex-row gap-1 mb-0 will-change-transform"
+                    className="hidden lg:flex flex-row gap-1 mb-0 will-change-transform"
                   >
                     <BottomNavQuickLink text="Home" href="/" inverted />
                     <BottomNavQuickLink text="Directory" href="/" inverted />
@@ -214,9 +207,9 @@ export default function BottomNav() {
               </div>
               <button
                 onClick={() => {
-                  setIsExpanded(!isExpanded);
+                  setIsExpanded(!isExpanded)
                   if (isExpanded) {
-                    setIsSearchActive(false);
+                    setIsSearchActive(false)
                   }
                 }}
                 className="w-full pr-4 flex items-center justify-end gap-1 focus:outline-none p-1.5"
@@ -243,7 +236,7 @@ export default function BottomNav() {
                 ease: [0.175, 0.885, 0.32, 1],
               }}
               layoutId="bottomQuickLinks"
-              className="absolute left-[calc(100%+0.25rem)] bottom-0 flex flex-row gap-1 will-change-transform"
+              className="absolute left-[calc(100%+0.25rem)] bottom-0 hidden lg:flex flex-row gap-1 will-change-transform"
             >
               <BottomNavQuickLink text="Home" href="/" inverted={isExpanded} />
               <BottomNavQuickLink
@@ -256,5 +249,5 @@ export default function BottomNav() {
         </div>
       </div>
     </>
-  );
+  )
 }

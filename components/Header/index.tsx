@@ -1,42 +1,47 @@
-import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import UserBtn from "./user-button";
-import AuthDrawer from "../auth-drawer";
-import { UserButton } from "@clerk/nextjs";
-import CustomButton from "../custom-button";
-import { createClient } from "@/lib/supabase/server";
+import Link from "next/link"
+import { UserButton } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
+
+import { createClient } from "@/lib/supabase/server"
+
+import AuthDrawer from "../auth-drawer"
+import CustomButton from "../custom-button"
+import UserBtn from "./user-button"
 
 async function getAvatarUrl(userId: string) {
-  const supabase = await createClient();
+  const supabase = await createClient()
   const { data, error } = await supabase
     .from("profile")
     .select("avatar_url")
     .eq("user_id", userId)
-    .single();
+    .single()
 
   if (error) {
-    console.log(error);
-    return null;
+    console.log(error)
+    return null
   }
 
-  return data?.avatar_url;
+  return data?.avatar_url
 }
 
 export default async function Header() {
-  const { userId } = await auth();
+  const { userId } = await auth()
 
-  let avatarUrl;
+  let avatarUrl
 
   if (userId) {
-    avatarUrl = await getAvatarUrl(userId);
+    avatarUrl = await getAvatarUrl(userId)
   }
 
   return (
-    <header className="w-screen absolute top-6 px-[22vw] flex flex-row items-center justify-between z-50">
-      <Link href="/" className="w-32 header-logo flex items-center text-black">
+    <header className="w-screen absolute top-4 lg:top-6 px-3 lg:px-[22vw] flex flex-row items-center justify-between z-50">
+      <Link
+        href="/"
+        className="w-28 lg:w-32 header-logo flex items-center text-black"
+      >
         <svg
           width="100%"
-          viewBox="0 0 560 134"
+          viewBox="0 0 550 134"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -83,12 +88,21 @@ export default async function Header() {
           <>
             <UserBtn avatarUrl={avatarUrl || ""} />
             {/* <UserButton /> */}
-            <CustomButton text="Premium" href="/premium" />
+            <CustomButton
+              text="Premium"
+              href="/premium"
+              className="hidden lg:flex"
+            />
           </>
         )}
         <AuthDrawer userExists={!!userId} />
-        <CustomButton text="Submit" href="/projects/new" inverted />
+        <CustomButton
+          text="Submit"
+          href="/projects/new"
+          inverted
+          className="hidden lg:flex"
+        />
       </div>
     </header>
-  );
+  )
 }

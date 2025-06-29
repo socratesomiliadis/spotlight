@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation"
 import { currentUser } from "@clerk/nextjs/server"
 
+import PageWrapper from "@/components/page-wrapper"
+
 import NewProjectForm from "../components/NewProjectForm"
 import NewProjectHeader from "../components/NewProjectHeader"
 
@@ -13,11 +15,9 @@ export default async function StaffPage() {
   }
 
   return (
-    <main className="w-screen px-[22vw] py-28">
-      <div className="w-full rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
-        <NewProjectHeader />
-        <NewProjectForm userId={user.id} isStaff={true} />
-      </div>
-    </main>
+    <PageWrapper className="w-full flex flex-col pb-0">
+      <NewProjectHeader />
+      <NewProjectForm userId={user.id} isStaff={true} />
+    </PageWrapper>
   )
 }

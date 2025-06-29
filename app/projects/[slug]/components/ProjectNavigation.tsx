@@ -1,7 +1,7 @@
-import { Tables } from "@/database.types";
+import { Tables } from "@/database.types"
 
 interface ProfileNavigationProps {
-  socialLinks?: Tables<"socials">;
+  socialLinks?: Tables<"socials">
 }
 
 function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
@@ -13,15 +13,15 @@ function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
     >
       {icon}
     </a>
-  );
+  )
 }
 
 export default function ProfileNavigation({
   socialLinks,
 }: ProfileNavigationProps) {
   return (
-    <div className="flex items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] px-8 py-4">
-      <div className="flex items-center gap-2 font-medium tracking-tight">
+    <div className="flex items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] px-4 lg:px-8 py-4">
+      <div className="flex flex-wrap items-center gap-2 font-medium tracking-tight text-sm lg:text-base">
         <button className="flex items-center gap-2 bg-[#A4810E] text-white px-4 py-2 rounded-lg">
           <span className="size-4 flex">
             <svg
@@ -147,5 +147,5 @@ export default function ProfileNavigation({
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -128,7 +128,7 @@ export default function Search({
       <div
         className={cn(
           "relative w-10 h-10 flex items-center transition-all duration-400 ease-out-expo rounded-lg overflow-hidden will-change-[width]",
-          isOpen && "bg-white w-72"
+          isOpen && "bg-white w-64 lg:w-72"
         )}
       >
         <button

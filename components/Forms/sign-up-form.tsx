@@ -1,20 +1,21 @@
-"use client";
+"use client"
 
-import { Form, Spinner } from "@heroui/react";
-import MyInput from "./components/Input";
-import { useState } from "react";
-import { Eye } from "../icons";
-import { EyeClosed } from "../icons";
-import { useSignUp } from "@clerk/nextjs";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { usePathname, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import SignUpVerify from "./sign-up-verify";
-import { motion } from "motion/react";
-import Link from "next/link";
-import { useQueryState } from "nuqs";
+import { useState } from "react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { useSignUp } from "@clerk/nextjs"
+import { Form, Spinner } from "@heroui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { motion } from "motion/react"
+import { useQueryState } from "nuqs"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+
+import { cn } from "@/lib/utils"
+
+import { Eye, EyeClosed } from "../icons"
+import MyInput from "./components/Input"
+import SignUpVerify from "./sign-up-verify"
 
 // Define validation schema with Zod
 const signUpSchema = z.object({
@@ -27,17 +28,17 @@ const signUpSchema = z.object({
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
-});
+})
 
-type SignUpFormValues = z.infer<typeof signUpSchema>;
+type SignUpFormValues = z.infer<typeof signUpSchema>
 
 export default function SignUpForm() {
-  const [auth, setAuth] = useQueryState("auth");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { isLoaded, signUp, setActive } = useSignUp();
-  const [isLoading, setIsLoading] = useState(false);
-  const [verifying, setVerifying] = useState(false);
+  const [auth, setAuth] = useQueryState("auth")
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const { isLoaded, signUp, setActive } = useSignUp()
+  const [isLoading, setIsLoading] = useState(false)
+  const [verifying, setVerifying] = useState(false)
 
   const {
     register,
@@ -51,13 +52,13 @@ export default function SignUpForm() {
       email: "",
       password: "",
     },
-  });
+  })
 
   const onSubmit = async (data: SignUpFormValues) => {
-    if (!isLoaded) return;
-    setIsLoading(true);
-    const firstName = data.displayName.split(" ")[0];
-    const lastName = data.displayName.split(" ")[1] || "";
+    if (!isLoaded) return
+    setIsLoading(true)
+    const firstName = data.displayName.split(" ")[0]
+    const lastName = data.displayName.split(" ")[1] || ""
     try {
       await signUp.create({
         firstName,
@@ -65,27 +66,27 @@ export default function SignUpForm() {
         username: data.username,
         emailAddress: data.email,
         password: data.password,
-      });
+      })
 
       // Handle successful sign-up (e.g., redirect)
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code",
-      });
+      })
 
-      setVerifying(true);
+      setVerifying(true)
     } catch (error) {
-      console.log("Error signing up:", error);
+      console.log("Error signing up:", error)
       setError(
         error instanceof Error ? error.message : "An unknown error occurred"
-      );
+      )
       // Handle error
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   if (verifying) {
-    return <SignUpVerify />;
+    return <SignUpVerify />
   }
 
   return (
@@ -94,8 +95,11 @@ export default function SignUpForm() {
       exit={{ opacity: 0, x: -100 }}
       className="w-full flex items-center justify-center"
     >
-      <Form className="w-[90%] max-w-md" onSubmit={handleSubmit(onSubmit)}>
-        <h1 className="text-4xl tracking-tight mb-8">
+      <Form
+        className="w-full lg:w-[90%] py-6 lg:py-0"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <h1 className="text-3xl lg:text-4xl tracking-tight mb-4 lg:mb-8">
           Create your account to
           <br />
           unleash your dreams.
@@ -151,7 +155,7 @@ export default function SignUpForm() {
           <span className={cn("-mb-1", isLoading && "opacity-0")}>Sign Up</span>
         </button>
         {error && <p className="text-danger">{error}</p>}
-        <p className="text-sm text-black mt-4 tracking-tight">
+        <p className="text-sm text-black lg:mt-4 tracking-tight">
           Already have an account?{" "}
           <button className="underline" onClick={() => setAuth("sign-in")}>
             Sign in
@@ -159,5 +163,5 @@ export default function SignUpForm() {
         </p>
       </Form>
     </motion.div>
-  );
+  )
 }

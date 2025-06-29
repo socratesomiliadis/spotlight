@@ -5,6 +5,7 @@ import { getProfileFull } from "@/lib/supabase/actions/profile"
 import { getFollowStatusAction } from "@/lib/supabase/follow-actions"
 import { cn } from "@/lib/utils"
 import PreviewCursor from "@/components/Home/preview-cursor"
+import PageWrapper from "@/components/page-wrapper"
 import ProfileHeader from "@/app/[username]/components/ProfileHeader"
 import ProfileNavigation from "@/app/[username]/components/ProfileNavigation"
 import ProjectsGrid from "@/app/[username]/components/ProjectsGrid"
@@ -37,26 +38,24 @@ export default async function UsernamePage({ params }: PageProps) {
   const { isFollowing } = await getFollowStatusAction(user.user_id)
 
   return (
-    <main className="w-screen px-[22vw] py-28">
-      <div className="w-full pb-11 rounded-3xl border-[1px] border-[#EAEAEA] flex flex-col">
-        <ProfileHeader
-          user={user}
-          isOwnProfile={isOwnProfile}
-          initialFollowStatus={isFollowing}
-        />
+    <PageWrapper className="w-full pb-3 lg:pb-11 flex flex-col">
+      <ProfileHeader
+        user={user}
+        isOwnProfile={isOwnProfile}
+        initialFollowStatus={isFollowing}
+      />
 
-        {/* Content Section */}
-        <div
-          className={cn(
-            "w-full",
-            (!!user.website_url || !!user.location) && "mt-5"
-          )}
-        >
-          <ProfileNavigation socialLinks={user.socials || undefined} />
-          <ProjectsGrid projects={user.project || undefined} />
-        </div>
+      {/* Content Section */}
+      <div
+        className={cn(
+          "w-full",
+          (!!user.website_url || !!user.location) && "mt-5"
+        )}
+      >
+        <ProfileNavigation socialLinks={user.socials || undefined} />
+        <ProjectsGrid projects={user.project || undefined} />
       </div>
       <PreviewCursor />
-    </main>
+    </PageWrapper>
   )
 }

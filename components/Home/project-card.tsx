@@ -25,7 +25,7 @@ export default function ProjectCard({
       href={`/projects/${project.slug}`}
       key={project.id}
       className={cn(
-        "w-full overflow-hidden rounded-2xl group show-preview-cursor relative",
+        "w-full overflow-hidden rounded-xl lg:rounded-2xl group show-preview-cursor relative",
         className
       )}
     >
@@ -44,7 +44,7 @@ export default function ProjectCard({
         width={1920}
         height={1080}
         className={cn(
-          "w-full aspect-video object-cover rounded-2xl group-hover:scale-[1.02] transition-all duration-500 ease-out-expo will-change-transform",
+          "w-full aspect-video object-cover rounded-xl lg:rounded-2xl group-hover:scale-[1.02] transition-all duration-500 ease-out-expo will-change-transform",
           hasPreview && "group-hover:scale-100"
         )}
       />

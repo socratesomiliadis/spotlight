@@ -1,22 +1,24 @@
-"use client";
+"use client"
 
-import { code, Form, InputOtp, Spinner } from "@heroui/react";
-import MyInput from "./components/Input";
-import { useState } from "react";
-import { Eye, EyeClosed } from "../icons";
-import { useSignIn } from "@clerk/nextjs";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import { useQueryState } from "nuqs";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useSignIn } from "@clerk/nextjs"
+import { code, Form, InputOtp, Spinner } from "@heroui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { motion } from "motion/react"
+import { useQueryState } from "nuqs"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+
+import { cn } from "@/lib/utils"
+
+import { Eye, EyeClosed } from "../icons"
+import MyInput from "./components/Input"
 
 // Define validation schemas
 const emailSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-});
+})
 
 const resetSchema = z
   .object({
@@ -32,29 +34,29 @@ const resetSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  });
+  })
 
-type EmailFormValues = z.infer<typeof emailSchema>;
-type ResetFormValues = z.infer<typeof resetSchema>;
+type EmailFormValues = z.infer<typeof emailSchema>
+type ResetFormValues = z.infer<typeof resetSchema>
 
 export default function ResetPasswordForm() {
-  const [auth, setAuth] = useQueryState("auth");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const { isLoaded, signIn, setActive } = useSignIn();
-  const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<"email" | "reset">("email");
-  const [email, setEmail] = useState("");
-  const router = useRouter();
+  const [auth, setAuth] = useQueryState("auth")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const { isLoaded, signIn, setActive } = useSignIn()
+  const [isLoading, setIsLoading] = useState(false)
+  const [step, setStep] = useState<"email" | "reset">("email")
+  const [email, setEmail] = useState("")
+  const router = useRouter()
 
   const emailForm = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
       email: "",
     },
-  });
+  })
 
   const resetForm = useForm<ResetFormValues>({
     resolver: zodResolver(resetSchema),
@@ -63,38 +65,38 @@ export default function ResetPasswordForm() {
       confirmPassword: "",
       code: "",
     },
-  });
+  })
 
   const onEmailSubmit = async (data: EmailFormValues) => {
-    if (!isLoaded) return;
-    setIsLoading(true);
-    setError(null);
+    if (!isLoaded) return
+    setIsLoading(true)
+    setError(null)
 
     try {
       // Start the password reset process
       await signIn?.create({
         strategy: "reset_password_email_code",
         identifier: data.email,
-      });
+      })
 
-      setEmail(data.email);
-      setStep("reset");
-      setSuccessMessage(`Reset code sent to ${data.email}`);
+      setEmail(data.email)
+      setStep("reset")
+      setSuccessMessage(`Reset code sent to ${data.email}`)
     } catch (err: any) {
       console.error(
         "Error sending reset email:",
         err.errors?.[0]?.longMessage || err
-      );
-      setError(err.errors?.[0]?.longMessage || "Failed to send reset email");
+      )
+      setError(err.errors?.[0]?.longMessage || "Failed to send reset email")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const onResetSubmit = async (data: ResetFormValues) => {
-    if (!isLoaded) return;
-    setIsLoading(true);
-    setError(null);
+    if (!isLoaded) return
+    setIsLoading(true)
+    setError(null)
 
     try {
       // Attempt to reset the password
@@ -102,39 +104,39 @@ export default function ResetPasswordForm() {
         strategy: "reset_password_email_code",
         code: data.code,
         password: data.password,
-      });
+      })
 
       // Check if 2FA is required
       if (result?.status === "needs_second_factor") {
-        setError("2FA is required, but this UI does not handle that");
-        setIsLoading(false);
-        return;
+        setError("2FA is required, but this UI does not handle that")
+        setIsLoading(false)
+        return
       }
 
       // If the reset is complete, set the session as active
       if (result?.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.push("/");
+        await setActive({ session: result.createdSessionId })
+        router.push("/")
       } else {
-        setError("Password reset failed. Please try again.");
+        setError("Password reset failed. Please try again.")
       }
     } catch (err: any) {
       console.error(
         "Error resetting password:",
         err.errors?.[0]?.longMessage || err
-      );
-      setError(err.errors?.[0]?.longMessage || "Failed to reset password");
+      )
+      setError(err.errors?.[0]?.longMessage || "Failed to reset password")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleBackToEmail = () => {
-    setStep("email");
-    setError(null);
-    setSuccessMessage(null);
-    resetForm.reset();
-  };
+    setStep("email")
+    setError(null)
+    setSuccessMessage(null)
+    resetForm.reset()
+  }
 
   return (
     <motion.div
@@ -144,11 +146,13 @@ export default function ResetPasswordForm() {
     >
       {step === "email" ? (
         <Form
-          className="w-[90%] max-w-md"
+          className="w-full lg:w-[90%] py-6 lg:py-0"
           onSubmit={emailForm.handleSubmit(onEmailSubmit)}
         >
-          <h1 className="text-4xl tracking-tight mb-0">Reset your password</h1>
-          <p className="text-[#acacac] mb-8">
+          <h1 className="text-3xl lg:text-4xl tracking-tight">
+            Reset your password
+          </h1>
+          <p className="text-[#acacac] mb-4 lg:mb-8">
             Enter your email address and we&apos;ll send you a reset code.
           </p>
 
@@ -175,7 +179,7 @@ export default function ResetPasswordForm() {
 
           {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
 
-          <p className="text-sm text-black mt-4 tracking-tight">
+          <p className="text-sm text-black lg:mt-4 tracking-tight">
             Remember your password?{" "}
             <button className="underline" onClick={() => setAuth("sign-in")}>
               Sign in
@@ -184,11 +188,13 @@ export default function ResetPasswordForm() {
         </Form>
       ) : (
         <Form
-          className="w-[90%] max-w-md relative"
+          className="w-full lg:w-[90%] relative py-6 lg:py-0"
           onSubmit={resetForm.handleSubmit(onResetSubmit)}
         >
-          <h1 className="text-4xl tracking-tight mb-4">Enter new password</h1>
-          <p className="text-gray-600 mb-8">
+          <h1 className="text-3xl lg:text-4xl tracking-tight lg:mb-4">
+            Enter new password
+          </h1>
+          <p className="text-gray-600 mb-4 lg:mb-8">
             Enter the code sent to {email} and your new password.
           </p>
 
@@ -260,7 +266,7 @@ export default function ResetPasswordForm() {
 
           {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
 
-          <div className="flex flex-col gap-2 mt-4">
+          <div className="flex flex-col gap-2 lg:mt-4">
             <p className="text-sm text-black tracking-tight">
               Remember your password?{" "}
               <button className="underline" onClick={() => setAuth("sign-in")}>
@@ -271,5 +277,5 @@ export default function ResetPasswordForm() {
         </Form>
       )}
     </motion.div>
-  );
+  )
 }

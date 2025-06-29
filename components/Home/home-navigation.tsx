@@ -1,8 +1,8 @@
-import { Tables } from "@/database.types";
+import { Tables } from "@/database.types"
 
 export default function HomeNavigation() {
   return (
-    <div className="flex items-center justify-between mt-8 mb-12 border-y-[1px] border-[#EAEAEA] px-8 py-4">
+    <div className="flex items-center justify-between mt-6 lg:mt-8 mb-12 border-y-[1px] border-[#EAEAEA] px-4 lg:px-8 py-3 lg:py-4">
       <div className="flex items-center gap-2 font-medium tracking-tight">
         <button className="flex items-center gap-2 bg-transparent text-[#989898] border-[2px] box-border border-[#F6F6F6] px-5 py-2 rounded-lg">
           <span className="size-4 flex">
@@ -42,7 +42,7 @@ export default function HomeNavigation() {
           </span>
           <span>Awards</span>
         </button>
-        <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
+        <button className="hidden lg:flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
           <span className="size-[1.1rem] flex">
             <svg
               width="100%"
@@ -63,5 +63,5 @@ export default function HomeNavigation() {
         </button>
       </div>
     </div>
-  );
+  )
 }

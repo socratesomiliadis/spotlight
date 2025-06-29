@@ -1,20 +1,23 @@
-"use client";
+"use client"
 
-import { ScrollTrigger } from "@/lib/gsap";
-import { Lenis } from "lenis/react";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react"
+import { Lenis } from "lenis/react"
+
+import { ScrollTrigger } from "@/lib/gsap"
 
 export default function MainLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   useLayoutEffect(() => {
-    ScrollTrigger.clearScrollMemory("manual");
-  }, []);
+    ScrollTrigger.clearScrollMemory("manual")
+  }, [])
   return (
-    <div className="relative max-w-[100vw] layout-wrapper">
-      <Lenis root>{children}</Lenis>
+    <div className="relative max-w-[100vw] layout-wrapper px-3 lg:px-[22vw]">
+      <Lenis root />
+
+      {children}
     </div>
-  );
+  )
 }

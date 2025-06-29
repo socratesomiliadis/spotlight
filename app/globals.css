@@ -20,9 +20,11 @@ body:has(.dark-logo) .header-logo {
   color: #fff;
 }
 
-.cl-navbar > div:first-child,
-.cl-navbar > div:last-child {
-  display: none;
+@media (min-width: 1025px) {
+  .cl-navbar > div:first-child,
+  .cl-navbar > div:last-child {
+    display: none;
+  }
 }
 
 @layer base {

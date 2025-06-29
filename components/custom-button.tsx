@@ -1,11 +1,12 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import TextSplit from "@/components/text-split";
-import { RefObject, useRef, useState } from "react";
-import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect";
-import { gsap } from "@/lib/gsap";
+import { RefObject, useRef, useState } from "react"
+import Link from "next/link"
+
+import { gsap } from "@/lib/gsap"
+import { cn } from "@/lib/utils"
+import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect"
+import TextSplit from "@/components/text-split"
 
 export default function CustomButton({
   text,
@@ -16,21 +17,21 @@ export default function CustomButton({
   type,
   disabled,
 }: {
-  text: string;
-  href?: string;
-  inverted?: boolean;
-  className?: string;
-  onClick?: () => void;
-  type?: "submit" | "button";
-  disabled?: boolean;
+  text: string
+  href?: string
+  inverted?: boolean
+  className?: string
+  onClick?: () => void
+  type?: "submit" | "button"
+  disabled?: boolean
 }) {
   const classes = cn(
-    "bg-black group/btn px-6 py-2 rounded-xl text-white tracking-tight text-lg relative overflow-hidden flex items-center justify-center font-[550]",
+    "bg-black group/btn px-6 py-2 rounded-xl text-white tracking-tight text-base lg:text-lg relative overflow-hidden flex items-center justify-center font-[550]",
     inverted &&
       "bg-white py-[0.4rem] border-[2px] box-border border-black text-black",
     disabled && "opacity-50 cursor-not-allowed",
     className
-  );
+  )
 
   if (href) {
     return (
@@ -42,7 +43,7 @@ export default function CustomButton({
           {text}
         </span>
       </Link>
-    );
+    )
   }
 
   return (
@@ -59,5 +60,5 @@ export default function CustomButton({
         {text}
       </span>
     </button>
-  );
+  )
 }

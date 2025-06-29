@@ -150,7 +150,10 @@ export default function EditProfileForm({
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col p-3 pb-10">
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col p-3 lg:pb-10"
+    >
       {/* Banner Upload Section - matches ProfileHeader layout */}
       <div className="w-full aspect-[3/1] bg-[#f6f6f6] rounded-2xl overflow-hidden relative">
         <ImageUpload
@@ -169,8 +172,8 @@ export default function EditProfileForm({
       </div>
 
       {/* Profile Image Upload Section - matches ProfileHeader positioning */}
-      <div className="w-full flex flex-row items-start justify-between relative -mt-[5.5rem] pl-8 pr-6 pointer-events-none">
-        <div className="w-40 h-40 relative pointer-events-auto">
+      <div className="w-full flex flex-col lg:flex-row items-start justify-between relative -mt-12 lg:-mt-[5.5rem] pl-4 lg:pl-8 pr-3 lg:pr-6 pointer-events-none">
+        <div className="size-20 lg:size-40 relative pointer-events-auto">
           <ImageUpload
             label="Profile Image"
             currentImageUrl={avatarUrl}
@@ -180,13 +183,13 @@ export default function EditProfileForm({
             folder="avatars"
             aspectRatio="aspect-square"
             userId={userAndSocials.user_id}
-            className="w-40 h-40 rounded-xl overflow-hidden outline outline-[0.7rem] outline-white"
+            className="size-20 lg:size-40 rounded-xl overflow-hidden outline outline-[0.7rem] outline-white"
             displayAreaClassName="rounded-xl"
             showRemoveButton={false}
           />
         </div>
 
-        <div className="flex flex-row items-center gap-2 mt-24 pointer-events-auto">
+        <div className="flex flex-row items-center gap-2 mt-4 lg:mt-24 pointer-events-auto">
           <CustomButton
             text="Cancel"
             href={`/${userAndSocials.username}`}
@@ -208,8 +211,8 @@ export default function EditProfileForm({
       </div>
 
       {/* Form Fields Section - matches ProfileHeader spacing */}
-      <div className="flex-col pl-8 mt-4 gap-y-2 gap-x-2 relative w-[66.6%] grid grid-cols-2">
-        <h3 className="text-lg font-semibold tracking-tight w-fit col-span-2">
+      <div className="pl-0 lg:pl-8 mt-4 gap-y-2 gap-x-2 relative w-full lg:w-[66.6%] grid grid-cols-1 lg:grid-cols-2">
+        <h3 className="text-lg font-semibold tracking-tight w-fit col-span-1 lg:col-span-2">
           Profile Info
         </h3>
         <MyInput
@@ -218,7 +221,6 @@ export default function EditProfileForm({
           isInvalid={!!errors.display_name}
           errorMessage={errors.display_name?.message}
         />
-        <div></div>
 
         <MyInput
           label="Location"
@@ -234,9 +236,9 @@ export default function EditProfileForm({
         />
       </div>
       {/* Social Links Section */}
-      <div className="flex flex-col gap-2 mt-8 w-full  pl-8 pr-6">
+      <div className="flex flex-col gap-2 mt-8 w-full pl-0 lg:pl-8 pr-0 lg:pr-6">
         <h3 className="text-lg font-semibold tracking-tight">Social Links</h3>
-        <div className="grid grid-cols-3 gap-2 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 w-full">
           <MyInput
             label="LinkedIn URL"
             {...register("linkedin")}
