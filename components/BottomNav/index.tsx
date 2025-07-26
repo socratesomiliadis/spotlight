@@ -156,11 +156,7 @@ export default function BottomNav() {
                         text="Design"
                         href="/?category=design"
                       />
-                      <BottomNavItem
-                        imageSRC="/static/images/bottom-nav/startup.png"
-                        text="Start-Ups"
-                        href="/?category=startups"
-                      />
+
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/crypto.png"
                         text="Crypto"
@@ -175,6 +171,11 @@ export default function BottomNav() {
                         imageSRC="/static/images/bottom-nav/ai.png"
                         text="AI"
                         href="/?category=ai"
+                      />
+                      <BottomNavItem
+                        imageSRC="/static/images/bottom-nav/startup.png"
+                        text="Start-Ups"
+                        href="/?category=startups"
                       />
                     </>
                   )}

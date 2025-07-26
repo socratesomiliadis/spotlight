@@ -71,7 +71,7 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
               : "Reset Password"}
         </Drawer.Description>
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur z-[100]" />
-        <Drawer.Content className="bg-white rounded-b-3xl w-screen lg:w-[75vw] h-fit fixed top-0 left-0 lg:left-[12.5%] outline-none z-[101]">
+        <Drawer.Content className="bg-white rounded-b-3xl w-screen lg:w-[56vw] h-fit fixed top-0 left-0 lg:left-[22%] outline-none z-[101]">
           {auth === "sign-in" ? (
             <SignIn />
           ) : auth === "sign-up" ? (

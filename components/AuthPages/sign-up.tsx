@@ -3,12 +3,12 @@ import Link from "next/link"
 import { AnimatePresence } from "motion/react"
 
 import SignUpForm from "../Forms/sign-up-form"
+import AuthPagesWrapper from "./wrapper"
 
 export default function SignIn() {
   return (
-    <main className="w-full h-fit lg:h-[75svh] flex flex-row items-center justify-center text-darkGreen">
-      <div className="w-full h-full flex flex-col lg:flex-row p-4">
-        <div className="w-full lg:w-1/2 h-[25vh] lg:h-full relative hidden lg:block">
+    <AuthPagesWrapper>
+      {/* <div className="w-full lg:w-1/2 h-[25vh] lg:h-full relative hidden lg:block">
           <Link
             href="/"
             className="w-24 text-black flex items-center absolute top-5 left-5 z-20"
@@ -75,13 +75,12 @@ export default function SignIn() {
             height={1200}
             className="w-full h-full object-cover rounded-2xl relative z-10"
           />
-        </div>
-        <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center">
-          <AnimatePresence mode="popLayout">
-            <SignUpForm />
-          </AnimatePresence>
-        </div>
+        </div> */}
+      <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center">
+        <AnimatePresence mode="popLayout">
+          <SignUpForm />
+        </AnimatePresence>
       </div>
-    </main>
+    </AuthPagesWrapper>
   )
 }

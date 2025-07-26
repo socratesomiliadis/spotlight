@@ -10,6 +10,7 @@ import { Toaster } from "sonner"
 
 import BottomNav from "@/components/BottomNav"
 import Header from "@/components/Header"
+import CloseCursor from "@/components/Home/close-cursor"
 import MainLayout from "@/components/main-layout"
 
 const helveticaNow = localFont({
@@ -38,7 +39,7 @@ export default function RootLayout({
     >
       <html lang="en">
         <body
-          className={`${helveticaNow.variable} font-helvetica antialiased relative max-w-[100vw]`}
+          className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-[100vw]`}
         >
           <NuqsAdapter>
             <HeroUIProvider>
@@ -46,6 +47,7 @@ export default function RootLayout({
               <MainLayout>
                 <Toaster richColors />
                 {children}
+                <CloseCursor />
               </MainLayout>
               <BottomNav />
             </HeroUIProvider>
