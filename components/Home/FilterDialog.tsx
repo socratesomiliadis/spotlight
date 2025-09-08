@@ -160,7 +160,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-full max-w-4xl mx-4 sm:mx-6 lg:w-160 lg:max-w-none max-h-[90vh] sm:max-h-[85vh] lg:max-h-none">
+      <DialogContent className="bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-[calc(100%-2rem)] max-w-4xl lg:w-160 lg:max-w-none max-h-[80vh] sm:max-h-[85vh] lg:max-h-none">
         <DialogTitle className="sr-only">Filter</DialogTitle>
         <div className="flex flex-col h-full max-h-[inherit]">
           {/* Search Input */}
@@ -202,8 +202,9 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                 ease: [0.175, 0.885, 0.32, 1],
               }}
               layout
+              data-lenis-prevent
               animate={selectedTags.length > 0 ? "open" : "closed"}
-              className="overflow-hidden h-0"
+              className="overflow-hidden h-0 max-h-16 sm:max-h-32 overflow-y-auto bottom-nav-scroller"
             >
               <div className="flex flex-wrap gap-2 px-4 sm:px-3 pt-2">
                 <AnimatePresence mode="popLayout">
@@ -243,7 +244,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
           <div className="flex-1 overflow-hidden min-h-0">
             <div className="flex flex-col lg:flex-row h-full min-h-[300px] sm:min-h-[400px] lg:min-h-0">
               {/* Left Side - Categories */}
-              <div className="lg:pr-10 border-b lg:border-b-0 border-white/5 overflow-y-auto lg:overflow-y-visible">
+              <div className="lg:pr-10 border-b lg:border-b-0 border-white/5 flex flex-row sm:flex-col">
                 <div className="px-4 py-3 sm:px-2">
                   <h3 className="ml-2 text-sm font-medium text-white mb-2 flex items-center gap-1">
                     Categories
@@ -269,7 +270,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                     ))}
                   </div>
                 </div>
-                <div className="px-4 py-3 mt-6 sm:px-2">
+                <div className="px-4 py-3 sm:mt-6 sm:px-2">
                   <h3 className="ml-2 text-sm font-medium text-white mb-2 flex items-center gap-1">
                     Awards
                   </h3>
