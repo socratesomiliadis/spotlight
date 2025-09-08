@@ -154,7 +154,7 @@ export default function NewProjectForm({
           onImageRemoved={() => setValue("banner_url", "")}
           bucketName="project-images"
           folder="banners"
-          aspectRatio="aspect-[3/1]"
+          aspectRatio="aspect-3/1"
           userId={userId}
           maxImages={1}
           uploadAreaText="Drop banner image here or click to upload"
@@ -294,7 +294,7 @@ export default function NewProjectForm({
               Add additional images to showcase different aspects of your
               project
             </p>
-            <div className="w-full h-[1px] bg-[#EAEAEA] my-3"></div>
+            <div className="w-full h-px bg-[#EAEAEA] my-3"></div>
           </div>
           {/* Tools Used */}
           <div className="space-y-2">
@@ -321,7 +321,7 @@ export default function NewProjectForm({
             }}
             bucketName="project-images"
             folder="elements"
-            aspectRatio="aspect-[16/9]"
+            aspectRatio="aspect-video"
             userId={userId}
             maxImages={4}
             uploadAreaText="Drop element images here or click to upload"

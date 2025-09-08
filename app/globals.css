@@ -1,29 +1,49 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-html {
-  overflow-x: hidden;
+@config '../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-body {
-  background-color: #fff;
-  color: #000;
-}
+@layer utilities {
+  html {
+    overflow-x: hidden;
+  }
 
-a,
-button {
-  user-select: none;
-}
+  body {
+    background-color: #fff;
+    color: #000;
+  }
 
-body:has(.dark-logo) .header-logo {
-  color: #fff;
-}
+  a,
+  button {
+    user-select: none;
+  }
 
-@media (min-width: 1025px) {
-  .cl-navbar > div:first-child,
-  .cl-navbar > div:last-child {
-    display: none;
+  body:has(.dark-logo) .header-logo {
+    color: #fff;
+  }
+
+  @media (min-width: 1025px) {
+    .cl-navbar > div:first-child,
+    .cl-navbar > div:last-child {
+      display: none;
+    }
   }
 }
 
@@ -83,54 +103,56 @@ body:has(.dark-logo) .header-logo {
   }
 }
 
-::selection {
-  background-color: #000;
-  color: #fff;
-}
+@layer utilities {
+  ::selection {
+    background-color: #000;
+    color: #fff;
+  }
 
-/*Custom Scrollbar*/
-::-webkit-scrollbar {
-  width: 8px;
-}
+  /*Custom Scrollbar*/
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #fff;
-}
+  ::-webkit-scrollbar-track {
+    background: #fff;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #1e1e1e;
-  cursor: grab;
-  border-radius: 999px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #1e1e1e;
+    cursor: grab;
+    border-radius: 999px;
+  }
 
-.bottom-nav-scroller::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0);
-}
+  .bottom-nav-scroller::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0);
+  }
 
-.bottom-nav-scroller::-webkit-scrollbar-thumb {
-  background: #989898;
-  cursor: grab;
-  border-radius: 999px;
-}
+  .bottom-nav-scroller::-webkit-scrollbar-thumb {
+    background: #989898;
+    cursor: grab;
+    border-radius: 999px;
+  }
 
-html.lenis,
-html.lenis body {
-  height: auto;
-}
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
 
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
 
-.lenis.lenis-stopped {
-  overflow: clip;
-}
+  .lenis.lenis-stopped {
+    overflow: clip;
+  }
 
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
-}
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
 
-/*---break---*/
+  /*---break---*/
+}
 
 @layer base {
   * {

@@ -160,11 +160,11 @@ export default function FilterDialog({ children }: FilterDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className=" bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-[40rem] max-w-none">
+      <DialogContent className=" bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-160 max-w-none">
         <DialogTitle className="sr-only">Filter</DialogTitle>
         <div className="flex flex-col">
           {/* Search Input */}
-          <div className="py-2 border-b-[1px] border-b-white/5">
+          <div className="py-2 border-b border-b-white/5">
             <div className="relative flex items-center text-white/60">
               <svg
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 size-5"
@@ -185,7 +185,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                 placeholder="Search tags..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-2 placeholder:text-white/60 text-white focus:outline-none bg-transparent"
+                className="w-full pl-12 pr-4 py-2 placeholder:text-white/60 text-white focus:outline-hidden bg-transparent"
               />
               <button
                 onClick={() => setOpen(false)}

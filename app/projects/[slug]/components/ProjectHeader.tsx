@@ -26,14 +26,14 @@ export default function ProjectHeader({
 }) {
   return (
     <div className="flex flex-col p-3">
-      <div className="w-full aspect-[3/1.5] lg:aspect-[3/1] bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
+      <div className="w-full aspect-[3/1.5] lg:aspect-3/1 bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
         <Image
           src={bannerUrl || ""}
           alt="Project Banner"
           width={3000}
           height={1000}
           priority
-          className="w-full aspect-[3/1.5] lg:aspect-[3/1] object-cover object-center"
+          className="w-full aspect-[3/1.5] lg:aspect-3/1 object-cover object-center"
         />
       </div>
       <div className="flex flex-col items-center gap-2 py-6 lg:py-10">

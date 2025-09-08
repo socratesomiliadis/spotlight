@@ -42,7 +42,7 @@ export default function ProfileHeader({
   return (
     <div className="flex flex-col p-3">
       {/* Banner */}
-      <div className="w-full aspect-[3/1] bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
+      <div className="w-full aspect-3/1 bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
         {user.banner_url && (
           <Image
             src={user.banner_url || ""}
@@ -50,7 +50,7 @@ export default function ProfileHeader({
             width={3000}
             height={1000}
             priority
-            className="w-full aspect-[3/1] object-cover object-center"
+            className="w-full aspect-3/1 object-cover object-center"
           />
         )}
       </div>
@@ -63,7 +63,7 @@ export default function ProfileHeader({
           width={256}
           height={256}
           priority
-          className="rounded-xl size-24 lg:size-40 aspect-square object-cover outline outline-[0.4rem] lg:outline-[0.7rem] outline-white"
+          className="rounded-xl size-24 lg:size-40 aspect-square object-cover outline-solid outline-[0.4rem] lg:outline-[0.7rem] outline-white"
         />
         {isOwnProfile ? (
           <CustomButton

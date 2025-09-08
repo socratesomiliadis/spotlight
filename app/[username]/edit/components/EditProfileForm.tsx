@@ -155,7 +155,7 @@ export default function EditProfileForm({
       className="flex flex-col p-3 lg:pb-10"
     >
       {/* Banner Upload Section - matches ProfileHeader layout */}
-      <div className="w-full aspect-[3/1] bg-[#f6f6f6] rounded-2xl overflow-hidden relative">
+      <div className="w-full aspect-3/1 bg-[#f6f6f6] rounded-2xl overflow-hidden relative">
         <ImageUpload
           label="Banner Image"
           currentImageUrl={bannerUrl}
@@ -163,7 +163,7 @@ export default function EditProfileForm({
           onImageRemoved={() => setValue("banner_url", "")}
           bucketName="profile-images"
           folder="banners"
-          aspectRatio="aspect-[3/1]"
+          aspectRatio="aspect-3/1"
           userId={userAndSocials.user_id}
           className="absolute inset-0 h-full"
           displayAreaClassName="rounded-2xl"
@@ -172,7 +172,7 @@ export default function EditProfileForm({
       </div>
 
       {/* Profile Image Upload Section - matches ProfileHeader positioning */}
-      <div className="w-full flex flex-col lg:flex-row items-start justify-between relative -mt-12 lg:-mt-[5.5rem] pl-4 lg:pl-8 pr-3 lg:pr-6 pointer-events-none">
+      <div className="w-full flex flex-col lg:flex-row items-start justify-between relative -mt-12 lg:-mt-22 pl-4 lg:pl-8 pr-3 lg:pr-6 pointer-events-none">
         <div className="size-20 lg:size-40 relative pointer-events-auto">
           <ImageUpload
             label="Profile Image"
@@ -183,7 +183,7 @@ export default function EditProfileForm({
             folder="avatars"
             aspectRatio="aspect-square"
             userId={userAndSocials.user_id}
-            className="size-20 lg:size-40 rounded-xl overflow-hidden outline outline-[0.7rem] outline-white"
+            className="size-20 lg:size-40 rounded-xl overflow-hidden outline-solid outline-[0.7rem] outline-white"
             displayAreaClassName="rounded-xl"
             showRemoveButton={false}
           />

@@ -20,7 +20,7 @@ export default function ProfileNavigation({
   socialLinks,
 }: ProfileNavigationProps) {
   return (
-    <div className="flex items-center justify-between mb-8 border-y-[1px] border-[#EAEAEA] px-4 lg:px-8 py-4">
+    <div className="flex items-center justify-between mb-8 border-y border-[#EAEAEA] px-4 lg:px-8 py-4">
       <div className="flex flex-wrap items-center gap-2 font-medium tracking-tight text-sm lg:text-base">
         <button className="flex items-center gap-2 bg-[#A4810E] text-white px-4 py-2 rounded-lg">
           <span className="size-4 flex">

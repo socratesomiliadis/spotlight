@@ -12,10 +12,10 @@ const GooeySvgFilter = ({
           <feGaussianBlur
             in="SourceGraphic"
             stdDeviation={strength}
-            result="blur-sm"
+            result="blur-xs"
           />
           <feColorMatrix
-            in="blur-sm"
+            in="blur-xs"
             type="matrix"
             values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
             result="goo"

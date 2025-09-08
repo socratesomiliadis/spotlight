@@ -13,7 +13,7 @@ export default function PageWrapper({
     <div className={cn("py-20 lg:py-28 w-fulll", wrapperClassName)}>
       <div
         className={cn(
-          "w-full pb-8 rounded-3xl border-[1px] border-[#EAEAEA] overflow-hidden",
+          "w-full pb-8 rounded-3xl border border-[#EAEAEA] overflow-hidden",
           className
         )}
       >

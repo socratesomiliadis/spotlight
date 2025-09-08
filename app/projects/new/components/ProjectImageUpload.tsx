@@ -38,7 +38,7 @@ export default function ProjectImageUpload({
   onImagesReordered,
   bucketName,
   folder,
-  aspectRatio = "aspect-[3/2]",
+  aspectRatio = "aspect-3/2",
   className = "",
   userId,
   maxImages = 10,
@@ -325,7 +325,7 @@ export default function ProjectImageUpload({
                     )}
                     {/* Drag indicator */}
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <div className="size-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                      <div className="size-6 bg-white/20 backdrop-blur-xs rounded-full flex items-center justify-center">
                         <svg
                           width="16"
                           height="16"
@@ -427,7 +427,7 @@ export default function ProjectImageUpload({
           {Object.keys(uploadProgress).length > 0 && (
             <div className="space-y-2 absolute top-0 left-0 w-full h-full">
               {Object.entries(uploadProgress).map(([fileId, progress]) => (
-                <div key={fileId} className="p-3 border-b-[1px]">
+                <div key={fileId} className="p-3 border-b">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-[#505050] tracking-tight">
                       Uploading...

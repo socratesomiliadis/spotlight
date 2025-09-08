@@ -205,7 +205,7 @@ export default function ImageUpload({
           "relative w-full h-full bg-[#f6f6f6] flex items-center justify-center cursor-pointer transition-colors",
           isDragging ? "bg-gray-200" : "hover:bg-gray-200",
           !displayUrl
-            ? "outline-[2px] outline-offset-[-2px] outline-dashed outline-gray-300"
+            ? "outline-2 -outline-offset-2 outline-dashed outline-gray-300"
             : "",
           displayAreaClassName
         )}

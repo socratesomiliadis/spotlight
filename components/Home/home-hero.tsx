@@ -24,7 +24,7 @@ export default function HomeHero({
               height={40}
               className="rounded-full size-8 lg:size-10"
             />
-            <p className="text-sm text-[#fff]">
+            <p className="text-sm text-white">
               By <span className="underline">{project?.user.display_name}</span>
             </p>
           </Link>

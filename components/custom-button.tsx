@@ -28,7 +28,7 @@ export default function CustomButton({
   const classes = cn(
     "bg-black group/btn px-6 py-2 rounded-lg lg:rounded-xl text-white tracking-tight text-sm lg:text-lg relative overflow-hidden flex items-center justify-center font-[550]",
     inverted &&
-      "bg-white py-[0.4rem] border-[2px] box-border border-black text-black",
+      "bg-white py-[0.4rem] border-2 box-border border-black text-black",
     disabled && "opacity-50 cursor-not-allowed",
     className
   )

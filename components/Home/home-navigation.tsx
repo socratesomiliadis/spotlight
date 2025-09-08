@@ -6,11 +6,11 @@ export default function HomeNavigation() {
   const { hasActiveFilters, activeFilterCount } = useFilters()
 
   return (
-    <div className="flex items-center justify-between mt-6 lg:mt-8 mb-8 lg:mb-12 border-y-[1px] border-[#EAEAEA] px-4 lg:px-8 py-3 lg:py-4">
+    <div className="flex items-center justify-between mt-6 lg:mt-8 mb-8 lg:mb-12 border-y border-[#EAEAEA] px-4 lg:px-8 py-3 lg:py-4">
       <div className="flex items-center gap-2 font-medium tracking-tight">
         <FilterDialog>
           <button
-            className={`flex items-center gap-2 border-[2px] box-border px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors relative 
+            className={`flex items-center gap-2 border-2 box-border px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors relative 
                 bg-transparent text-[#989898] border-[#F6F6F6]
             }`}
           >

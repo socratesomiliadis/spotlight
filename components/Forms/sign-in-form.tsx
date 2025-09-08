@@ -114,7 +114,7 @@ export default function SignInForm() {
           endContent={
             <button
               aria-label="toggle password visibility"
-              className="focus:outline-none w-6 pt-1 h-full flex items-center justify-center overflow-hidden text-[#BFBFBF]"
+              className="focus:outline-hidden w-6 pt-1 h-full flex items-center justify-center overflow-hidden text-[#BFBFBF]"
               type="button"
               onClick={() => setShowPassword(!showPassword)}
             >

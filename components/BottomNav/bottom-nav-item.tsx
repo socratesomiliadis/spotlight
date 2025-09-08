@@ -17,7 +17,7 @@ export default function BottomNavItem({
     <Link
       href={href}
       className={cn(
-        "w-full flex flex-row items-center p-3 gap-3 border-white/5 border-b-[1px] hover:bg-[#242424]/30 group",
+        "w-full flex flex-row items-center p-3 gap-3 border-white/5 border-b hover:bg-[#242424]/30 group",
         className
       )}
     >

@@ -48,7 +48,7 @@ export default async function DashboardPage() {
                 alt={project.title}
                 width={720}
                 height={405}
-                className="rounded-xl w-44 aspect-video flex-shrink-0"
+                className="rounded-xl w-44 aspect-video shrink-0"
               />
             </Link>
             <div className="flex flex-row items-center gap-20">

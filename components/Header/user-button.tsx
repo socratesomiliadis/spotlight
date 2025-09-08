@@ -51,7 +51,7 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
             Premium
           </span>
         </Link>
-        <span className="w-full h-[1px] bg-[#72727280]/50"></span>
+        <span className="w-full h-px bg-[#72727280]/50"></span>
         <Link
           onClick={() => setIsOpen(false)}
           className="py-2 pl-4 hover:bg-[#72727280]/10"
@@ -74,7 +74,7 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
         >
           Settings
         </Link>
-        {isStaff && <span className="w-full h-[1px] bg-[#72727280]/50"></span>}
+        {isStaff && <span className="w-full h-px bg-[#72727280]/50"></span>}
         {isStaff && (
           <Link
             onClick={() => setIsOpen(false)}
@@ -93,7 +93,7 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
             New Staff Project
           </Link>
         )}
-        <span className="w-full h-[1px] bg-[#72727280]/50"></span>
+        <span className="w-full h-px bg-[#72727280]/50"></span>
         <button
           className="w-full text-left hover:bg-[#72727280]/10 pl-4 py-3 text-[#FA5A59]"
           onClick={() => {

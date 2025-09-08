@@ -11,7 +11,7 @@ export default function ProjectElements({
       <p className="text-[#ACACAC] text-xl">
         See the highlights of this website
       </p>
-      <div className="w-full h-[1px] bg-[#EAEAEA] my-6"></div>
+      <div className="w-full h-px bg-[#EAEAEA] my-6"></div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {elementURLs.map((url, index) => (
           <Image

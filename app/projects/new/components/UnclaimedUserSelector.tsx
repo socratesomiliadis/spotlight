@@ -239,7 +239,7 @@ export default function UnclaimedUserSelector({
                           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                     >
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
                         {user.avatar_url ? (
                           <img
                             src={user.avatar_url}
@@ -262,7 +262,7 @@ export default function UnclaimedUserSelector({
                         </p>
                       </div>
                       {selectedUserId === user.user_id && (
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shrink-0">
                           <svg
                             className="w-3 h-3 text-white"
                             fill="currentColor"

@@ -87,7 +87,7 @@ export default function MultiSelectCombobox({
           <PopoverTrigger asChild>
             <div
               className={cn(
-                "min-h-[56px] bg-white relative w-full flex items-center rounded-2xl border-[1px] border-[#EAEAEA] px-4 py-3 transition-colors hover:border-gray-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-black/20",
+                "min-h-[56px] bg-white relative w-full flex items-center rounded-2xl border border-[#EAEAEA] px-4 py-3 transition-colors hover:border-gray-300 focus-within:outline-hidden focus-within:ring-2 focus-within:ring-black/20",
                 isInvalid && "border-red-500/50"
               )}
               onClick={() => setIsOpen(true)}
@@ -132,7 +132,7 @@ export default function MultiSelectCombobox({
         </div>
 
         <PopoverContent
-          className="w-[--radix-popover-trigger-width] p-0 rounded-2xl"
+          className="w-(--radix-popover-trigger-width) p-0 rounded-2xl"
           align="start"
           sideOffset={4}
         >

@@ -39,7 +39,7 @@ export default function RootLayout({
     >
       <html lang="en">
         <body
-          className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-[100vw]`}
+          className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-screen`}
         >
           <NuqsAdapter>
             <HeroUIProvider>

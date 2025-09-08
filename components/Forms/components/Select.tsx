@@ -11,13 +11,13 @@ const MySelect = extendVariants(Select, {
         trigger: [
           // <- Input wrapper slot
           "bg-transparent",
-          "border-[1px] border-[#EAEAEA]",
+          "border border-[#EAEAEA]",
           "shadow-none",
           "transition-colors",
           "focus-within:bg-transparent",
           "data-[hover=true]:bg-transparent",
           "group-data-[focus=true]:bg-transparent",
-          "group-data-[invalid=true]:!bg-transparent",
+          "group-data-[invalid=true]:bg-transparent!",
           "group-data-[invalid=true]:border-[#FF0000]/20",
           "rounded-2xl",
           "px-4",

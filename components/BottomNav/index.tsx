@@ -54,11 +54,11 @@ export default function BottomNav() {
 
   return (
     <>
-      <div className="fixed w-screen bottom-4 lg:bottom-8 left-0 z-[100]">
+      <div className="fixed w-screen bottom-4 lg:bottom-8 left-0 z-100">
         <div
           ref={ref}
           className={cn(
-            "absolute bottom-0 z-[100] left-1/2 -translate-x-1/2 flex flex-row items-center gap-1 transition-transform duration-500 ease-out-expo will-change-transform",
+            "absolute bottom-0 z-100 left-1/2 -translate-x-1/2 flex flex-row items-center gap-1 transition-transform duration-500 ease-out-expo will-change-transform",
             !isExpanded && "-translate-x-1/2 lg:-translate-x-[71%]"
           )}
         >
@@ -71,7 +71,7 @@ export default function BottomNav() {
             <div
               className={cn(
                 "w-full h-0 transition-all duration-500 ease-out-expo overflow-hidden",
-                isExpanded && "h-[20rem] lg:h-[30rem]"
+                isExpanded && "h-80 lg:h-120"
               )}
             >
               <div className="h-full flex flex-col pb-2 pr-2">
@@ -132,7 +132,7 @@ export default function BottomNav() {
                   className="w-full h-full overflow-y-auto bottom-nav-scroller flex flex-col gap-0 pb-16 relative"
                 >
                   {isSearchActive ? (
-                    <div className="px-2 py-2 border-white/5 border-t-[1px]">
+                    <div className="px-2 py-2 border-white/5 border-t">
                       <SearchResultsComponent
                         users={searchResults.users}
                         projects={searchResults.projects}
@@ -149,7 +149,7 @@ export default function BottomNav() {
                         imageSRC="/static/images/bottom-nav/web.png"
                         text="Websites"
                         href="/?category=websites"
-                        className="border-t-[1px]"
+                        className="border-t"
                       />
                       <BottomNavItem
                         imageSRC="/static/images/bottom-nav/design.png"
@@ -181,7 +181,7 @@ export default function BottomNav() {
                   )}
                   {/* <div
                   className={cn(
-                    "w-full h-16 bg-gradient-to-t from-[#1e1e1e] via-[#1e1e1e]/80 to-transparent fixed bottom-[3.6rem] left-0 z-10 pointer-events-none",
+                    "w-full h-16 bg-linear-to-t from-[#1e1e1e] via-[#1e1e1e]/80 to-transparent fixed bottom-[3.6rem] left-0 z-10 pointer-events-none",
                     !isExpanded && "hidden"
                   )}
                 ></div> */}
@@ -218,7 +218,7 @@ export default function BottomNav() {
                     setIsSearchActive(false)
                   }
                 }}
-                className="w-full pr-4 flex items-center justify-end gap-1 focus:outline-none p-1.5"
+                className="w-full pr-4 flex items-center justify-end gap-1 focus:outline-hidden p-1.5"
               >
                 <span className="ml-3">
                   <span className="size-4 relative flex items-center justify-center">
