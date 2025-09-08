@@ -1,6 +1,7 @@
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
+
+import { cn } from "@/lib/utils"
 
 export default function BottomNavItem({
   imageSRC,
@@ -8,16 +9,16 @@ export default function BottomNavItem({
   href,
   className,
 }: {
-  imageSRC: string;
-  text: string;
-  href: string;
-  className?: string;
+  imageSRC: string
+  text: string
+  href: string
+  className?: string
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "w-full flex flex-row items-center p-3 gap-3 border-white/5 border-b hover:bg-[#242424]/30 group",
+        "w-full flex flex-row items-center p-3 gap-3 border-white/5 border-b hover:bg-[#242424]/30 group bottom-nav-item",
         className
       )}
     >
@@ -30,5 +31,5 @@ export default function BottomNavItem({
       />
       <span className="text-xl text-white tracking-tight">{text}</span>
     </Link>
-  );
+  )
 }

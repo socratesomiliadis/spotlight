@@ -160,11 +160,11 @@ export default function FilterDialog({ children }: FilterDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className=" bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-160 max-w-none">
+      <DialogContent className="bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-full max-w-4xl mx-4 sm:mx-6 lg:w-160 lg:max-w-none max-h-[90vh] sm:max-h-[85vh] lg:max-h-none">
         <DialogTitle className="sr-only">Filter</DialogTitle>
-        <div className="flex flex-col">
+        <div className="flex flex-col h-full max-h-[inherit]">
           {/* Search Input */}
-          <div className="py-2 border-b border-b-white/5">
+          <div className="py-3 px-4 sm:py-2 sm:px-0 border-b border-b-white/5">
             <div className="relative flex items-center text-white/60">
               <svg
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 size-5"
@@ -185,11 +185,11 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                 placeholder="Search tags..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-2 placeholder:text-white/60 text-white focus:outline-hidden bg-transparent"
+                className="w-full pl-12 pr-12 py-3 sm:py-2 placeholder:text-white/60 text-white focus:outline-hidden bg-transparent"
               />
               <button
                 onClick={() => setOpen(false)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-white/10 rounded-md transition-colors"
               >
                 <X size={16} />
               </button>
@@ -205,7 +205,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
               animate={selectedTags.length > 0 ? "open" : "closed"}
               className="overflow-hidden h-0"
             >
-              <div className="flex flex-wrap gap-2 px-3 pt-2">
+              <div className="flex flex-wrap gap-2 px-4 sm:px-3 pt-2">
                 <AnimatePresence mode="popLayout">
                   {selectedTags.map((tag) => (
                     <motion.div
@@ -240,11 +240,11 @@ export default function FilterDialog({ children }: FilterDialogProps) {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-hidden">
-            <div className="flex h-full">
+          <div className="flex-1 overflow-hidden min-h-0">
+            <div className="flex flex-col lg:flex-row h-full min-h-[300px] sm:min-h-[400px] lg:min-h-0">
               {/* Left Side - Categories */}
-              <div className="pr-10">
-                <div className="px-2 py-3">
+              <div className="lg:pr-10 border-b lg:border-b-0 border-white/5 overflow-y-auto lg:overflow-y-visible">
+                <div className="px-4 py-3 sm:px-2">
                   <h3 className="ml-2 text-sm font-medium text-white mb-2 flex items-center gap-1">
                     Categories
                   </h3>
@@ -254,7 +254,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                         key={category.key}
                         onClick={() => handleCategoryChange(category.key)}
                         className={cn(
-                          "flex items-center select-none cursor-pointer w-fit group rounded-lg px-2.5 text-white/60 hover:text-white transition-colors duration-300",
+                          "flex items-center select-none cursor-pointer w-fit group rounded-lg px-2.5 text-white/60 hover:text-white transition-colors duration-300 touch-manipulation",
                           selectedCategory === category.key && "text-white"
                         )}
                       >
@@ -269,17 +269,17 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                     ))}
                   </div>
                 </div>
-                <div className="px-2 py-3 mt-6">
+                <div className="px-4 py-3 mt-6 sm:px-2">
                   <h3 className="ml-2 text-sm font-medium text-white mb-2 flex items-center gap-1">
                     Awards
                   </h3>
-                  <div className="text-lg">
+                  <div className="text-lg space-y-1 lg:space-y-0">
                     {awards.map((award) => (
                       <button
                         key={award.key}
                         onClick={() => handleAwardChange(award.key)}
                         className={cn(
-                          "flex select-none items-center cursor-pointer w-fit group rounded-lg px-2.5 text-white/60 hover:text-white transition-colors duration-300",
+                          "flex select-none items-center cursor-pointer w-fit group rounded-lg px-2.5 text-white/60 hover:text-white transition-colors duration-300 touch-manipulation",
                           selectedAward === award.key && "text-white"
                         )}
                       >
@@ -297,8 +297,8 @@ export default function FilterDialog({ children }: FilterDialogProps) {
               </div>
 
               {/* Right Side - Tags */}
-              <div className="flex-1 pl-12">
-                <div className="p-3 h-full">
+              <div className="flex-1 lg:pl-12 pt-4 lg:pt-0">
+                <div className="p-4 sm:p-3 h-full">
                   <h3 className="text-sm font-medium text-white mb-2 flex items-center gap-1">
                     Tags
                   </h3>
@@ -310,13 +310,13 @@ export default function FilterDialog({ children }: FilterDialogProps) {
                   ) : (
                     <div
                       data-lenis-prevent
-                      className="space-y-0 max-h-80 overflow-y-auto bottom-nav-scroller"
+                      className="space-y-0 max-h-48 sm:max-h-60 lg:max-h-80 overflow-y-auto bottom-nav-scroller"
                     >
                       {filteredTags.map((tag) => (
                         <label
                           key={tag}
                           className={cn(
-                            "flex items-center cursor-pointer text-white/30 group-hover:text-white select-none",
+                            "flex items-center cursor-pointer text-white/30 hover:text-white select-none px-1 rounded transition-colors touch-manipulation",
                             selectedTags.includes(tag) && "text-white"
                           )}
                         >
@@ -342,16 +342,16 @@ export default function FilterDialog({ children }: FilterDialogProps) {
           </div>
 
           {/* Footer Buttons */}
-          <div className="p-4 flex justify-end">
+          <div className="p-4 sm:px-6 flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-end">
             <button
               onClick={handleClear}
-              className="px-4 py-2 text-sm text-white/60 hover:text-white font-medium"
+              className="w-full sm:w-auto px-4 py-3 sm:py-2 text-sm text-white/60 hover:text-white font-medium order-2 sm:order-1"
             >
               Clear
             </button>
             <button
               onClick={handleApply}
-              className="px-6 py-2 bg-white text-black text-sm rounded-lg hover:bg-white/70 font-medium transition-colors duration-300"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2 bg-white text-black text-sm rounded-lg hover:bg-white/70 font-medium transition-colors duration-300 order-1 sm:order-2"
             >
               Apply
             </button>

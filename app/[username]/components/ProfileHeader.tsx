@@ -80,11 +80,10 @@ export default function ProfileHeader({
               className="text-[#FF710C] border-[#FF710C]"
             />
             <CustomButton
-              text={
-                isPending ? "Loading..." : isFollowing ? "Unfollow" : "Follow"
-              }
+              text={isFollowing ? "Unfollow" : "Follow"}
               onClick={handleFollowClick}
               disabled={isPending}
+              isLoading={isPending}
               className={
                 isFollowing ? "bg-gray-100 text-gray-700 border-gray-300" : ""
               }

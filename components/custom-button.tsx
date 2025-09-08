@@ -16,6 +16,7 @@ export default function CustomButton({
   onClick,
   type,
   disabled,
+  isLoading,
 }: {
   text: string
   href?: string
@@ -24,6 +25,7 @@ export default function CustomButton({
   onClick?: () => void
   type?: "submit" | "button"
   disabled?: boolean
+  isLoading?: boolean
 }) {
   const classes = cn(
     "bg-black group/btn px-6 py-2 rounded-lg lg:rounded-xl text-white tracking-tight text-sm lg:text-lg relative overflow-hidden flex items-center justify-center font-[550]",
@@ -36,11 +38,25 @@ export default function CustomButton({
   if (href) {
     return (
       <Link href={href} className={classes}>
-        <span className="normal-chars group-hover/btn:translate-y-[-120%] transition-all duration-400 ease-spring">
+        <span
+          className={cn(
+            "normal-chars group-hover/btn:translate-y-[-120%] transition-all duration-400 ease-spring",
+            isLoading && "translate-y-[-120%]"
+          )}
+        >
           {text}
         </span>
         <span className="absolute hover-chars translate-y-[120%] group-hover/btn:translate-y-0 transition-all duration-400 ease-spring">
           {text}
+        </span>
+
+        <span
+          className={cn(
+            "absolute loading-chars translate-y-[120%] group-hover/btn:translate-y-0 transition-all duration-400 ease-spring",
+            isLoading && "translate-y-0"
+          )}
+        >
+          Loading...
         </span>
       </Link>
     )
@@ -53,11 +69,24 @@ export default function CustomButton({
       disabled={disabled}
       className={classes}
     >
-      <span className="normal-chars group-hover/btn:translate-y-[-120%] transition-all duration-400 ease-spring">
+      <span
+        className={cn(
+          "normal-chars group-hover/btn:translate-y-[-120%] transition-all duration-400 ease-spring",
+          isLoading && "translate-y-[-120%]"
+        )}
+      >
         {text}
       </span>
       <span className="absolute hover-chars translate-y-[120%] group-hover/btn:translate-y-0 transition-all duration-400 ease-spring">
         {text}
+      </span>
+      <span
+        className={cn(
+          "absolute loading-chars translate-y-[120%] group-hover/btn:translate-y-0 transition-all duration-400 ease-spring",
+          isLoading && "translate-y-0"
+        )}
+      >
+        Loading...
       </span>
     </button>
   )

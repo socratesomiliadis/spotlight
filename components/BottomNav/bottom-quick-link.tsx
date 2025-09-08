@@ -1,20 +1,21 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useRef, useState } from "react"
+import Link from "next/link"
+
+import { cn } from "@/lib/utils"
 
 export default function BottomNavQuickLink({
   text,
   href,
   inverted,
 }: {
-  text: string;
-  href: string;
-  inverted?: boolean;
+  text: string
+  href: string
+  inverted?: boolean
 }) {
-  const ref = useRef<HTMLAnchorElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const ref = useRef<HTMLAnchorElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
 
   return (
     <Link
@@ -23,11 +24,11 @@ export default function BottomNavQuickLink({
       // onMouseEnter={() => setIsHovered(true)}
       // onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "bg-[#1E1E1E]/90 backdrop-blur-xl px-5 py-3.5 rounded-xl text-white tracking-tight text-base font-medium relative overflow-hidden flex items-center justify-center",
+        "bg-[#1E1E1E]/90 backdrop-blur-xl px-5 py-3.5 rounded-xl text-white tracking-tight text-base font-medium relative overflow-hidden flex items-center justify-center bottom-nav-quick-link",
         inverted && "bg-white text-black py-2 rounded-lg"
       )}
     >
       <span>{text}</span>
     </Link>
-  );
+  )
 }

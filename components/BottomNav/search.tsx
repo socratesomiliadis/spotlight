@@ -181,7 +181,7 @@ export default function Search({
           defaultValue=""
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          className="w-full will-change-transform pr-2 overflow-hidden h-10 bg-transparent outline-hidden ml-8 leading-none placeholder:leading-none text-black"
+          className="w-full text-sm lg:text-base will-change-transform pr-2 overflow-hidden h-10 bg-transparent outline-hidden ml-8 leading-none placeholder:leading-none text-black"
         />
       </div>
     </div>

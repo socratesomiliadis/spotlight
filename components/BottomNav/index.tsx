@@ -35,10 +35,25 @@ export default function BottomNav() {
         setIsExpanded(false)
       }
     }
+
+    const handleClickOnItem = (e: MouseEvent) => {
+      setIsExpanded(false)
+    }
+
+    const items = document.querySelectorAll(
+      ".bottom-nav-item,.bottom-nav-quick-link"
+    ) as NodeListOf<HTMLElement>
+    items.forEach((item) => {
+      item.addEventListener("click", handleClickOnItem)
+    })
+
     window.addEventListener("keydown", handleEscape)
 
     return () => {
       window.removeEventListener("keydown", handleEscape)
+      items.forEach((item) => {
+        item.removeEventListener("click", handleClickOnItem)
+      })
     }
   }, [])
 
