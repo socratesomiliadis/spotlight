@@ -18,10 +18,48 @@ const helveticaNow = localFont({
   variable: "--font-helvetica-now",
 })
 
-export const metadata: Metadata = {
-  title: "Spotlight",
+const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+  : "http://localhost:3000"
+
+export const metadata = {
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "Spotlight",
+    template: `Spotlight — %s`,
+  },
   description:
-    "Spotlight Awards is a platform for celebrating the best in design, web and motion.",
+    "A platform that awards creativity and innovation across industries worldwide.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Spotlight",
+    description:
+      "A platform that awards creativity and innovation across industries worldwide.",
+    images: [
+      {
+        url: "https://spotlight.day/og-image.png",
+        width: 1600,
+        height: 900,
+        alt: "Preview image for Spotlight",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Spotlight",
+    description:
+      "A platform that awards creativity and innovation across industries worldwide.",
+    images: [
+      {
+        url: "https://spotlight.day/og-image.png",
+        width: 1600,
+        height: 900,
+        alt: "Preview image for Spotlight",
+      },
+    ],
+  },
 }
 
 export default function RootLayout({
