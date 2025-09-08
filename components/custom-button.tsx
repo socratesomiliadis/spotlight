@@ -52,7 +52,7 @@ export default function CustomButton({
 
         <span
           className={cn(
-            "absolute loading-chars translate-y-[120%] group-hover/btn:translate-y-0 transition-all duration-400 ease-spring",
+            "absolute loading-chars translate-y-[120%] transition-all duration-400 ease-spring",
             isLoading && "translate-y-0"
           )}
         >
@@ -82,7 +82,7 @@ export default function CustomButton({
       </span>
       <span
         className={cn(
-          "absolute loading-chars translate-y-[120%] group-hover/btn:translate-y-0 transition-all duration-400 ease-spring",
+          "absolute loading-chars translate-y-[120%] transition-all duration-400 ease-spring",
           isLoading && "translate-y-0"
         )}
       >

@@ -30,6 +30,10 @@
     color: #000;
   }
 
+  body:has(.lanyard-page) .layout-wrapper {
+    padding: 0;
+  }
+
   a,
   button {
     user-select: none;

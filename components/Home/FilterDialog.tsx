@@ -160,7 +160,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
-      <DialogContent className="bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-[calc(100%-2rem)] max-w-4xl lg:w-160 lg:max-w-none max-h-[80vh] sm:max-h-[85vh] lg:max-h-none">
+      <DialogContent className="bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-[calc(100%-2rem)] max-w-4xl lg:w-160 lg:max-w-none max-h-[80vh] sm:max-h-[85vh] lg:max-h-none z-[999]">
         <DialogTitle className="sr-only">Filter</DialogTitle>
         <div className="flex flex-col h-full max-h-[inherit]">
           {/* Search Input */}
