@@ -1,24 +1,25 @@
-"use client";
+"use client"
 
-import { useState, useRef } from "react";
-import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
-import { useSession } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
+import { useRef, useState } from "react"
+import Image from "next/image"
+import { useSession } from "@clerk/nextjs"
+
+import { createClient } from "@/lib/supabase/client"
+import { cn } from "@/lib/utils"
 
 interface ImageUploadProps {
-  label: string;
-  currentImageUrl?: string;
-  onImageUploaded: (url: string) => void;
-  onImageRemoved?: () => void;
-  showRemoveButton?: boolean;
-  bucketName: string;
-  folder: string;
-  aspectRatio?: string;
-  className?: string;
-  displayAreaClassName?: string;
-  userId: string;
-  showInfoText?: boolean;
+  label: string
+  currentImageUrl?: string
+  onImageUploaded: (url: string) => void
+  onImageRemoved?: () => void
+  showRemoveButton?: boolean
+  bucketName: string
+  folder: string
+  aspectRatio?: string
+  className?: string
+  displayAreaClassName?: string
+  userId: string
+  showInfoText?: boolean
 }
 
 export default function ImageUpload({
@@ -35,71 +36,71 @@ export default function ImageUpload({
   userId,
   showInfoText = false,
 }: ImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { session } = useSession();
-  const supabase = createClient({ session });
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { session } = useSession()
+  const supabase = createClient({ session })
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    processFile(file);
-  };
+    processFile(file)
+  }
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
+    e.preventDefault()
+    setIsDragging(false)
 
-    const file = e.dataTransfer.files[0];
+    const file = e.dataTransfer.files[0]
     if (file) {
-      processFile(file);
+      processFile(file)
     }
-  };
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+    e.preventDefault()
+    setIsDragging(true)
+  }
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
+    e.preventDefault()
+    setIsDragging(false)
+  }
 
   const processFile = (file: File) => {
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
-      return;
+      setError("Please select an image file")
+      return
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setError("File size must be less than 5MB");
-      return;
+      setError("File size must be less than 5MB")
+      return
     }
 
     // Create preview URL
-    const preview = URL.createObjectURL(file);
-    setPreviewUrl(preview);
+    const preview = URL.createObjectURL(file)
+    setPreviewUrl(preview)
 
     // Upload file
-    uploadImage(file);
-  };
+    uploadImage(file)
+  }
 
   const uploadImage = async (file: File) => {
-    setIsUploading(true);
-    setError(null);
+    setIsUploading(true)
+    setError(null)
 
     try {
       // Generate unique filename
-      const timestamp = Date.now();
-      const fileExtension = file.name.split(".").pop();
-      const filename = `${userId}/${folder}/${timestamp}.${fileExtension}`;
+      const timestamp = Date.now()
+      const fileExtension = file.name.split(".").pop()
+      const filename = `${userId}/${folder}/${timestamp}.${fileExtension}`
 
       // Upload to Supabase storage
       const { data, error: uploadError } = await supabase.storage
@@ -107,52 +108,52 @@ export default function ImageUpload({
         .upload(filename, file, {
           cacheControl: "3600",
           upsert: true,
-        });
+        })
 
       if (uploadError) {
-        throw uploadError;
+        throw uploadError
       }
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from(bucketName)
-        .getPublicUrl(filename);
+        .getPublicUrl(filename)
 
       if (publicUrlData?.publicUrl) {
-        onImageUploaded(publicUrlData.publicUrl);
-        setError(null);
+        onImageUploaded(publicUrlData.publicUrl)
+        setError(null)
       } else {
-        throw new Error("Failed to get public URL");
+        throw new Error("Failed to get public URL")
       }
     } catch (err: any) {
-      console.error("Upload error:", err);
-      setError(err.message || "Failed to upload image");
-      setPreviewUrl(null);
+      console.error("Upload error:", err)
+      setError(err.message || "Failed to upload image")
+      setPreviewUrl(null)
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   const handleButtonClick = () => {
-    fileInputRef.current?.click();
-  };
+    fileInputRef.current?.click()
+  }
 
   const handleRemoveImage = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsUploading(true);
-    setError(null);
+    e.stopPropagation()
+    setIsUploading(true)
+    setError(null)
 
     try {
       // If there's a current image URL, delete it from storage
       if (currentImageUrl) {
-        const filename = extractFilenameFromUrl(currentImageUrl);
+        const filename = extractFilenameFromUrl(currentImageUrl)
         if (filename) {
           const { error: deleteError } = await supabase.storage
             .from(bucketName)
-            .remove([filename]);
+            .remove([filename])
 
           if (deleteError) {
-            console.error("Error deleting file:", deleteError);
+            console.error("Error deleting file:", deleteError)
             // Don't throw here, still proceed with removal from form
           }
         }
@@ -160,34 +161,34 @@ export default function ImageUpload({
 
       // Call the callback to update the form
       if (onImageRemoved) {
-        onImageRemoved();
+        onImageRemoved()
       }
-      setPreviewUrl(null);
+      setPreviewUrl(null)
     } catch (err: any) {
-      console.error("Error removing image:", err);
-      setError("Failed to remove image");
+      console.error("Error removing image:", err)
+      setError("Failed to remove image")
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   // Extract filename from Supabase public URL
   const extractFilenameFromUrl = (url: string): string | null => {
     try {
       // Supabase public URLs have format: https://[project].supabase.co/storage/v1/object/public/[bucket]/[filename]
-      const urlParts = url.split("/");
-      const bucketIndex = urlParts.findIndex((part) => part === bucketName);
+      const urlParts = url.split("/")
+      const bucketIndex = urlParts.findIndex((part) => part === bucketName)
       if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
         // Join all parts after the bucket name to handle nested folders
-        return urlParts.slice(bucketIndex + 1).join("/");
+        return urlParts.slice(bucketIndex + 1).join("/")
       }
-      return null;
+      return null
     } catch {
-      return null;
+      return null
     }
-  };
+  }
 
-  const displayUrl = previewUrl || currentImageUrl;
+  const displayUrl = previewUrl || currentImageUrl
 
   return (
     <div className={`relative group ${className}`}>
@@ -226,16 +227,20 @@ export default function ImageUpload({
         )}
         {displayUrl ? (
           <div className="relative w-full h-full">
-            <Image src={displayUrl} alt={label} fill className="object-cover" />
+            <img
+              src={displayUrl}
+              alt={label}
+              className="object-cover w-full h-full"
+            />
             {isUploading && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <div className="text-white text-sm font-medium">
                   Uploading...
                 </div>
               </div>
             )}
             {!isUploading && (
-              <div className="absolute inset-0 bg-black text-white gap-2 bg-opacity-0 group-hover:bg-opacity-60 transition-all flex flex-col items-center justify-center px-4">
+              <div className="absolute inset-0 bg-black/0 text-white gap-2 group-hover:bg-black/60 transition-all flex flex-col items-center justify-center px-4">
                 <div className="flex flex-row gap-3 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="size-16 hover:scale-90 transition-all duration-300 rounded-full bg-white/20 flex items-center justify-center">
                     <svg
@@ -322,5 +327,5 @@ export default function ImageUpload({
         </div>
       )}
     </div>
-  );
+  )
 }

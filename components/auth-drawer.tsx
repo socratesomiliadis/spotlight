@@ -5,15 +5,11 @@ import { useLenis } from "lenis/react"
 import { useQueryState } from "nuqs"
 import { Drawer } from "vaul"
 
-import { gsap } from "@/lib/gsap"
-import { cn } from "@/lib/utils"
-import useIsomorphicLayoutEffect from "@/hooks/useIsomorphicLayoutEffect"
 import SignIn from "@/components/AuthPages/sign-in"
 import SignUp from "@/components/AuthPages/sign-up"
 
 import ResetPassword from "./AuthPages/reset-password"
 import CustomButton from "./custom-button"
-import TextSplit from "./text-split"
 
 export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -71,7 +67,7 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
               : "Reset Password"}
         </Drawer.Description>
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100" />
-        <Drawer.Content className="bg-white rounded-b-3xl w-screen lg:w-[56vw] h-fit fixed top-0 left-0 lg:left-[22%] outline-hidden z-101">
+        <Drawer.Content className="bg-white rounded-b-3xl w-screen lg:w-[56vw] h-fit fixed top-0 left-0 lg:left-[22%] outline-hidden z-101 transform-gpu">
           {auth === "sign-in" ? (
             <SignIn />
           ) : auth === "sign-up" ? (

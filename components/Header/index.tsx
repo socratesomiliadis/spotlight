@@ -37,7 +37,7 @@ export default async function Header() {
     <header className="w-screen absolute top-4 lg:top-6 px-3 lg:px-[22vw] flex flex-row items-center justify-between z-50">
       <Link
         href="/"
-        className="w-28 lg:w-32 header-logo flex items-center text-black"
+        className="w-28 lg:w-38 header-logo flex items-center text-black"
       >
         <svg
           width="100%"

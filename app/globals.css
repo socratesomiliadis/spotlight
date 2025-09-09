@@ -39,6 +39,10 @@
     user-select: none;
   }
 
+  button {
+    cursor: pointer;
+  }
+
   body:has(.dark-logo) .header-logo {
     color: #fff;
   }
