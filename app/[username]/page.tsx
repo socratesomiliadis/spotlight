@@ -46,12 +46,7 @@ export default async function UsernamePage({ params }: PageProps) {
       />
 
       {/* Content Section */}
-      <div
-        className={cn(
-          "w-full",
-          (!!user.website_url || !!user.location) && "mt-5"
-        )}
-      >
+      <div className={cn("w-full")}>
         <ProfileNavigation socialLinks={user.socials || undefined} />
         <ProjectsGrid projects={user.project || undefined} />
       </div>

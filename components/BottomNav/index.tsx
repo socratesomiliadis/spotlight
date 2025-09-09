@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useProjectVisit } from "@/contexts/project-visit-context"
 import { AnimatePresence, motion } from "motion/react"
 import { useOnClickOutside } from "usehooks-ts"
 
@@ -24,6 +25,7 @@ export default function BottomNav() {
   })
   const [isSearchActive, setIsSearchActive] = useState(false)
   const pathname = usePathname()
+  const { visitUrl } = useProjectVisit()
 
   const isAuthRoute =
     pathname.includes("/sign-in") || pathname.includes("/sign-up")
@@ -222,7 +224,17 @@ export default function BottomNav() {
                     className="hidden lg:flex flex-row gap-1 mb-0 will-change-transform"
                   >
                     <BottomNavQuickLink text="Home" href="/" inverted />
-                    <BottomNavQuickLink text="Directory" href="/" inverted />
+                    {!visitUrl && (
+                      <BottomNavQuickLink text="Directory" href="/" inverted />
+                    )}
+                    {visitUrl && (
+                      <BottomNavQuickLink
+                        text="Visit Project"
+                        href={visitUrl}
+                        inverted
+                        isExternal
+                      />
+                    )}
                   </motion.div>
                 )}
               </div>
@@ -260,11 +272,21 @@ export default function BottomNav() {
               className="absolute left-[calc(100%+0.25rem)] bottom-0 hidden lg:flex flex-row gap-1 will-change-transform"
             >
               <BottomNavQuickLink text="Home" href="/" inverted={isExpanded} />
-              <BottomNavQuickLink
-                text="Directory"
-                href="/"
-                inverted={isExpanded}
-              />
+              {!visitUrl && (
+                <BottomNavQuickLink
+                  text="Directory"
+                  href="/"
+                  inverted={isExpanded}
+                />
+              )}
+              {visitUrl && (
+                <BottomNavQuickLink
+                  text="Visit Project"
+                  href={visitUrl}
+                  inverted={isExpanded}
+                  isExternal
+                />
+              )}
             </motion.div>
           )}
         </div>

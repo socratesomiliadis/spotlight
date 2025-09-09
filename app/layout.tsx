@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 import localFont from "next/font/local"
+import { ProjectVisitProvider } from "@/contexts/project-visit-context"
 import { ClerkProvider } from "@clerk/nextjs"
 import { HeroUIProvider } from "@heroui/react"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
@@ -81,13 +82,15 @@ export default function RootLayout({
         >
           <NuqsAdapter>
             <HeroUIProvider>
-              <Header />
-              <MainLayout>
-                <Toaster richColors />
-                {children}
-                <CloseCursor />
-              </MainLayout>
-              <BottomNav />
+              <ProjectVisitProvider>
+                <Header />
+                <MainLayout>
+                  <Toaster richColors />
+                  {children}
+                  <CloseCursor />
+                </MainLayout>
+                <BottomNav />
+              </ProjectVisitProvider>
             </HeroUIProvider>
           </NuqsAdapter>
         </body>

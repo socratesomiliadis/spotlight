@@ -23,7 +23,6 @@ export default function MainLayout({
   return (
     <div className="relative max-w-screen layout-wrapper px-3 lg:px-[22vw]">
       <Lenis root />
-
       {children}
     </div>
   )

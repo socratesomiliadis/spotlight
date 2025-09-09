@@ -10,7 +10,7 @@ export default function PageWrapper({
   wrapperClassName?: string
 }) {
   return (
-    <div className={cn("py-20 lg:py-28 w-fulll", wrapperClassName)}>
+    <div className={cn("py-20 lg:py-28 w-full", wrapperClassName)}>
       <div
         className={cn(
           "w-full pb-8 rounded-3xl border border-[#EAEAEA] overflow-hidden",

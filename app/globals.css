@@ -43,6 +43,13 @@
     cursor: pointer;
   }
 
+  .test-cond {
+    font-variation-settings:
+      "wdth" 70,
+      "opsz" 800.999,
+      "wght" 900.98;
+  }
+
   body:has(.dark-logo) .header-logo {
     color: #fff;
   }
@@ -50,6 +57,12 @@
   @media (min-width: 1025px) {
     .cl-navbar > div:first-child,
     .cl-navbar > div:last-child {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .no-mobile-br br {
       display: none;
     }
   }

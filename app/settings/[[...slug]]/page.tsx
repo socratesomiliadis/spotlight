@@ -13,8 +13,8 @@ export default function SettingsPage() {
           path="/settings"
           appearance={{
             elements: {
-              rootBox: "w-full",
-              cardBox: "w-full shadow-none border-none",
+              rootBox: "!w-full",
+              cardBox: "!w-full shadow-none border-none",
               navbar: "bg-none",
               scrollBox: "rounded-none",
               profileSection__profile: "hidden",

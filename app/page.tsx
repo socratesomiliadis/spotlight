@@ -2,6 +2,7 @@ import { Database } from "@/database.types"
 
 import { getTodaysSiteOfTheDay } from "@/lib/supabase/actions"
 import { createClient } from "@/lib/supabase/server"
+import GradientText from "@/components/gradient-text"
 import HomeHero from "@/components/Home/home-hero"
 import HomeNavigation from "@/components/Home/home-navigation"
 import PreviewCursor from "@/components/Home/preview-cursor"
@@ -92,7 +93,7 @@ export default async function Home({
   }
 
   // Use site of the day as featured project, or fallback to most recent
-  const featuredProject = siteOfTheDay || projects?.[0]
+  const featuredProject = siteOfTheDay
 
   return (
     <PageWrapper className="flex flex-col pb-3 lg:pb-8">

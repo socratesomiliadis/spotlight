@@ -8,6 +8,7 @@ import ProjectDetails from "./components/ProjectDetails"
 import ProjectElements from "./components/ProjectElements"
 import ProjectHeader from "./components/ProjectHeader"
 import ProjectNavigation from "./components/ProjectNavigation"
+import ProjectVisitManager from "./components/ProjectVisitManager"
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -31,6 +32,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
   return (
     <PageWrapper className="w-full flex flex-col">
+      <ProjectVisitManager liveUrl={project.live_url} />
       <ProjectHeader
         bannerUrl={project.banner_url || ""}
         title={project.title}
