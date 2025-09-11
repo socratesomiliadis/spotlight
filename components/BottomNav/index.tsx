@@ -233,6 +233,7 @@ export default function BottomNav() {
                         href={visitUrl}
                         inverted
                         isExternal
+                        className="bg-[#FF98FB]"
                       />
                     )}
                   </motion.div>
@@ -285,6 +286,7 @@ export default function BottomNav() {
                   href={visitUrl}
                   inverted={isExpanded}
                   isExternal
+                  className="bg-[#FF98FB] text-black"
                 />
               )}
             </motion.div>

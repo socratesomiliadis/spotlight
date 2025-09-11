@@ -1,6 +1,7 @@
 import { Tables } from "@/database.types"
 
 interface ProfileNavigationProps {
+  websiteUrl?: string
   socialLinks?: Tables<"socials">
 }
 
@@ -15,7 +16,7 @@ export function SocialLink({
     <a
       href={href}
       target="_blank"
-      className="w-10 h-10 bg-black text-white rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-300"
+      className="size-9 lg:size-10 bg-black text-white rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-300"
     >
       {icon}
     </a>
@@ -23,11 +24,19 @@ export function SocialLink({
 }
 
 export default function ProfileNavigation({
+  websiteUrl,
   socialLinks,
 }: ProfileNavigationProps) {
+  const hasSocialLinks =
+    (!!socialLinks &&
+      (socialLinks?.linked_in ||
+        socialLinks?.instagram ||
+        socialLinks?.twitter)) ||
+    !!websiteUrl
+
   return (
-    <div className="flex flex-col lg:flex-row gap-3 lg:gap-0 lg:items-center justify-between mb-8 border-y border-[#EAEAEA] pl-4 lg:pl-11 pr-3 lg:pr-9 py-3 lg:py-6">
-      <div className="flex items-center gap-2 font-medium tracking-tight text-sm lg:text-base">
+    <div className="max-w-none profile-nav-scroller overflow-x-auto whitespace-nowrap flex flex-row gap-3 lg:gap-0 lg:items-center justify-between mb-8 border-y border-[#EAEAEA] pl-4 lg:pl-11 pr-3 lg:pr-9 py-3 lg:py-6">
+      <div className="flex items-center gap-2 font-medium tracking-tight text-sm lg:text-base order-2 lg:order-1">
         <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
           <span className="size-4 flex">
             <svg
@@ -69,13 +78,36 @@ export default function ProfileNavigation({
       </div>
 
       {/* Social Links */}
-      {socialLinks && (
-        <div className="flex items-center gap-2">
+      {hasSocialLinks && (
+        <div className="flex items-center gap-2 order-1 lg:order-2">
+          {websiteUrl && (
+            <SocialLink
+              href={websiteUrl}
+              icon={
+                <span className="size-4 lg:size-5">
+                  <svg
+                    width="100%"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10 19.25C15.1086 19.25 19.25 15.1086 19.25 10C19.25 4.89137 15.1086 0.75 10 0.75M10 19.25C4.89137 19.25 0.75 15.1086 0.75 10C0.75 4.89137 4.89137 0.75 10 0.75M10 19.25C7.65279 19.25 5.75 15.1086 5.75 10C5.75 4.89137 7.65279 0.75 10 0.75M10 19.25C12.3472 19.25 14.25 15.1086 14.25 10C14.25 4.89137 12.3472 0.75 10 0.75M19 10H1"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      stroke-linecap="square"
+                    />
+                  </svg>
+                </span>
+              }
+            />
+          )}
+
           {socialLinks?.linked_in && (
             <SocialLink
               href={socialLinks?.linked_in}
               icon={
-                <span className="size-4">
+                <span className="size-3 lg:size-4">
                   <svg
                     width="100%"
                     viewBox="0 0 12 12"
@@ -96,7 +128,7 @@ export default function ProfileNavigation({
             <SocialLink
               href={socialLinks?.instagram}
               icon={
-                <span className="size-[1.1rem]">
+                <span className="size-4 lg:size-[1.1rem]">
                   <svg
                     width="100%"
                     viewBox="0 0 12 12"
@@ -116,7 +148,7 @@ export default function ProfileNavigation({
             <SocialLink
               href={socialLinks?.twitter}
               icon={
-                <span className="size-5">
+                <span className="size-4 lg:size-5">
                   <svg
                     width="100%"
                     height="100%"
@@ -133,6 +165,7 @@ export default function ProfileNavigation({
               }
             />
           )}
+          {/* <div className="h-9 w-px bg-[#EAEAEA] lg:hidden"></div> */}
         </div>
       )}
     </div>

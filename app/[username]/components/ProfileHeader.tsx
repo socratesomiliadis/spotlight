@@ -102,9 +102,9 @@ export default function ProfileHeader({
             @{user.username}
           </span>
         </div>
-        <div className="flex flex-row gap-2 lg:gap-5 text-base lg:text-lg text-[#ACACAC] mt-6 mb-0">
+        <div className="hidden lg:flex flex-row flex-wrap gap-x-3.5 lg:gap-x-5 text-base lg:text-lg text-[#ACACAC] mt-6 mb-0">
           {user.location && (
-            <div className="hidden lg:flex flex-row items-center gap-1">
+            <div className="flex flex-row items-center gap-1">
               <span className="w-3 lg:w-4">
                 <svg
                   width="100%"

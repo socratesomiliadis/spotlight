@@ -29,11 +29,11 @@ export default async function ProjectsGrid({
       ))}
       {!projects ||
         (projects.length <= 0 && (
-          <div className="flex flex-col gap-2 col-span-2 w-full lg:w-1/2">
-            <span className="text-2xl font-medium tracking-tight">
-              Nothing Here Yet
+          <div className="flex flex-col gap-1 col-span-2 w-full lg:w-[40%]">
+            <span className="text-lg lg:text-xl tracking-tight">
+              Nothing here yet...
             </span>
-            <p className="text-lg text-[#acacac] tracking-tight leading-none">
+            <p className="text-base lg:text-lg text-[#acacac] tracking-tight leading-none text-balance">
               This user hasn&apos;t uploaded any projects yet. In the meantime,
               feel free to explore some of our recommended projects below.
             </p>

@@ -10,11 +10,13 @@ export default function BottomNavQuickLink({
   href,
   inverted,
   isExternal,
+  className,
 }: {
   text: string
   href: string
   inverted?: boolean
   isExternal?: boolean
+  className?: string
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -28,7 +30,8 @@ export default function BottomNavQuickLink({
       // onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "bg-[#1E1E1E]/90 backdrop-blur-xl px-5 py-3.5 rounded-xl text-white tracking-tight text-base font-medium relative overflow-hidden flex items-center justify-center bottom-nav-quick-link whitespace-nowrap",
-        inverted && "bg-white text-black py-2 rounded-lg"
+        inverted && "bg-white text-black py-2 rounded-lg",
+        className
       )}
     >
       <span>{text}</span>

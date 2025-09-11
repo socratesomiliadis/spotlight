@@ -43,7 +43,7 @@ export default function PremiumPage() {
           <CustomButton text="Benefits" className="text-[#1e1e1e] bg-white" />
           <CustomButton
             text="Subscribe"
-            className="text-[#1e1e1e] bg-[#FF77FA]"
+            className="text-[#1e1e1e] bg-[#FF98FB]"
           />
         </div>
       </div>

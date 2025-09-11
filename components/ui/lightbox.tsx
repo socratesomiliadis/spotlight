@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { useLenis } from "lenis/react"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
@@ -25,6 +25,38 @@ export function Lightbox({
   onPrevious,
 }: LightboxProps) {
   const lenis = useLenis()
+  const imageContainerRef = useRef<HTMLDivElement>(null)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  // Minimum distance required for a swipe (in pixels)
+  const minSwipeDistance = 50
+
+  // Handle touch events for swipe functionality
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null) // Reset touchEnd
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe && currentIndex < images.length - 1) {
+      onNext()
+    }
+    if (isRightSwipe && currentIndex > 0) {
+      onPrevious()
+    }
+  }
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -108,15 +140,19 @@ export function Lightbox({
 
       {/* Main image */}
       <div
-        className="relative w-full h-full flex items-center justify-center"
+        ref={imageContainerRef}
+        className="relative lg:h-full w-auto aspect-video flex items-center justify-center touch-none select-none"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
         <Image
           src={images[currentIndex]}
           alt={`Element ${currentIndex + 1}`}
           width={1920}
           height={1080}
-          className="max-w-full max-h-full object-contain"
+          className="max-w-full max-h-full object-contain pointer-events-none"
           priority
         />
       </div>
