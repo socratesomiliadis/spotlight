@@ -71,6 +71,19 @@ export default function ProfileHeader({
             className="mt-14 lg:mt-24"
             href={`/${user.username}/edit`}
           />
+        ) : user.is_unclaimed ? (
+          <div className="flex flex-row gap-2 buttons mt-14 lg:mt-24">
+            <CustomButton
+              text="Claim Account"
+              href={`/claim/${user.username}`}
+            />
+            <CustomButton
+              text="Hire"
+              inverted
+              href="#"
+              className="text-[#FF710C] border-[#FF710C]"
+            />
+          </div>
         ) : (
           <div className="flex flex-row gap-2 buttons mt-14 lg:mt-24">
             <CustomButton
@@ -95,9 +108,16 @@ export default function ProfileHeader({
       {/* Name and Details */}
       <div className="flex flex-col pl-4 lg:pl-8 mt-4">
         <div className="flex flex-col gap-0">
-          <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight">
-            {displayName}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight">
+              {displayName}
+            </h1>
+            {user.is_unclaimed && (
+              <span className="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full -mb-1">
+                Unclaimed
+              </span>
+            )}
+          </div>
           <span className="text-base lg:text-lg text-[#989898]">
             @{user.username}
           </span>

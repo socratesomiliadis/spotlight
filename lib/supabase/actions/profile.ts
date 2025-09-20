@@ -60,3 +60,23 @@ export async function getUnclaimedUsers() {
   }
   return profile
 }
+
+export async function claimAccount(userId: string) {
+  const supabase = await createClient()
+
+  try {
+    // Update the profile to mark as claimed
+    const { error } = await supabase
+      .from("profile")
+      .update({ is_unclaimed: false })
+      .eq("user_id", userId)
+
+    if (error) {
+      throw error
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to update profile claim status")
+  }
+}

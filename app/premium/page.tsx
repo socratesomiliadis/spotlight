@@ -3,6 +3,8 @@ import GradientText from "@/components/gradient-text"
 import PageWrapper from "@/components/page-wrapper"
 import SpotlightLogo from "@/components/SVGs/spotlight-logo"
 
+import { SubscribeButton } from "./components/SubscribeButton"
+
 export default function PremiumPage() {
   return (
     <PageWrapper
@@ -32,7 +34,7 @@ export default function PremiumPage() {
           colorAccent="#FF77FA"
           colorFinal="#FFFFFF"
         >
-          <h1 className="text-8xl lg:text-9xl font-black test-cond text-[#ffffff]">
+          <h1 className="text-8xl lg:text-9xl whitespace-nowrap font-black test-cond text-[#ffffff]">
             $3.88
           </h1>
           <p className="text-center tracking-tight text-[#ffffff] text-lg">
@@ -41,10 +43,7 @@ export default function PremiumPage() {
         </GradientText>
         <div className="lg:absolute bottom-10 flex flex-row items-center gap-2 mt-8 lg:mt-0">
           <CustomButton text="Benefits" className="text-[#1e1e1e] bg-white" />
-          <CustomButton
-            text="Subscribe"
-            className="text-[#1e1e1e] bg-[#FF98FB]"
-          />
+          <SubscribeButton />
         </div>
       </div>
       {/* <div className="absolute left-0 top-0 w-[548px] h-full p-4 md:p-8 flex flex-col justify-between">
