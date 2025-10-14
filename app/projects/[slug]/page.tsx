@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { notFound } from "next/navigation"
+import { currentUser } from "@clerk/nextjs/server"
 
 import { getProjectBySlug } from "@/lib/supabase/actions/projects"
 import PageWrapper from "@/components/page-wrapper"
@@ -30,6 +31,13 @@ export default async function ProjectPage({ params }: PageProps) {
     notFound()
   }
 
+  // Check if user can edit this project
+  const user = await currentUser()
+  const userRole = user?.publicMetadata.role as string
+  const isStaff = userRole === "staff"
+  const isOwner = user?.id === project.user_id
+  const canEdit = isOwner || isStaff
+
   return (
     <PageWrapper className="w-full flex flex-col">
       <ProjectVisitManager liveUrl={project.live_url} />
@@ -40,6 +48,8 @@ export default async function ProjectPage({ params }: PageProps) {
         userAvatarUrl={project.profile.avatar_url}
         userDisplayName={project.profile.display_name}
         userUsername={project.profile.username}
+        slug={project.slug}
+        canEdit={canEdit}
       />
       <ProjectNavigation awards={project.award} />
       <div className="px-4 lg:px-8">

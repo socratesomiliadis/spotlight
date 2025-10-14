@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import { Tables } from "@/database.types"
 import { auth, currentUser } from "@clerk/nextjs/server"
 
-import { createClient } from "../server"
+import { createAdminClient, createClient } from "../server"
 import { createAward, getAllProjectsWithAwards, removeAward } from "./index"
 
 export async function getProjects(username: string) {
@@ -63,6 +63,48 @@ export async function createProject(project: Tables<"project">) {
     console.log(error)
     throw error
   }
+  return data
+}
+
+export async function updateProject(
+  projectId: string,
+  updates: Partial<Tables<"project">>
+) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("project")
+    .update(updates)
+    .eq("id", projectId)
+    .select()
+    .single()
+
+  if (error) {
+    console.log(error)
+    throw error
+  }
+
+  revalidatePath(`/projects/${data.slug}`)
+  return data
+}
+
+export async function updateProjectAdmin(
+  projectId: string,
+  updates: Partial<Tables<"project">>
+) {
+  const supabase = await createAdminClient()
+  const { data, error } = await supabase
+    .from("project")
+    .update(updates)
+    .eq("id", projectId)
+    .select()
+    .single()
+
+  if (error) {
+    console.log(error)
+    throw error
+  }
+
+  revalidatePath(`/projects/${data.slug}`)
   return data
 }
 

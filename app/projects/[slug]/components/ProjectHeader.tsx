@@ -16,6 +16,8 @@ export default function ProjectHeader({
   userAvatarUrl,
   userDisplayName,
   userUsername,
+  slug,
+  canEdit = false,
 }: {
   bannerUrl: string | null
   title: string
@@ -23,9 +25,19 @@ export default function ProjectHeader({
   userAvatarUrl: string | null
   userDisplayName: string | null
   userUsername: string
+  slug: string
+  canEdit?: boolean
 }) {
   return (
-    <div className="flex flex-col p-3">
+    <div className="flex flex-col p-3 relative">
+      {canEdit && (
+        <Link
+          href={`/projects/${slug}/edit`}
+          className="absolute top-6 right-6 z-10 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+        >
+          Edit Project
+        </Link>
+      )}
       <div className="w-full aspect-[3/1.5] lg:aspect-3/1 bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
         <Image
           src={bannerUrl || ""}

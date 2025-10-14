@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useClerk } from "@clerk/nextjs"
 
+import { cn } from "@/lib/utils"
 import {
   Popover,
   PopoverContent,
@@ -20,14 +21,19 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <button className="rounded-lg text-sm size-10 lg:size-[2.7rem] bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold overflow-hidden">
+        <button
+          className={cn(
+            "rounded-lg text-sm size-10 lg:size-[2.7rem] bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold",
+            !!avatarUrl && "bg-transparent"
+          )}
+        >
           {avatarUrl ? (
             <Image
               src={avatarUrl}
               width={128}
               height={128}
               alt="User Avatar"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-lg"
             />
           ) : (
             <span>

@@ -1,0 +1,343 @@
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Form, SelectItem } from "@heroui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { arrayMoveImmutable } from "array-move"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+import * as z from "zod"
+
+import { updateProjectAdmin } from "@/lib/supabase/actions/projects"
+import tagsJSON from "@/lib/tags.json"
+import CustomButton from "@/components/custom-button"
+import MyInput from "@/components/Forms/components/Input"
+import MultiSelectCombobox from "@/components/Forms/components/MultiSelectCombobox"
+import MySelect from "@/components/Forms/components/Select"
+import ProjectImageUpload from "@/app/projects/new/components/ProjectImageUpload"
+
+// Define validation schema for project submission
+const projectSchema = z.object({
+  title: z.string().min(1, "Project title is required"),
+  tags: z.array(z.string()).min(1, "Please add at least one tag"),
+  main_img_url: z.string().min(1, "Main project image is required"),
+  preview_url: z.string().optional(),
+  banner_url: z.string().min(1, "Banner image is required"),
+  elements_url: z.array(z.string()).optional(),
+  live_url: z.string().optional(),
+  description: z.string().optional(),
+  category: z.enum(["websites", "design", "films", "crypto", "startups", "ai"]),
+})
+
+type ProjectFormValues = z.infer<typeof projectSchema>
+
+interface EditProjectFormProps {
+  project: any
+  userId: string
+}
+
+export default function EditProjectForm({
+  project,
+  userId,
+}: EditProjectFormProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [elementImages, setElementImages] = useState<string[]>(
+    project.elements_url || []
+  )
+  const router = useRouter()
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectSchema),
+    shouldFocusError: false,
+    defaultValues: {
+      title: project.title || "",
+      tags: project.tags || [],
+      main_img_url: project.main_img_url || "",
+      preview_url: project.preview_url || "",
+      banner_url: project.banner_url || "",
+      elements_url: project.elements_url || [],
+      live_url: project.live_url || "",
+      description: project.description || "",
+      category: project.category || "websites",
+    },
+  })
+
+  // Watch the image URLs to update the preview
+  const bannerUrl = watch("banner_url")
+  const mainImageUrl = watch("main_img_url")
+  const previewUrl = watch("preview_url")
+  const tags = watch("tags")
+  const category = watch("category")
+
+  async function handleUpdateProject(data: ProjectFormValues) {
+    try {
+      // Generate slug from title if title changed
+      const slug = data.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .substring(0, 50)
+
+      const updatedProject = await updateProjectAdmin(project.id, {
+        title: data.title,
+        tags: data.tags,
+        main_img_url: data.main_img_url,
+        preview_url: data.preview_url || null,
+        banner_url: data.banner_url,
+        elements_url: elementImages.length > 0 ? elementImages : null,
+        slug: slug,
+        category: data.category,
+        live_url: data.live_url || null,
+      })
+
+      // Redirect to the updated project page after successful update
+      setTimeout(() => {
+        router.push(`/projects/${updatedProject.slug}`)
+      }, 2000)
+    } catch (err: any) {
+      console.error("Error updating project:", err)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const onSubmit = async (data: ProjectFormValues) => {
+    setIsLoading(true)
+    toast.promise(handleUpdateProject(data), {
+      loading: "Updating project...",
+      success: "Project updated successfully! Redirecting...",
+      error: "Failed to update project. Please try again.",
+    })
+  }
+
+  const addElementImage = (url: string) => {
+    setElementImages((prev) => {
+      const newElements = [...prev, url]
+      setValue("elements_url", newElements)
+      return newElements
+    })
+  }
+
+  const removeElementImage = (index: number) => {
+    const newElements = elementImages.filter((_, i) => i !== index)
+    setElementImages(newElements)
+    setValue("elements_url", newElements)
+  }
+
+  return (
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col w-full relative"
+    >
+      {/* Banner Upload Section */}
+      <div className="w-full px-6 pt-4">
+        <ProjectImageUpload
+          label="Project Banner *"
+          currentImages={bannerUrl ? [bannerUrl] : []}
+          onImageAdded={(url) => setValue("banner_url", url)}
+          onImageRemoved={() => setValue("banner_url", "")}
+          bucketName="project-images"
+          folder="banners"
+          aspectRatio="aspect-3/1"
+          userId={userId}
+          maxImages={1}
+          uploadAreaText="Drop banner image here or click to upload"
+          supportedFormats="PNG, JPG, JPEG"
+          maxFileSize="5MB"
+          gridCols={1}
+          isMultiple={false}
+          placeholder="No banner image uploaded. Add a banner to showcase your project prominently."
+        />
+      </div>
+
+      {/* Project Details Section */}
+      <div className="px-6 py-8 space-y-6 w-full">
+        <div className="flex flex-col gap-2 w-full">
+          <span className="text-black text-xl">Project Details</span>
+          {/* Project Title and Category */}
+          <div className="w-full flex flex-row gap-4">
+            <MyInput
+              label="Project Title *"
+              type="text"
+              {...register("title")}
+              isInvalid={!!errors.title}
+              errorMessage={errors.title?.message}
+            />
+            <div className="w-full">
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <MySelect
+                    label="Category"
+                    selectedKeys={field.value ? [field.value] : []}
+                    onSelectionChange={(keys) => {
+                      const selectedKey = Array.from(keys)[0] as string
+                      field.onChange(selectedKey)
+                    }}
+                    isInvalid={!!errors.category}
+                    errorMessage={errors.category?.message}
+                    className="w-full"
+                  >
+                    <SelectItem key="websites" textValue="Websites">
+                      Websites
+                    </SelectItem>
+                    <SelectItem key="design" textValue="Design">
+                      Design
+                    </SelectItem>
+                    <SelectItem key="films" textValue="Films">
+                      Films
+                    </SelectItem>
+                    <SelectItem key="crypto" textValue="Crypto">
+                      Crypto
+                    </SelectItem>
+                    <SelectItem key="startups" textValue="Startups">
+                      Startups
+                    </SelectItem>
+                    <SelectItem key="ai" textValue="AI">
+                      AI
+                    </SelectItem>
+                  </MySelect>
+                )}
+              />
+            </div>
+          </div>
+          <MyInput
+            label="Project URL *"
+            type="text"
+            {...register("live_url")}
+            isInvalid={!!errors.live_url}
+            errorMessage={errors.live_url?.message}
+          />
+        </div>
+        <div className="w-full grid grid-cols-2 gap-4">
+          {/* Main Project Image */}
+          <div className="space-y-2 w-full">
+            <ProjectImageUpload
+              label="Main Project Image *"
+              currentImages={mainImageUrl ? [mainImageUrl] : []}
+              onImageAdded={(url) => setValue("main_img_url", url)}
+              onImageRemoved={() => setValue("main_img_url", "")}
+              bucketName="project-images"
+              folder="main"
+              aspectRatio="aspect-video"
+              userId={userId}
+              maxImages={1}
+              uploadAreaText="Drop main project image here or click to upload"
+              supportedFormats="PNG, JPG, JPEG"
+              maxFileSize="5MB"
+              gridCols={1}
+              isMultiple={false}
+              placeholder="Upload the main image that represents your project best."
+            />
+            {errors.main_img_url && (
+              <p className="text-sm text-red-500">
+                {errors.main_img_url.message}
+              </p>
+            )}
+          </div>
+          {/* Preview Video */}
+          <div className="space-y-2 w-full">
+            <div className="w-full">
+              <ProjectImageUpload
+                label="Preview Video *"
+                currentImages={previewUrl ? [previewUrl] : []}
+                onImageAdded={(url) => setValue("preview_url", url)}
+                onImageRemoved={() => setValue("preview_url", "")}
+                bucketName="project-images"
+                folder="previews"
+                aspectRatio="aspect-video"
+                userId={userId}
+                maxImages={1}
+                uploadAreaText="Drop preview video here"
+                supportedFormats="MP4, WEBM, GIF"
+                maxFileSize="5MB"
+                gridCols={1}
+                isMultiple={false}
+                placeholder="Upload a preview video for your project."
+              />
+            </div>
+            {errors.preview_url && (
+              <p className="text-sm text-red-500">
+                {errors.preview_url.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Element Images */}
+        <div className="space-y-4">
+          <div>
+            <span className="text-black text-xl">Elements</span>
+            <p className="text-[#ACACAC] text-xl">
+              Add additional images to showcase different aspects of your
+              project
+            </p>
+            <div className="w-full h-px bg-[#EAEAEA] my-3"></div>
+          </div>
+          {/* Tools Used */}
+          <div className="space-y-2">
+            <MultiSelectCombobox
+              label="Tags"
+              placeholder="Search and select tags..."
+              value={tags}
+              onChange={(value) => setValue("tags", value)}
+              options={tagsJSON.categories[category]}
+              isInvalid={!!errors.tags}
+              errorMessage={errors.tags?.message}
+            />
+          </div>
+          <ProjectImageUpload
+            currentImages={elementImages}
+            onImageAdded={addElementImage}
+            label="Element Images"
+            onImageRemoved={(url, index) => removeElementImage(index)}
+            onImagesReordered={(oldIndex: number, newIndex: number) => {
+              setElementImages((array) =>
+                arrayMoveImmutable(array, oldIndex, newIndex)
+              )
+              setValue("elements_url", elementImages)
+            }}
+            bucketName="project-images"
+            folder="elements"
+            aspectRatio="aspect-video"
+            userId={userId}
+            maxImages={4}
+            uploadAreaText="Drop element images here or click to upload"
+            supportedFormats="PNG, JPG, JPEG"
+            maxFileSize="5MB"
+            gridCols={2}
+            isMultiple={true}
+            placeholder="No element images added yet. Add images to showcase different aspects of your project."
+          />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-row items-center justify-between w-full gap-4 px-8 pb-8">
+        <CustomButton
+          text="Cancel"
+          href={`/projects/${project.slug}`}
+          inverted
+          className="text-[#FA5A59] border-[#FA5A59]"
+        />
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="bg-black px-6 py-2 rounded-xl text-white tracking-tight text-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? "Updating..." : "Update Project"}
+        </button>
+      </div>
+    </Form>
+  )
+}

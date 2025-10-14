@@ -57,14 +57,16 @@ export default function ProfileHeader({
 
       {/* Profile Image and Buttons */}
       <div className="w-full flex flex-row justify-between items-start -mt-12 lg:-mt-20 pl-4 lg:pl-8 pr-3 lg:pr-6">
-        <Image
-          src={user.avatar_url || ""}
-          alt={displayName}
-          width={256}
-          height={256}
-          priority
-          className="rounded-xl size-24 lg:size-40 aspect-square object-cover outline-solid outline-[0.4rem] lg:outline-[0.7rem] outline-white"
-        />
+        <div className="bg-white">
+          <Image
+            src={user.avatar_url || ""}
+            alt={displayName}
+            width={256}
+            height={256}
+            priority
+            className="rounded-xl transform-gpu size-24 lg:size-40 aspect-square object-cover outline-solid outline-[0.4rem] lg:outline-[0.7rem] outline-white bg-white"
+          />
+        </div>
         {isOwnProfile ? (
           <CustomButton
             text="Edit Profile"

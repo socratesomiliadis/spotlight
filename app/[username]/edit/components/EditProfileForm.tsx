@@ -15,6 +15,7 @@ import * as z from "zod"
 import { createClient } from "@/lib/supabase/client"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
+import LocationAutocomplete from "@/components/Forms/components/LocationAutocomplete"
 
 import ImageUpload from "./ImageUpload"
 
@@ -222,6 +223,13 @@ export default function EditProfileForm({
           errorMessage={errors.display_name?.message}
         />
 
+        {/* <LocationAutocomplete
+          label="Location"
+          value={watch("location") || ""}
+          onChange={(value) => setValue("location", value)}
+          isInvalid={!!errors.location}
+          errorMessage={errors.location?.message}
+        /> */}
         <MyInput
           label="Location"
           {...register("location")}

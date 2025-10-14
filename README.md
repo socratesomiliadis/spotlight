@@ -74,6 +74,7 @@
 - **pnpm** (recommended) or npm
 - **Supabase** account
 - **Clerk** account
+- **Google Maps API** key (for location autocomplete)
 
 ### Installation
 
@@ -108,6 +109,9 @@
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
+   # Google Maps API (for location autocomplete)
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+
    # Webhooks
    CLERK_WEBHOOK_SECRET=your_clerk_webhook_secret
    ```
@@ -115,7 +119,6 @@
 4. **Database Setup**
 
    The project uses Supabase with the following tables:
-
    - `profile` - User profiles and metadata
    - `project` - Creative projects and portfolios
    - `socials` - Social media links
