@@ -37,7 +37,7 @@ export const metadata: Metadata = {
       "A platform that awards creativity and innovation across industries worldwide.",
     images: [
       {
-        url: "https://spotlight.day/ogImage.png",
+        url: "https://spotlight-awards.vercel.app/ogImage.png",
         width: 1600,
         height: 900,
         alt: "Preview image for Spotlight",
