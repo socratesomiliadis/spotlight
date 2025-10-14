@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Database } from "@/database.types"
 
 import { getTodaysSiteOfTheDay } from "@/lib/supabase/actions"
@@ -22,6 +23,33 @@ const validCategories: CategoryType[] = [
 ]
 
 const validAwards: AwardType[] = ["otd", "otm", "oty", "honorable"]
+
+export const metadata: Metadata = {
+  title: "Spotlight",
+  description:
+    "A platform that awards creativity and innovation across industries worldwide.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Spotlight",
+    description:
+      "A platform that awards creativity and innovation across industries worldwide.",
+    images: [
+      {
+        url: "https://spotlight.day/ogImage.png",
+        width: 1600,
+        height: 900,
+        alt: "Preview image for Spotlight",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@SpotlightDay",
+  },
+}
 
 export default async function Home({
   searchParams,

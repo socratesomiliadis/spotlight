@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 
 import "./globals.css"
 
@@ -19,12 +19,7 @@ const helveticaNow = localFont({
   variable: "--font-helvetica-now",
 })
 
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : "http://localhost:3000"
-
-export const metadata = {
-  metadataBase: new URL(baseUrl),
+export const metadata: Metadata = {
   title: {
     default: "Spotlight",
     template: `Spotlight — %s`,
@@ -40,27 +35,22 @@ export const metadata = {
       "A platform that awards creativity and innovation across industries worldwide.",
     images: [
       {
-        url: "https://spotlight.day/og-image.png",
+        url: "https://spotlight.day/ogImage.png",
         width: 1600,
         height: 900,
         alt: "Preview image for Spotlight",
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Spotlight",
-    description:
-      "A platform that awards creativity and innovation across industries worldwide.",
-    images: [
-      {
-        url: "https://spotlight.day/og-image.png",
-        width: 1600,
-        height: 900,
-        alt: "Preview image for Spotlight",
-      },
-    ],
+    site: "@SpotlightDay",
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
 }
 
 export default function RootLayout({
