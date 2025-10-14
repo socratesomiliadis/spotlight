@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Spotlight",
+    type: "website",
+    url: "https://spotlight.day",
     description:
       "A platform that awards creativity and innovation across industries worldwide.",
     images: [
@@ -47,6 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@SpotlightDay",
   },
+  robots: "index, follow",
 }
 
 export const viewport: Viewport = {
