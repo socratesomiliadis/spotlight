@@ -40,7 +40,7 @@ export async function getProjectBySlug(slug: string) {
   const supabase = await createClient()
   const { data: project, error } = await supabase
     .from("project")
-    .select("*, profile(avatar_url, display_name, username)")
+    .select("*, profile(avatar_url, display_name, username), award(*)")
     .eq("slug", slug)
     .single()
 

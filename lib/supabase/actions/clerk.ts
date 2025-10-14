@@ -26,7 +26,16 @@ export async function createUser(userData: {
     },
   })
 
-  return user
+  // Return a plain object instead of the Clerk User instance
+  return {
+    id: user.id,
+    email: user.emailAddresses[0]?.emailAddress,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    username: user.username,
+    imageUrl: user.imageUrl,
+    publicMetadata: user.publicMetadata,
+  }
 }
 
 export async function initiateAccountClaim(email: string, username: string) {

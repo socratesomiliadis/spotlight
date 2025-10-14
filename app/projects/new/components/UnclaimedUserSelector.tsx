@@ -46,7 +46,9 @@ export default function UnclaimedUserSelector({
   const [unclaimedUsers, setUnclaimedUsers] = useState<UnclaimedUser[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
-  const [loadingUsers, setLoadingUsers] = useState(true)
+  const [loadingUsers, setLoadingUsers] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [hasSearched, setHasSearched] = useState(false)
   const { user } = useUser()
 
   const {
@@ -66,23 +68,42 @@ export default function UnclaimedUserSelector({
   // Watch the avatar URL to update preview
   const avatarUrl = watch("avatar_url")
 
-  const loadUnclaimedUsers = async () => {
+  const searchUnclaimedUsers = async (query: string) => {
+    if (!query.trim()) {
+      setUnclaimedUsers([])
+      setHasSearched(false)
+      return
+    }
+
     try {
       setLoadingUsers(true)
+      setHasSearched(true)
       const users = await getUnclaimedUsers()
-      setUnclaimedUsers(users || [])
+      const filtered = (users || []).filter((user) => {
+        const searchLower = query.toLowerCase()
+        return (
+          user.username.toLowerCase().includes(searchLower) ||
+          user.display_name?.toLowerCase().includes(searchLower) ||
+          user.user_id.toLowerCase().includes(searchLower)
+        )
+      })
+      setUnclaimedUsers(filtered)
     } catch (error) {
-      console.error("Error loading unclaimed users:", error)
-      toast.error("Failed to load unclaimed users")
+      console.error("Error searching unclaimed users:", error)
+      toast.error("Failed to search unclaimed users")
     } finally {
       setLoadingUsers(false)
     }
   }
 
-  // Load unclaimed users on component mount
+  // Debounce search
   useEffect(() => {
-    loadUnclaimedUsers()
-  }, [])
+    const timer = setTimeout(() => {
+      searchUnclaimedUsers(searchQuery)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   if (!user || !user.id) {
     return <div>Loading...</div>
@@ -143,7 +164,7 @@ export default function UnclaimedUserSelector({
       <div className="flex flex-col gap-2">
         <h3 className="text-xl font-medium text-black">Project Owner</h3>
         <p className="text-[#ACACAC] text-base">
-          Select an existing unclaimed user or create a new one
+          Search for an existing unclaimed user or create a new one
         </p>
       </div>
 
@@ -212,82 +233,123 @@ export default function UnclaimedUserSelector({
               </div>
             )}
 
-            {/* User List */}
+            {/* Search Bar */}
             <div className="space-y-2">
-              <h4 className="font-medium text-gray-900">
-                Available Unclaimed Users
-              </h4>
-
-              {loadingUsers ? (
-                <div className="p-8 text-center text-gray-500">
-                  Loading unclaimed users...
-                </div>
-              ) : unclaimedUsers.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  No unclaimed users found. Create a new one to get started.
-                </div>
-              ) : (
-                <div className="grid gap-2 max-h-60 overflow-y-auto">
-                  {unclaimedUsers.map((user) => (
-                    <button
-                      key={user.user_id}
-                      type="button"
-                      onClick={() => handleUserSelect(user)}
-                      className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-colors ${
-                        selectedUserId === user.user_id
-                          ? "border-green-500 bg-green-50"
-                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                      }`}
+              <label className="block text-sm font-medium text-gray-900">
+                Search Unclaimed Users
+              </label>
+              <div className="relative">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by username or name..."
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
                     >
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
-                        {user.avatar_url ? (
-                          <img
-                            src={user.avatar_url}
-                            alt={user.username}
-                            className="w-full h-full rounded-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-gray-600 font-medium">
-                            {user.display_name?.charAt(0) ||
-                              user.username.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate">
-                          {user.display_name || user.username}
-                        </p>
-                        <p className="text-sm text-gray-500 truncate">
-                          @{user.username}
-                        </p>
-                      </div>
-                      {selectedUserId === user.user_id && (
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shrink-0">
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
 
-            <CustomButton
-              text="Refresh List"
-              onClick={loadUnclaimedUsers}
-              className="w-full"
-              disabled={loadingUsers}
-            />
+            {/* Search Results */}
+            {hasSearched && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-gray-900">Search Results</h4>
+
+                {loadingUsers ? (
+                  <div className="p-8 text-center text-gray-500">
+                    Searching...
+                  </div>
+                ) : unclaimedUsers.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    No unclaimed users found matching &quot;{searchQuery}&quot;
+                  </div>
+                ) : (
+                  <div className="grid gap-2 max-h-60 overflow-y-auto">
+                    {unclaimedUsers.map((user) => (
+                      <button
+                        key={user.user_id}
+                        type="button"
+                        onClick={() => handleUserSelect(user)}
+                        className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-colors ${
+                          selectedUserId === user.user_id
+                            ? "border-green-500 bg-green-50"
+                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
+                          {user.avatar_url ? (
+                            <img
+                              src={user.avatar_url}
+                              alt={user.username}
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-gray-600 font-medium">
+                              {user.display_name?.charAt(0) ||
+                                user.username.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">
+                            {user.display_name || user.username}
+                          </p>
+                          <p className="text-sm text-gray-500 truncate">
+                            @{user.username}
+                          </p>
+                        </div>
+                        {selectedUserId === user.user_id && (
+                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shrink-0">
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div

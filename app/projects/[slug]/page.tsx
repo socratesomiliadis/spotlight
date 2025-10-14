@@ -41,7 +41,7 @@ export default async function ProjectPage({ params }: PageProps) {
         userDisplayName={project.profile.display_name}
         userUsername={project.profile.username}
       />
-      <ProjectNavigation />
+      <ProjectNavigation awards={project.award} />
       <div className="px-4 lg:px-8">
         <Image
           src={project.main_img_url}

@@ -98,6 +98,7 @@ export default function NewProjectForm({
         user_id: isStaff && selectedUserId ? selectedUserId : userId,
         slug: slug,
         category: data.category,
+        live_url: data.live_url || null,
       })
 
       // Redirect to the new project page after successful creation
@@ -230,6 +231,13 @@ export default function NewProjectForm({
               />
             </div>
           </div>
+          <MyInput
+            label="Project URL *"
+            type="text"
+            {...register("live_url")}
+            isInvalid={!!errors.live_url}
+            errorMessage={errors.live_url?.message}
+          />
         </div>
         <div className="w-full grid grid-cols-2 gap-4">
           {/* Main Project Image */}
@@ -335,7 +343,7 @@ export default function NewProjectForm({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-row items-center justify-end gap-4 px-8 pb-8">
+      <div className="flex flex-row items-center justify-between w-full gap-4 px-8 pb-8">
         <CustomButton
           text="Cancel"
           href="/"

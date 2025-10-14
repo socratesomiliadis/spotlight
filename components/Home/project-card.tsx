@@ -50,12 +50,12 @@ export default function ProjectCard({
         playsInline
         preload="none"
         poster={project.main_img_url}
-        className="w-full aspect-video object-cover rounded-xl"
+        className="w-full w-max-none aspect-video object-cover rounded-xl"
       >
         {/* @ts-expect-error */}
         <source src={project.preview_url || null} type="video/mp4" />
       </video>
-      {/* 
+
       <Image
         src={project.main_img_url}
         alt={project.title}
@@ -65,7 +65,7 @@ export default function ProjectCard({
           "w-full aspect-video object-cover rounded-xl lg:rounded-2xl group-hover:scale-[1.02] transition-all duration-500 ease-out-expo will-change-transform",
           hasPreview && "group-hover:scale-100"
         )}
-      /> */}
+      />
     </Link>
   )
 }

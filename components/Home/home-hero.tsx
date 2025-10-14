@@ -31,7 +31,7 @@ export default function HomeHero({
 
           <ProjectCard
             project={project as Tables<"project">}
-            className="w-[70%] lg:w-[38%]"
+            className="w-[70%] lg:w-[20vw]"
           />
         </div>
       )}
