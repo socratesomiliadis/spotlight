@@ -1,5 +1,7 @@
 import "server-only"
 
+import { Database } from "@/database.types"
+
 import { createAdminClient } from "../server"
 
 export async function upsertUser(data: any, isUpdate: boolean = false) {
@@ -217,4 +219,97 @@ export async function getTodaysSiteOfTheDay() {
   }
 
   return data
+}
+
+export async function getTodaysOfTheDayByCategory(
+  category: Database["public"]["Enums"]["category"]
+) {
+  const supabaseServerClient = await createAdminClient()
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]
+  const startOfDay = `${today}T00:00:00.000Z`
+  const endOfDay = `${today}T23:59:59.999Z`
+
+  // Try to get today's award for the specified category
+  const { data: todayData, error: todayError } = await supabaseServerClient
+    .from("project")
+    .select(
+      `
+      *,
+      user:user_id(username, avatar_url, display_name),
+      award!inner(award_type, awarded_at, created_at)
+    `
+    )
+    .eq("category", category)
+    .eq("award.award_type", "otd")
+    .gte("award.awarded_at", startOfDay)
+    .lte("award.awarded_at", endOfDay)
+    .single()
+
+  if (todayData) return todayData
+
+  // If no award today, get the most recent previous award for this category
+  const { data: previousData, error: previousError } =
+    await supabaseServerClient
+      .from("project")
+      .select(
+        `
+      *,
+      user:user_id(username, avatar_url, display_name),
+      award!inner(award_type, awarded_at, created_at)
+    `
+      )
+      .eq("category", category)
+      .eq("award.award_type", "otd")
+      .lt("award.awarded_at", startOfDay)
+      .order("award.awarded_at", { ascending: false })
+      .limit(1)
+      .single()
+
+  if (previousData) return previousData
+
+  // If no awards for this category at all, fall back to website category
+  if (category !== "websites") {
+    const { data: websiteData, error: websiteError } =
+      await supabaseServerClient
+        .from("project")
+        .select(
+          `
+      *,
+      user:user_id(username, avatar_url, display_name),
+      award!inner(award_type, awarded_at, created_at)
+    `
+        )
+        .eq("category", "websites")
+        .eq("award.award_type", "otd")
+        .gte("award.awarded_at", startOfDay)
+        .lte("award.awarded_at", endOfDay)
+        .single()
+
+    if (websiteData) return websiteData
+
+    // If no website award today, get the most recent previous website award
+    const { data: previousWebsiteData, error: previousWebsiteError } =
+      await supabaseServerClient
+        .from("project")
+        .select(
+          `
+      *,
+      user:user_id(username, avatar_url, display_name),
+      award!inner(award_type, awarded_at, created_at)
+    `
+        )
+        .eq("category", "websites")
+        .eq("award.award_type", "otd")
+        .lt("award.awarded_at", startOfDay)
+        .order("award.awarded_at", { ascending: false })
+        .limit(1)
+        .single()
+
+    if (previousWebsiteData) return previousWebsiteData
+  }
+
+  // No awards found at all
+  return null
 }

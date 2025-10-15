@@ -1,8 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Search, X } from "lucide-react"
+import { SelectItem } from "@heroui/react"
+import { Loader2, Search, X } from "lucide-react"
+
+import MySelect from "@/components/Forms/components/Select"
 
 const categories = [
   { key: "", label: "All Categories" },
@@ -25,6 +28,8 @@ const awards = [
 export default function DashboardFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
+
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get("search") || ""
   )
@@ -47,7 +52,9 @@ export default function DashboardFilters() {
       const queryString = params.toString()
       const newUrl = queryString ? `?${queryString}` : "/dashboard"
 
-      router.push(newUrl, { scroll: false })
+      startTransition(() => {
+        router.push(newUrl, { scroll: false })
+      })
     }, 300) // 300ms debounce for search
 
     return () => clearTimeout(timer)
@@ -73,46 +80,67 @@ export default function DashboardFilters() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
         />
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
-            <X size={18} />
-          </button>
+        {isPending ? (
+          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 size-4 animate-spin" />
+        ) : (
+          searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X size={18} />
+            </button>
+          )
         )}
       </div>
 
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Category Filter */}
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent bg-white text-sm"
+        <MySelect
+          selectedKeys={selectedCategory ? [selectedCategory] : [""]}
+          onSelectionChange={(keys) => {
+            const selectedKey = Array.from(keys)[0] as string
+            setSelectedCategory(selectedKey)
+          }}
+          size="md"
+          className="w-48"
+          placeholder="Category"
         >
           {categories.map((category) => (
-            <option key={category.key} value={category.key}>
+            <SelectItem key={category.key} textValue={category.label}>
               {category.label}
-            </option>
+            </SelectItem>
           ))}
-        </select>
+        </MySelect>
 
         {/* Award Filter */}
-        <select
-          value={selectedAward}
-          onChange={(e) => setSelectedAward(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent bg-white text-sm"
+        <MySelect
+          selectedKeys={selectedAward ? [selectedAward] : [""]}
+          onSelectionChange={(keys) => {
+            const selectedKey = Array.from(keys)[0] as string
+            setSelectedAward(selectedKey)
+          }}
+          size="md"
+          className="w-48"
+          placeholder="Award"
         >
           {awards.map((award) => (
-            <option key={award.key} value={award.key}>
+            <SelectItem key={award.key} textValue={award.label}>
               {award.label}
-            </option>
+            </SelectItem>
           ))}
-        </select>
+        </MySelect>
 
-        {/* Clear All Button */}
-        {hasActiveFilters && (
+        {/* Loading indicator and Clear All Button */}
+        {isPending && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Loader2 className="size-4 animate-spin" />
+            <span>Filtering...</span>
+          </div>
+        )}
+
+        {hasActiveFilters && !isPending && (
           <button
             onClick={handleClearAll}
             className="px-3 py-2 text-sm text-gray-600 hover:text-black transition-colors"

@@ -69,12 +69,6 @@ export default async function DashboardPage({
       <p className="text-gray-600 mt-2">
         Manage project awards by clicking the award buttons. Active awards are
         highlighted.
-        <br />
-        <span className="text-sm">
-          • Click an unawarded button to select a date and give the award •
-          Click an awarded button to remove the award • Click the date under an
-          awarded button to edit the award date
-        </span>
       </p>
 
       {/* Filters */}
@@ -94,7 +88,7 @@ export default async function DashboardPage({
               key={project.id}
               className="flex flex-row items-start gap-6 py-6 w-full"
             >
-              <div className="flex flex-row items-center gap-6 w-[50%]">
+              <div className="flex flex-row items-center gap-4 w-[50%]">
                 <Link target="_blank" href={`/projects/${project.slug}`}>
                   <Image
                     src={project.main_img_url}

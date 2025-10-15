@@ -1,6 +1,8 @@
 import Image from "next/image"
 import Link from "next/link"
 
+import CustomButton from "@/components/custom-button"
+
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
@@ -31,12 +33,18 @@ export default function ProjectHeader({
   return (
     <div className="flex flex-col p-3 relative">
       {canEdit && (
-        <Link
+        // <Link
+        //   href={`/projects/${slug}/edit`}
+        //   className="absolute top-6 right-6 z-10 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+        // >
+        //   Edit Project
+        // </Link>
+        <CustomButton
+          text="Edit Project"
+          inverted
           href={`/projects/${slug}/edit`}
-          className="absolute top-6 right-6 z-10 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
-        >
-          Edit Project
-        </Link>
+          className="absolute top-6 right-6 z-10"
+        />
       )}
       <div className="w-full aspect-[3/1.5] lg:aspect-3/1 bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
         <Image

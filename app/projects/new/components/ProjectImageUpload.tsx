@@ -305,6 +305,7 @@ export default function ProjectImageUpload({
                     {onImageRemoved && (
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                         <button
+                          type="button"
                           onClick={() => handleRemoveImage(url, index)}
                           className="size-16 hover:scale-90 transition-all duration-300 rounded-full bg-white/20 flex items-center justify-center text-white pointer-events-auto"
                           title="Remove image"
@@ -383,6 +384,7 @@ export default function ProjectImageUpload({
                       {onImageRemoved && (
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                           <button
+                            type="button"
                             onClick={() => handleRemoveImage(url, index)}
                             className="size-16 hover:scale-90 transition-all duration-300 rounded-full bg-white/20 flex items-center justify-center text-white"
                             title="Remove image"

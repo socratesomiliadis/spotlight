@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Database } from "@/database.types"
 
-import { getTodaysSiteOfTheDay } from "@/lib/supabase/actions"
+import { getTodaysOfTheDayByCategory } from "@/lib/supabase/actions"
 import { createClient } from "@/lib/supabase/server"
 import GradientText from "@/components/gradient-text"
 import HomeHero from "@/components/Home/home-hero"
@@ -82,8 +82,9 @@ export default async function Home({
       ? (awardParam as AwardType)
       : undefined
 
-  // Get today's site of the day
-  const siteOfTheDay = await getTodaysSiteOfTheDay()
+  // Get today's of the day for the category (default to "websites")
+  const categoryForHero = category || "websites"
+  const ofTheDay = await getTodaysOfTheDayByCategory(categoryForHero)
 
   // Build base query
   let query = supabase
@@ -123,8 +124,8 @@ export default async function Home({
     )
   }
 
-  // Use site of the day as featured project, or fallback to most recent
-  const featuredProject = siteOfTheDay
+  // Use of the day as featured project
+  const featuredProject = ofTheDay
 
   return (
     <PageWrapper className="flex flex-col pb-3 lg:pb-8">

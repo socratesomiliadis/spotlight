@@ -20,10 +20,7 @@ const helveticaNow = localFont({
 })
 
 export const metadata: Metadata = {
-  title: {
-    default: "Spotlight",
-    template: `Spotlight — %s`,
-  },
+  title: "Spotlight",
   description:
     "A platform that awards creativity and innovation across industries worldwide.",
   icons: {

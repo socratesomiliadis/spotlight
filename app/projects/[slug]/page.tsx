@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { currentUser } from "@clerk/nextjs/server"
@@ -5,14 +6,49 @@ import { currentUser } from "@clerk/nextjs/server"
 import { getProjectBySlug } from "@/lib/supabase/actions/projects"
 import PageWrapper from "@/components/page-wrapper"
 
+import ProjectAwards from "./components/ProjectAwards"
 import ProjectDetails from "./components/ProjectDetails"
 import ProjectElements from "./components/ProjectElements"
 import ProjectHeader from "./components/ProjectHeader"
-import ProjectNavigation from "./components/ProjectNavigation"
 import ProjectVisitManager from "./components/ProjectVisitManager"
 
 interface PageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params
+
+  let project
+  try {
+    const data = await getProjectBySlug(slug)
+
+    project = data
+  } catch (error) {
+    console.error(error)
+    notFound()
+  }
+
+  if (!project) {
+    notFound()
+  }
+
+  return {
+    title: `${project.title} — Spotlight`,
+    openGraph: {
+      title: `${project.title} — Spotlight`,
+      images: [
+        {
+          url: project.main_img_url,
+          width: 1600,
+          height: 900,
+          alt: project.title,
+        },
+      ],
+    },
+  }
 }
 
 export default async function ProjectPage({ params }: PageProps) {
@@ -24,6 +60,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
     project = data
   } catch (error) {
+    console.error(error)
     notFound()
   }
 
@@ -51,7 +88,9 @@ export default async function ProjectPage({ params }: PageProps) {
         slug={project.slug}
         canEdit={canEdit}
       />
-      <ProjectNavigation awards={project.award} />
+      {project.award && project.award.length > 0 && (
+        <ProjectAwards awards={project.award} category={project.category} />
+      )}
       <div className="px-4 lg:px-8">
         <Image
           src={project.main_img_url}
