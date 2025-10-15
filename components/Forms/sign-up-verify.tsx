@@ -32,11 +32,11 @@ export default function SignUpVerify() {
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === "complete") {
-        setAuth(null)
         await setActive({
           session: signUpAttempt.createdSessionId,
           redirectUrl: "/welcome",
         })
+        setAuth(null)
         setIsLoading(false)
       } else {
         // If the status is not complete, check why. User may need to
