@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Form, SelectItem } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -267,7 +268,18 @@ export default function NewProjectForm({
           </div>
           {/* Preview Video */}
           <div className="space-y-2 w-full">
-            <div className="w-full">
+            <div className="w-full relative">
+              <span className="absolute -bottom-7 left-0">
+                You can use our{" "}
+                <Link
+                  href="https://video-tool.spotlight.day"
+                  target="_blank"
+                  className="underline"
+                >
+                  Video Tool
+                </Link>{" "}
+                to optimize your preview video.
+              </span>
               <ProjectImageUpload
                 label="Preview Video *"
                 currentImages={previewUrl ? [previewUrl] : []}
@@ -279,7 +291,7 @@ export default function NewProjectForm({
                 userId={userId}
                 maxImages={1}
                 uploadAreaText="Drop preview video here"
-                supportedFormats="MP4, WEBM, GIF"
+                supportedFormats="WEBM"
                 maxFileSize="5MB"
                 gridCols={1}
                 isMultiple={false}
