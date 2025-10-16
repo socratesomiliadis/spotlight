@@ -33,8 +33,13 @@ export default function SignUpVerify() {
       if (signUpAttempt.status === "complete") {
         await setActive({
           session: signUpAttempt.createdSessionId,
-          navigate: () => {
-            router.refresh()
+          navigate: async ({ session }) => {
+            if (session?.currentTask) {
+              // Check for session tasks and navigate to custom UI to help users resolve them
+              // See https://clerk.com/docs/guides/development/custom-flows/overview#session-tasks
+              console.log(session?.currentTask)
+            }
+
             router.push("/welcome")
           },
         })
