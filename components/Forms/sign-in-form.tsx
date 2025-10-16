@@ -120,6 +120,7 @@ export default function SignInForm() {
         <p className="text-sm text-[#787878] mt-0 tracking-tight">
           Forgot your password?{" "}
           <button
+            type="button"
             className="underline"
             onClick={() => setAuth("reset-password")}
           >

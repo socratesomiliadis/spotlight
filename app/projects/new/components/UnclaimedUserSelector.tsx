@@ -17,8 +17,7 @@ import ImageUpload from "@/app/[username]/edit/components/ImageUpload"
 // Define validation schema for creating new unclaimed user
 const newUserSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
+  display_name: z.string().min(1, "Display name is required"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   avatar_url: z.string().min(1, "Profile picture is required"),
 })
@@ -116,11 +115,15 @@ export default function UnclaimedUserSelector({
       // Generate a random password for unclaimed user
       const randomPassword = Math.random().toString(36).slice(-8) + "Aa1!"
 
+      const isFullName = data.display_name.includes(" ")
+      const firstName = isFullName ? data.display_name.split(" ")[0] : ""
+      const lastName = isFullName ? data.display_name.split(" ")[1] : ""
+
       // Create the user in Clerk
       const newUser = await createUser({
         email: data.email,
-        first_name: data.first_name,
-        last_name: data.last_name,
+        first_name: isFullName ? firstName : data.display_name,
+        last_name: isFullName ? lastName : "",
         password: randomPassword,
         username: data.username,
         avatar_url: data.avatar_url || "",
@@ -131,7 +134,7 @@ export default function UnclaimedUserSelector({
         user_id: newUser.id,
         username: data.username,
         avatar_url: data.avatar_url || newUser.imageUrl || null,
-        display_name: `${data.first_name} ${data.last_name}`,
+        display_name: data.display_name,
         is_unclaimed: true,
       }
 
@@ -383,18 +386,11 @@ export default function UnclaimedUserSelector({
                 </div>
                 <div className="grid grid-cols-1 gap-4 w-96">
                   <MyInput
-                    label="First Name *"
+                    label="Display Name *"
                     type="text"
-                    {...register("first_name")}
-                    isInvalid={!!errors.first_name}
-                    errorMessage={errors.first_name?.message}
-                  />
-                  <MyInput
-                    label="Last Name *"
-                    type="text"
-                    {...register("last_name")}
-                    isInvalid={!!errors.last_name}
-                    errorMessage={errors.last_name?.message}
+                    {...register("display_name")}
+                    isInvalid={!!errors.display_name}
+                    errorMessage={errors.display_name?.message}
                   />
                 </div>
               </div>

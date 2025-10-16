@@ -52,12 +52,13 @@ export default function SignUpForm() {
   const onSubmit = async (data: SignUpFormValues) => {
     if (!isLoaded) return
     setIsLoading(true)
-    const firstName = data.displayName.split(" ")[0]
-    const lastName = data.displayName.split(" ")[1] || ""
+    const isFullName = data.displayName.includes(" ")
+    const firstName = isFullName ? data.displayName.split(" ")[0] : ""
+    const lastName = isFullName ? data.displayName.split(" ")[1] : ""
     try {
       await signUp.create({
-        firstName,
-        lastName,
+        firstName: isFullName ? firstName : data.displayName,
+        lastName: isFullName ? lastName : "",
         username: data.username,
         emailAddress: data.email,
         password: data.password,
