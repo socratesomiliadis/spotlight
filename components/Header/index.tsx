@@ -54,7 +54,7 @@ export default async function Header() {
             />
           </>
         )}
-        <AuthDrawer userExists={!!userId} />
+        {!userId ? <AuthDrawer userExists={!!userId} /> : null}
         <CustomButton
           text="Submit"
           href="/projects/new"

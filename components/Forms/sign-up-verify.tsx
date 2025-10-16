@@ -19,6 +19,7 @@ export default function SignUpVerify() {
     e.preventDefault()
 
     if (!isLoaded) return
+    router.prefetch("/welcome")
     setIsLoading(true)
 
     try {
@@ -27,8 +28,6 @@ export default function SignUpVerify() {
         code: code || "",
       })
 
-      router.prefetch("/welcome")
-
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === "complete") {
@@ -36,6 +35,7 @@ export default function SignUpVerify() {
           session: signUpAttempt.createdSessionId,
           redirectUrl: "/welcome",
         })
+        router.refresh()
         setAuth(null)
         setIsLoading(false)
       } else {
