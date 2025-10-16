@@ -228,8 +228,6 @@ export async function getTodaysOfTheDayByCategory(
 
   // Get today's date in YYYY-MM-DD format
   const today = new Date().toISOString().split("T")[0]
-  const startOfDay = `${today}T00:00:00.000Z`
-  const endOfDay = `${today}T23:59:59.999Z`
 
   // Try to get today's award for the specified category
   const { data: todayData, error: todayError } = await supabaseServerClient
@@ -243,10 +241,10 @@ export async function getTodaysOfTheDayByCategory(
     )
     .eq("category", category)
     .eq("award.award_type", "otd")
-    .gte("award.awarded_at", startOfDay)
-    .lte("award.awarded_at", endOfDay)
+    .eq("award.awarded_at", today)
     .single()
 
+  if (todayError && todayError.code !== "PGRST116") throw todayError
   if (todayData) return todayData
 
   // If no award today, get the most recent previous award for this category
@@ -262,11 +260,12 @@ export async function getTodaysOfTheDayByCategory(
       )
       .eq("category", category)
       .eq("award.award_type", "otd")
-      .lt("award.awarded_at", startOfDay)
-      .order("award.awarded_at", { ascending: false })
+      .lt("award.awarded_at", today)
+      .order("awarded_at", { referencedTable: "award", ascending: false })
       .limit(1)
       .single()
 
+  if (previousError && previousError.code !== "PGRST116") throw previousError
   if (previousData) return previousData
 
   // If no awards for this category at all, fall back to website category
@@ -283,10 +282,10 @@ export async function getTodaysOfTheDayByCategory(
         )
         .eq("category", "websites")
         .eq("award.award_type", "otd")
-        .gte("award.awarded_at", startOfDay)
-        .lte("award.awarded_at", endOfDay)
+        .eq("award.awarded_at", today)
         .single()
 
+    if (websiteError && websiteError.code !== "PGRST116") throw websiteError
     if (websiteData) return websiteData
 
     // If no website award today, get the most recent previous website award
@@ -302,11 +301,13 @@ export async function getTodaysOfTheDayByCategory(
         )
         .eq("category", "websites")
         .eq("award.award_type", "otd")
-        .lt("award.awarded_at", startOfDay)
-        .order("award.awarded_at", { ascending: false })
+        .lt("award.awarded_at", today)
+        .order("awarded_at", { foreignTable: "award", ascending: false })
         .limit(1)
         .single()
 
+    if (previousWebsiteError && previousWebsiteError.code !== "PGRST116")
+      throw previousWebsiteError
     if (previousWebsiteData) return previousWebsiteData
   }
 
