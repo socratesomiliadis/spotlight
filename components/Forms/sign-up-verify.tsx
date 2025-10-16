@@ -33,10 +33,11 @@ export default function SignUpVerify() {
       if (signUpAttempt.status === "complete") {
         await setActive({
           session: signUpAttempt.createdSessionId,
-          redirectUrl: "/welcome",
+          navigate: () => {
+            router.refresh()
+            router.push("/welcome")
+          },
         })
-        router.refresh()
-        setAuth(null)
         setIsLoading(false)
       } else {
         // If the status is not complete, check why. User may need to
