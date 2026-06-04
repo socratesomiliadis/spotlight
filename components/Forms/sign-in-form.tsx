@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 import { Form, Spinner } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "convex/react"
+import { useConvexAuth, useMutation } from "convex/react"
 import { motion } from "motion/react"
 import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
@@ -29,6 +29,9 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
+  const postSignInStarted = useRef(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
   const ensureCurrent = useMutation(api.profiles.ensureCurrent)
   const claimCurrent = useMutation(api.profiles.claimCurrent)
   const router = useRouter()
@@ -42,8 +45,45 @@ export default function SignInForm() {
     defaultValues: { emailOrUsername: "", password: "" },
   })
 
+  useEffect(() => {
+    if (
+      !isAwaitingConvexAuth ||
+      isAuthLoading ||
+      !isAuthenticated ||
+      postSignInStarted.current
+    ) {
+      return
+    }
+
+    postSignInStarted.current = true
+    void (async () => {
+      try {
+        await ensureCurrent({})
+        await claimCurrent()
+        setAuth(null)
+        router.refresh()
+      } catch (err) {
+        postSignInStarted.current = false
+        setIsAwaitingConvexAuth(false)
+        setError(err instanceof Error ? err.message : "Sign in failed")
+      } finally {
+        setIsLoading(false)
+      }
+    })()
+  }, [
+    claimCurrent,
+    ensureCurrent,
+    isAuthenticated,
+    isAuthLoading,
+    isAwaitingConvexAuth,
+    router,
+    setAuth,
+  ])
+
   const onSubmit = async (data: SignInFormValues) => {
     setIsLoading(true)
+    postSignInStarted.current = false
+    setIsAwaitingConvexAuth(false)
     setError(null)
     try {
       const payload = { password: data.password, callbackURL: "/" }
@@ -57,13 +97,10 @@ export default function SignInForm() {
             username: data.emailOrUsername,
           })
       if (response?.error) throw new Error(response.error.message)
-      await ensureCurrent({})
-      await claimCurrent()
-      setAuth(null)
-      router.refresh()
+      await authClient.getSession({ fetchOptions: { throw: false } })
+      setIsAwaitingConvexAuth(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign in failed")
-    } finally {
       setIsLoading(false)
     }
   }
@@ -115,6 +152,7 @@ export default function SignInForm() {
         </p>
         <button
           type="submit"
+          disabled={isLoading}
           className="w-full mt-2 lg:mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"
         >
           {isLoading && (

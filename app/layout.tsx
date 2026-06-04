@@ -3,17 +3,15 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
 import localFont from "next/font/local"
-import { ProjectVisitProvider } from "@/contexts/project-visit-context"
-import { HeroUIProvider } from "@heroui/react"
-import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { Toaster } from "sonner"
 
+import { getToken } from "@/lib/auth-server"
 import BottomNav from "@/components/BottomNav"
-import ConvexClientProvider from "@/components/ConvexClientProvider"
 import Header from "@/components/Header"
 import CloseCursor from "@/components/Home/close-cursor"
 import MainLayout from "@/components/main-layout"
-import { getToken } from "@/lib/auth-server"
+
+import Providers from "./providers"
 
 const helveticaNow = localFont({
   src: "../fonts/HelveticaNowVar.woff2",
@@ -66,21 +64,15 @@ export default async function RootLayout({
       <body
         className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-screen`}
       >
-        <ConvexClientProvider initialToken={token}>
-          <NuqsAdapter>
-            <HeroUIProvider>
-              <ProjectVisitProvider>
-                <Header />
-                <MainLayout>
-                  <Toaster richColors />
-                  {children}
-                  <CloseCursor />
-                </MainLayout>
-                <BottomNav />
-              </ProjectVisitProvider>
-            </HeroUIProvider>
-          </NuqsAdapter>
-        </ConvexClientProvider>
+        <Providers initialToken={token}>
+          <Header />
+          <MainLayout>
+            <Toaster richColors />
+            {children}
+            <CloseCursor />
+          </MainLayout>
+          <BottomNav />
+        </Providers>
       </body>
     </html>
   )

@@ -76,9 +76,27 @@ export default function SignUpForm() {
           <br />
           unleash your dreams.
         </h1>
-        <MyInput label="Display Name" {...register("displayName")} isInvalid={!!errors.displayName} errorMessage={errors.displayName?.message} autoComplete="name" />
-        <MyInput label="Username" {...register("username")} isInvalid={!!errors.username} errorMessage={errors.username?.message} autoComplete="username" />
-        <MyInput label="Email Address" {...register("email")} isInvalid={!!errors.email} errorMessage={errors.email?.message} autoComplete="email" />
+        <MyInput
+          label="Display Name"
+          {...register("displayName")}
+          isInvalid={!!errors.displayName}
+          errorMessage={errors.displayName?.message}
+          autoComplete="name"
+        />
+        <MyInput
+          label="Username"
+          {...register("username")}
+          isInvalid={!!errors.username}
+          errorMessage={errors.username?.message}
+          autoComplete="username"
+        />
+        <MyInput
+          label="Email Address"
+          {...register("email")}
+          isInvalid={!!errors.email}
+          errorMessage={errors.email?.message}
+          autoComplete="email"
+        />
         <MyInput
           label="Password"
           type={showPassword ? "text" : "password"}

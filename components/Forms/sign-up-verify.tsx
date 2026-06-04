@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
+import { api } from "@/convex/_generated/api"
 import { Form, InputOtp, Spinner } from "@heroui/react"
-import { useMutation } from "convex/react"
+import { useConvexAuth, useMutation } from "convex/react"
 import { motion } from "motion/react"
 import { useQueryState } from "nuqs"
 
-import { api } from "@/convex/_generated/api"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
@@ -17,14 +17,57 @@ export default function SignUpVerify({
   const [code, setCode] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
+  const ensureCurrentStarted = useRef(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
   const [, setAuth] = useQueryState("auth")
   const ensureCurrent = useMutation(api.profiles.ensureCurrent)
   const router = useRouter()
+
+  useEffect(() => {
+    if (
+      !isAwaitingConvexAuth ||
+      isAuthLoading ||
+      !isAuthenticated ||
+      ensureCurrentStarted.current
+    ) {
+      return
+    }
+
+    ensureCurrentStarted.current = true
+    void (async () => {
+      try {
+        await ensureCurrent({
+          username: pendingUser.username,
+          displayName: pendingUser.displayName,
+        })
+        setAuth(null)
+        router.push("/welcome")
+      } catch (err) {
+        ensureCurrentStarted.current = false
+        setIsAwaitingConvexAuth(false)
+        setError(err instanceof Error ? err.message : "Verification failed")
+      } finally {
+        setIsLoading(false)
+      }
+    })()
+  }, [
+    ensureCurrent,
+    isAuthenticated,
+    isAuthLoading,
+    isAwaitingConvexAuth,
+    pendingUser.displayName,
+    pendingUser.username,
+    router,
+    setAuth,
+  ])
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault()
     router.prefetch("/welcome")
     setIsLoading(true)
+    ensureCurrentStarted.current = false
+    setIsAwaitingConvexAuth(false)
     setError(null)
 
     try {
@@ -33,15 +76,10 @@ export default function SignUpVerify({
         otp: code || "",
       })
       if (response?.error) throw new Error(response.error.message)
-      await ensureCurrent({
-        username: pendingUser.username,
-        displayName: pendingUser.displayName,
-      })
-      setAuth(null)
-      router.push("/welcome")
+      await authClient.getSession({ fetchOptions: { throw: false } })
+      setIsAwaitingConvexAuth(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Verification failed")
-    } finally {
       setIsLoading(false)
     }
   }
@@ -68,6 +106,7 @@ export default function SignUpVerify({
         />
         <button
           type="submit"
+          disabled={isLoading}
           className="w-full mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"
         >
           {isLoading && (
