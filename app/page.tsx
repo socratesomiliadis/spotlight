@@ -82,7 +82,10 @@ export default async function Home({
 
   return (
     <PageWrapper className="flex flex-col pb-3 lg:pb-8">
-      <HomeContent preloadedHome={preloadedHome} />
+      <HomeContent
+        preloadedHome={preloadedHome}
+        filters={{ category, tags, award }}
+      />
     </PageWrapper>
   )
 }

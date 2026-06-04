@@ -4,19 +4,118 @@ import { mutation, query } from "./_generated/server"
 import {
   authUserId,
   nowIso,
+  projectCardView,
   projectView,
   requireAuthUser,
   requireStaff,
   slugify,
+  staffProjectRowView,
 } from "./lib"
 import { awardValidator, categoryValidator } from "./schema"
+
+type Category = "websites" | "design" | "films" | "crypto" | "startups" | "ai"
+type Award = "otd" | "otm" | "oty" | "honorable"
+
+async function listProjectCardPage(
+  ctx: any,
+  args: {
+    category?: Category
+    tags?: string[]
+    award?: Award
+    limit?: number
+    cursor?: string
+  }
+) {
+  const limit = args.limit ?? 24
+  const takeLimit = limit + 1
+  let projects: any[] = []
+
+  if (args.award) {
+    const awards = await ctx.db
+      .query("awards")
+      .withIndex("by_type_date", (q: any) => q.eq("awardType", args.award!))
+      .order("desc")
+      .collect()
+    const seenProjectIds = new Set()
+
+    for (const award of awards) {
+      const project = await ctx.db.get(award.projectId)
+      if (!project || seenProjectIds.has(project._id)) continue
+      seenProjectIds.add(project._id)
+      projects.push(project)
+    }
+  } else {
+    const hasInMemoryFilters = !!args.tags?.length
+    const projectsQuery = args.category
+      ? ctx.db
+          .query("projects")
+          .withIndex("by_category_created", (q: any) => {
+            const categoryQuery = q.eq("category", args.category!)
+            return args.cursor
+              ? categoryQuery.lt("createdAt", args.cursor)
+              : categoryQuery
+          })
+          .order("desc")
+      : ctx.db
+          .query("projects")
+          .withIndex("by_created", (q: any) =>
+            args.cursor ? q.lt("createdAt", args.cursor) : q
+          )
+          .order("desc")
+
+    if (!hasInMemoryFilters) {
+      const page = await projectsQuery.take(takeLimit)
+      const hasMore = page.length > limit
+      const items = hasMore ? page.slice(0, limit) : page
+
+      return {
+        projects: await Promise.all(
+          items.map((project: any) => projectCardView(ctx, project))
+        ),
+        hasMore,
+        nextCursor: hasMore ? items[items.length - 1]?.createdAt : null,
+      }
+    }
+
+    projects = await projectsQuery.collect()
+  }
+
+  if (args.category && args.award) {
+    projects = projects.filter((project) => project.category === args.category)
+  }
+
+  if (args.cursor) {
+    projects = projects.filter((project) => project.createdAt < args.cursor!)
+  }
+
+  if (args.tags?.length) {
+    const selected = new Set(args.tags)
+    projects = projects.filter((project) =>
+      project.tags.some((tag: string) => selected.has(tag))
+    )
+  }
+
+  projects = projects.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+
+  const items = projects.slice(0, takeLimit)
+  const hasMore = items.length > limit
+  const page = hasMore ? items.slice(0, limit) : items
+
+  return {
+    projects: await Promise.all(
+      page.map((project: any) => projectCardView(ctx, project))
+    ),
+    hasMore,
+    nextCursor: hasMore ? page[page.length - 1]?.createdAt : null,
+  }
+}
 
 async function listProjectViews(
   ctx: any,
   args: {
-    category?: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
+    category?: Category
     tags?: string[]
-    award?: "otd" | "otm" | "oty" | "honorable"
+    award?: Award
     limit?: number
   }
 ) {
@@ -66,30 +165,22 @@ async function listProjectViews(
   )
 }
 
-async function getTodaysOfTheDayByCategoryView(
-  ctx: any,
-  category: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
-) {
-  async function findForCategory(
-    category: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
-  ) {
-    const projects = await ctx.db
-      .query("projects")
-      .withIndex("by_category_created", (q: any) => q.eq("category", category))
+async function getTodaysOfTheDayByCategoryView(ctx: any, category: Category) {
+  async function findForCategory(category: Category) {
+    const awards = await ctx.db
+      .query("awards")
+      .withIndex("by_type_date", (q: any) => q.eq("awardType", "otd"))
+      .order("desc")
       .collect()
-    const projectIds = new Set(projects.map((project: any) => project._id))
-    const awards = (
-      await ctx.db
-        .query("awards")
-        .withIndex("by_type_date", (q: any) => q.eq("awardType", "otd"))
-        .collect()
-    )
-      .filter((award: any) => projectIds.has(award.projectId))
-      .sort((a: any, b: any) => b.awardedAt.localeCompare(a.awardedAt))
-    const award = awards[0]
-    if (!award) return null
-    const project = await ctx.db.get(award.projectId)
-    return project ? projectView(ctx, project) : null
+
+    for (const award of awards) {
+      const project = await ctx.db.get(award.projectId)
+      if (project?.category === category) {
+        return projectCardView(ctx, project)
+      }
+    }
+
+    return null
   }
 
   return (
@@ -107,6 +198,19 @@ export const list = query({
   },
   handler: async (ctx, args) => {
     return listProjectViews(ctx, args)
+  },
+})
+
+export const listCardPage = query({
+  args: {
+    category: v.optional(categoryValidator),
+    tags: v.optional(v.array(v.string())),
+    award: v.optional(awardValidator),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return listProjectCardPage(ctx, args)
   },
 })
 
@@ -136,12 +240,12 @@ export const getHomePage = query({
   },
   handler: async (ctx, args) => {
     const categoryForHero = args.category || "websites"
-    const [featuredProject, projects] = await Promise.all([
+    const [featuredProject, projectsPage] = await Promise.all([
       getTodaysOfTheDayByCategoryView(ctx, categoryForHero),
-      listProjectViews(ctx, args),
+      listProjectCardPage(ctx, args),
     ])
 
-    return { featuredProject, projects }
+    return { featuredProject, ...projectsPage }
   },
 })
 
@@ -293,17 +397,54 @@ export const update = mutation({
 })
 
 export const listWithAwardsForStaff = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    search: v.optional(v.string()),
+    category: v.optional(categoryValidator),
+    award: v.optional(awardValidator),
+  },
+  handler: async (ctx, args) => {
     await requireStaff(ctx)
-    const projects = await ctx.db
+    let projects = await ctx.db
       .query("projects")
       .withIndex("by_created")
+      .order("desc")
       .collect()
+
+    if (args.category) {
+      projects = projects.filter(
+        (project) => project.category === args.category
+      )
+    }
+
+    if (args.award) {
+      const awardedProjectIds = new Set(
+        (
+          await ctx.db
+            .query("awards")
+            .withIndex("by_type_date", (q) => q.eq("awardType", args.award!))
+            .collect()
+        ).map((award) => award.projectId)
+      )
+      projects = projects.filter((project) =>
+        awardedProjectIds.has(project._id)
+      )
+    }
+
+    if (args.search?.trim()) {
+      const search = args.search.trim().toLowerCase()
+      const rows = await Promise.all(
+        projects.map((project) => staffProjectRowView(ctx, project))
+      )
+      return rows.filter(
+        (project) =>
+          project.title.toLowerCase().includes(search) ||
+          project.user?.display_name?.toLowerCase().includes(search) ||
+          project.user?.username?.toLowerCase().includes(search)
+      )
+    }
+
     return Promise.all(
-      projects
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-        .map((project) => projectView(ctx, project))
+      projects.map((project) => staffProjectRowView(ctx, project))
     )
   },
 })

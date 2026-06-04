@@ -100,6 +100,19 @@ export async function profileView(ctx: any, profile: Doc<"profiles">) {
   }
 }
 
+export async function profileSummaryView(ctx: any, profile: Doc<"profiles">) {
+  return {
+    user_id: profile.authUserId,
+    username: profile.username,
+    display_name: profile.displayName || null,
+    avatar_url: await storageUrl(
+      ctx,
+      profile.avatarStorageId,
+      profile.legacyAvatarUrl
+    ),
+  }
+}
+
 export async function awardView(award: Doc<"awards">) {
   return {
     id: award._id,
@@ -107,6 +120,50 @@ export async function awardView(award: Doc<"awards">) {
     award_type: award.awardType,
     awarded_at: award.awardedAt,
     created_at: award.createdAt,
+  }
+}
+
+export async function projectCardView(ctx: any, project: Doc<"projects">) {
+  const profile = await getProfileByAuthUserId(ctx, project.ownerAuthUserId)
+  const user = profile ? await profileSummaryView(ctx, profile) : null
+
+  return {
+    id: project._id,
+    _id: project._id,
+    user_id: project.ownerAuthUserId,
+    title: project.title,
+    slug: project.slug,
+    category: project.category,
+    tags: project.tags,
+    main_img_url:
+      (await storageUrl(
+        ctx,
+        project.mainImageStorageId,
+        project.legacyMainImgUrl
+      )) || "",
+    preview_url: await storageUrl(
+      ctx,
+      project.previewStorageId,
+      project.legacyPreviewUrl
+    ),
+    created_at: project.createdAt,
+    profile: user,
+    user,
+  }
+}
+
+export async function staffProjectRowView(ctx: any, project: Doc<"projects">) {
+  const [card, awards] = await Promise.all([
+    projectCardView(ctx, project),
+    ctx.db
+      .query("awards")
+      .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
+      .collect(),
+  ])
+
+  return {
+    ...card,
+    award: await Promise.all(awards.map(awardView)),
   }
 }
 

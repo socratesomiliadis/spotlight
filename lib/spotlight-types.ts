@@ -16,6 +16,40 @@ export type SocialsView = {
   twitter: string | null
 }
 
+export type ProfileSummaryView = {
+  user_id: string
+  username: string
+  display_name: string | null
+  avatar_url: string | null
+}
+
+export type AwardView = {
+  id?: string
+  project_id: string
+  award_type: AwardType
+  awarded_at: string
+  created_at: string
+}
+
+export type ProjectCardView = {
+  id: string
+  _id?: string
+  user_id: string
+  title: string
+  slug: string
+  category: CategoryType
+  tags: string[]
+  main_img_url: string
+  preview_url: string | null
+  created_at: string
+  profile?: ProfileSummaryView | null
+  user?: ProfileSummaryView | null
+}
+
+export type StaffProjectRowView = ProjectCardView & {
+  award?: AwardView[]
+}
+
 export type ProfileView = {
   id?: string
   user_id: string
@@ -33,15 +67,7 @@ export type ProfileView = {
   created_at: string
   updated_at: string
   socials?: SocialsView | null
-  project?: ProjectView[] | null
-}
-
-export type AwardView = {
-  id?: string
-  project_id: string
-  award_type: AwardType
-  awarded_at: string
-  created_at: string
+  project?: ProjectCardView[] | ProjectView[] | null
 }
 
 export type ProjectView = {

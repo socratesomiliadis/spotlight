@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react"
 import { useMutation } from "convex/react"
 import { CalendarDays } from "lucide-react"
 
-import type { AwardView, ProjectView } from "@/lib/spotlight-types"
+import type { AwardView, StaffProjectRowView } from "@/lib/spotlight-types"
 
 type AwardType = "otd" | "otm" | "oty" | "honorable"
 
@@ -45,7 +45,7 @@ function updateDashboardAwardQueries(
   )) {
     if (!query.value) continue
 
-    const projects = query.value as ProjectView[]
+    const projects = query.value as StaffProjectRowView[]
 
     localStore.setQuery(
       api.projects.listWithAwardsForStaff,

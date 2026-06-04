@@ -1,14 +1,15 @@
 import { Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import type { ProjectView } from "@/lib/spotlight-types"
+
+import type { ProjectCardView } from "@/lib/spotlight-types"
 
 import ProjectCard from "./project-card"
 
 export default function HomeHero({
   project,
 }: {
-  project: ProjectView | null
+  project: ProjectCardView | null
 }) {
   return (
     <div className="w-full p-3 lg:p-4 relative flex items-center justify-center">

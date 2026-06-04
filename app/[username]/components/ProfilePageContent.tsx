@@ -23,7 +23,8 @@ export default function ProfilePageContent({
     notFound()
   }
 
-  const { user, isOwnProfile, isFollowing, recommendedProjects } = profilePage
+  const { user, isOwnProfile, isFollowing, recommendedProjects, projectsPage } =
+    profilePage
 
   return (
     <>
@@ -42,6 +43,8 @@ export default function ProfilePageContent({
         <ProjectsGrid
           projects={user.project || undefined}
           recommendedProjects={recommendedProjects}
+          username={username}
+          projectsPage={projectsPage}
         />
       </div>
       <PreviewCursor />

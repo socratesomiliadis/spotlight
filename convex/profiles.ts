@@ -5,6 +5,7 @@ import {
   authUserId,
   nowIso,
   profileView,
+  projectCardView,
   projectView,
   requireAuthUser,
   requireProfile,
@@ -125,7 +126,7 @@ export const getFullByUsername = query({
 })
 
 export const getProfilePage = query({
-  args: { username: v.string() },
+  args: { username: v.string(), limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
     const profile = await ctx.db
       .query("profiles")
@@ -146,14 +147,14 @@ export const getProfilePage = query({
           )
           .first()
       : null
-    const projects = (
-      await ctx.db
-        .query("projects")
-        .withIndex("by_owner", (q) =>
-          q.eq("ownerAuthUserId", profile.authUserId)
-        )
-        .collect()
-    ).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const limit = args.limit ?? 24
+    const projects = await ctx.db
+      .query("projects")
+      .withIndex("by_owner_created", (q) =>
+        q.eq("ownerAuthUserId", profile.authUserId)
+      )
+      .order("desc")
+      .take(limit + 1)
     const recommendedProjects =
       projects.length > 0
         ? []
@@ -162,19 +163,73 @@ export const getProfilePage = query({
             .withIndex("by_created")
             .order("desc")
             .take(4)
+    const projectPage = projects.slice(0, limit + 1)
+    const hasMoreProjects = projectPage.length > limit
+    const visibleProjects = hasMoreProjects
+      ? projectPage.slice(0, limit)
+      : projectPage
 
     return {
       user: {
         ...(await profileView(ctx, profile)),
         project: await Promise.all(
-          projects.map((project) => projectView(ctx, project))
+          visibleProjects.map((project) => projectCardView(ctx, project))
         ),
       },
       isOwnProfile,
       isFollowing: !isOwnProfile && !!follow,
+      projectsPage: {
+        hasMore: hasMoreProjects,
+        nextCursor: hasMoreProjects
+          ? visibleProjects[visibleProjects.length - 1]?.createdAt
+          : null,
+      },
       recommendedProjects: await Promise.all(
-        recommendedProjects.map((project) => projectView(ctx, project))
+        recommendedProjects.map((project) => projectCardView(ctx, project))
       ),
+    }
+  },
+})
+
+export const listProjectCardsPage = query({
+  args: {
+    username: v.string(),
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .first()
+    if (!profile) {
+      return { projects: [], hasMore: false, nextCursor: null }
+    }
+
+    const limit = args.limit ?? 24
+    const projects = await ctx.db
+      .query("projects")
+      .withIndex("by_owner_created", (q) => {
+        const ownerQuery = q.eq("ownerAuthUserId", profile.authUserId)
+        return args.cursor
+          ? ownerQuery.lt("createdAt", args.cursor)
+          : ownerQuery
+      })
+      .order("desc")
+      .take(limit + 1)
+
+    const page = projects.slice(0, limit + 1)
+    const hasMore = page.length > limit
+    const visibleProjects = hasMore ? page.slice(0, limit) : page
+
+    return {
+      projects: await Promise.all(
+        visibleProjects.map((project) => projectCardView(ctx, project))
+      ),
+      hasMore,
+      nextCursor: hasMore
+        ? visibleProjects[visibleProjects.length - 1]?.createdAt
+        : null,
     }
   },
 })

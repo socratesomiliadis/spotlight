@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 import { Preloaded, usePreloadedQuery } from "convex/react"
 
@@ -14,44 +13,13 @@ export default function DashboardContent({
 }: {
   preloadedProjects: Preloaded<typeof api.projects.listWithAwardsForStaff>
 }) {
-  const allProjects = usePreloadedQuery(preloadedProjects) || []
-  const searchParams = useSearchParams()
-  const searchQuery = searchParams.get("search") || ""
-  const categoryFilter = searchParams.get("category") || ""
-  const awardFilter = searchParams.get("award") || ""
-
-  let projects = allProjects
-
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase()
-    projects = projects.filter(
-      (project) =>
-        project.title.toLowerCase().includes(query) ||
-        project.user?.display_name?.toLowerCase().includes(query) ||
-        project.user?.username?.toLowerCase().includes(query)
-    )
-  }
-
-  if (categoryFilter) {
-    projects = projects.filter((project) => project.category === categoryFilter)
-  }
-
-  if (awardFilter) {
-    projects = projects.filter(
-      (project) =>
-        project.award &&
-        Array.isArray(project.award) &&
-        project.award.some((award) => award.award_type === awardFilter)
-    )
-  }
+  const projects = usePreloadedQuery(preloadedProjects) || []
 
   return (
     <>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Staff Dashboard</h1>
-        <div className="text-sm text-gray-600">
-          {projects.length} of {allProjects.length} projects
-        </div>
+        <div className="text-sm text-gray-600">{projects.length} projects</div>
       </div>
       <p className="text-gray-600 mt-2">
         Manage project awards by clicking the award buttons. Active awards are

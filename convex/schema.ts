@@ -63,6 +63,7 @@ export default defineSchema({
   })
     .index("by_slug", ["slug"])
     .index("by_owner", ["ownerAuthUserId"])
+    .index("by_owner_created", ["ownerAuthUserId", "createdAt"])
     .index("by_category_created", ["category", "createdAt"])
     .index("by_created", ["createdAt"]),
   awards: defineTable({
