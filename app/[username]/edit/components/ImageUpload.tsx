@@ -2,15 +2,15 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
-import { useSession } from "@clerk/nextjs"
+import { useMutation } from "convex/react"
 
-import { createClient } from "@/lib/supabase/client"
+import { api } from "@/convex/_generated/api"
 import { cn } from "@/lib/utils"
 
 interface ImageUploadProps {
   label: string
   currentImageUrl?: string
-  onImageUploaded: (url: string) => void
+  onImageUploaded: (url: string, storageId?: string) => void
   onImageRemoved?: () => void
   showRemoveButton?: boolean
   bucketName: string
@@ -41,8 +41,7 @@ export default function ImageUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { session } = useSession()
-  const supabase = createClient({ session })
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -97,34 +96,18 @@ export default function ImageUpload({
     setError(null)
 
     try {
-      // Generate unique filename
-      const timestamp = Date.now()
-      const fileExtension = file.name.split(".").pop()
-      const filename = `${userId}/${folder}/${timestamp}.${fileExtension}`
-
-      // Upload to Supabase storage
-      const { data, error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(filename, file, {
-          cacheControl: "3600",
-          upsert: true,
-        })
-
-      if (uploadError) {
-        throw uploadError
+      const uploadUrl = await generateUploadUrl()
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      })
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.status}`)
       }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filename)
-
-      if (publicUrlData?.publicUrl) {
-        onImageUploaded(publicUrlData.publicUrl)
-        setError(null)
-      } else {
-        throw new Error("Failed to get public URL")
-      }
+      const { storageId } = await uploadResponse.json()
+      onImageUploaded(URL.createObjectURL(file), storageId)
+      setError(null)
     } catch (err: any) {
       console.error("Upload error:", err)
       setError(err.message || "Failed to upload image")
@@ -144,21 +127,6 @@ export default function ImageUpload({
     setError(null)
 
     try {
-      // If there's a current image URL, delete it from storage
-      if (currentImageUrl) {
-        const filename = extractFilenameFromUrl(currentImageUrl)
-        if (filename) {
-          const { error: deleteError } = await supabase.storage
-            .from(bucketName)
-            .remove([filename])
-
-          if (deleteError) {
-            console.error("Error deleting file:", deleteError)
-            // Don't throw here, still proceed with removal from form
-          }
-        }
-      }
-
       // Call the callback to update the form
       if (onImageRemoved) {
         onImageRemoved()
@@ -172,10 +140,9 @@ export default function ImageUpload({
     }
   }
 
-  // Extract filename from Supabase public URL
+  // Legacy storage URL parsing; Convex-backed deletion currently ignores it.
   const extractFilenameFromUrl = (url: string): string | null => {
     try {
-      // Supabase public URLs have format: https://[project].supabase.co/storage/v1/object/public/[bucket]/[filename]
       const urlParts = url.split("/")
       const bucketIndex = urlParts.findIndex((part) => part === bucketName)
       if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {

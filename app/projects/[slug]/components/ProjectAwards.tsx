@@ -1,4 +1,4 @@
-import { Database, Tables } from "@/database.types"
+import type { AwardType, AwardView, CategoryType } from "@/lib/spotlight-types"
 
 import {
   Tooltip,
@@ -8,15 +8,13 @@ import {
 } from "@/components/ui/tooltip"
 
 interface ProjectAwardsProps {
-  awards?: Tables<"award">[]
-  category?: Database["public"]["Enums"]["category"]
+  awards?: AwardView[]
+  category?: CategoryType
 }
 
 // Helper function to get category display name
-function getCategoryDisplayName(
-  category?: Database["public"]["Enums"]["category"]
-): string {
-  const categoryMap: Record<Database["public"]["Enums"]["category"], string> = {
+function getCategoryDisplayName(category?: CategoryType): string {
+  const categoryMap: Record<CategoryType, string> = {
     websites: "Site",
     design: "Design",
     films: "Film",
@@ -28,10 +26,7 @@ function getCategoryDisplayName(
 }
 
 // Helper function to get award label based on category
-function getAwardLabel(
-  awardType: Database["public"]["Enums"]["awards"],
-  category?: Database["public"]["Enums"]["category"]
-): string {
+function getAwardLabel(awardType: AwardType, category?: CategoryType): string {
   const categoryName = getCategoryDisplayName(category)
 
   switch (awardType) {
@@ -47,10 +42,7 @@ function getAwardLabel(
 }
 
 // Helper function to format the awarded date for tooltip
-function formatAwardedDate(
-  awardedAt: string,
-  awardType: Database["public"]["Enums"]["awards"]
-): string {
+function formatAwardedDate(awardedAt: string, awardType: AwardType): string {
   const date = new Date(awardedAt)
 
   switch (awardType) {

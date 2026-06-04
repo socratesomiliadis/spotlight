@@ -1,17 +1,18 @@
 "use client"
 
-import { useState, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Tables } from "@/database.types"
+import { api } from "@/convex/_generated/api"
+import { useMutation } from "convex/react"
 
-import { toggleFollowAction } from "@/lib/supabase/follow-actions"
+import type { ProfileView } from "@/lib/spotlight-types"
 import CustomButton from "@/components/custom-button"
 
 interface ProfileHeaderProps {
-  user: Tables<"profile">
+  user: ProfileView
   isOwnProfile: boolean
-  initialFollowStatus: boolean
+  isFollowing: boolean
+  profileUsername: string
 }
 
 function removeHttpsAndTrailingSlash(url: string) {
@@ -21,21 +22,44 @@ function removeHttpsAndTrailingSlash(url: string) {
 export default function ProfileHeader({
   user,
   isOwnProfile,
-  initialFollowStatus,
+  isFollowing,
+  profileUsername,
 }: ProfileHeaderProps) {
-  const [isFollowing, setIsFollowing] = useState(initialFollowStatus)
-  const [isPending, startTransition] = useTransition()
+  const toggleFollow = useMutation(api.follows.toggle).withOptimisticUpdate(
+    (localStore, args) => {
+      const profilePage = localStore.getQuery(api.profiles.getProfilePage, {
+        username: profileUsername,
+      })
+
+      if (profilePage) {
+        localStore.setQuery(
+          api.profiles.getProfilePage,
+          { username: profileUsername },
+          {
+            ...profilePage,
+            isFollowing: !profilePage.isFollowing,
+          }
+        )
+      }
+
+      const followStatus = localStore.getQuery(api.follows.getStatus, {
+        targetAuthUserId: args.targetAuthUserId,
+      })
+
+      if (followStatus) {
+        localStore.setQuery(
+          api.follows.getStatus,
+          { targetAuthUserId: args.targetAuthUserId },
+          { isFollowing: !followStatus.isFollowing }
+        )
+      }
+    }
+  )
   const displayName = user.display_name || user.username || "User"
 
   const handleFollowClick = () => {
-    startTransition(async () => {
-      try {
-        const result = await toggleFollowAction(user.user_id)
-        setIsFollowing(result.isFollowing)
-      } catch (error) {
-        console.error("Error toggling follow status:", error)
-        // Optionally show an error message to the user
-      }
+    void toggleFollow({ targetAuthUserId: user.user_id }).catch((error) => {
+      console.error("Error toggling follow status:", error)
     })
   }
 
@@ -97,8 +121,6 @@ export default function ProfileHeader({
             <CustomButton
               text={isFollowing ? "Unfollow" : "Follow"}
               onClick={handleFollowClick}
-              disabled={isPending}
-              isLoading={isPending}
               className={
                 isFollowing ? "bg-gray-100 text-gray-700 border-gray-300" : ""
               }

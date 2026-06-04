@@ -3,8 +3,9 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useClerk } from "@clerk/nextjs"
 
+import { authClient } from "@/lib/auth-client"
+import type { ProfileView } from "@/lib/spotlight-types"
 import { cn } from "@/lib/utils"
 import {
   Popover,
@@ -12,11 +13,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
+export default function UserBtn({ user }: { user: ProfileView }) {
   const [isOpen, setIsOpen] = useState(false)
-  const { user, signOut } = useClerk()
 
-  const isStaff = user?.publicMetadata.role === "staff"
+  const isStaff = user.role === "staff" || user.role === "admin"
+  const displayName = user.display_name || user.username
+  const initials = displayName
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -24,22 +31,19 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
         <button
           className={cn(
             "rounded-lg text-sm size-10 lg:size-[2.7rem] bg-[#1E1E1E] text-[#989898] flex items-center justify-center leading-none font-bold",
-            !!avatarUrl && "bg-transparent"
+            !!user.avatar_url && "bg-transparent"
           )}
         >
-          {avatarUrl ? (
+          {user.avatar_url ? (
             <Image
-              src={avatarUrl}
+              src={user.avatar_url}
               width={128}
               height={128}
               alt="User Avatar"
               className="w-full h-full object-cover rounded-lg"
             />
           ) : (
-            <span>
-              {user?.firstName?.charAt(0)}
-              {user?.lastName?.charAt(0)}
-            </span>
+            <span>{initials}</span>
           )}
         </button>
       </PopoverTrigger>
@@ -61,14 +65,14 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
         <Link
           onClick={() => setIsOpen(false)}
           className="py-2 pl-4 hover:bg-[#72727280]/10"
-          href={`/${user?.username}`}
+          href={`/${user.username}`}
         >
           Profile
         </Link>
         <Link
           onClick={() => setIsOpen(false)}
           className="py-2 pl-4 hover:bg-[#72727280]/10"
-          href={`/${user?.username}/projects`}
+          href={`/${user.username}/projects`}
         >
           Projects
         </Link>
@@ -104,7 +108,13 @@ export default function UserBtn({ avatarUrl }: { avatarUrl: string }) {
           className="w-full text-left hover:bg-[#72727280]/10 pl-4 py-3 text-[#FA5A59]"
           onClick={() => {
             setIsOpen(false)
-            signOut({ redirectUrl: "/" })
+            authClient.signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  window.location.href = "/"
+                },
+              },
+            })
           }}
         >
           Logout

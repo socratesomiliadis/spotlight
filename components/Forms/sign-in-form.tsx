@@ -1,40 +1,39 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useSignIn } from "@clerk/nextjs"
+import { api } from "@/convex/_generated/api"
 import { Form, Spinner } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useConvexAuth, useMutation } from "convex/react"
 import { motion } from "motion/react"
 import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 import { Eye, EyeClosed } from "../icons"
 import MyInput from "./components/Input"
 
-// Define validation schema with Zod
 const signInSchema = z.object({
-  emailOrUsername: z
-    .string()
-    .min(1, "Email or username is required")
-    .refine(
-      (value) => !value.includes(" "),
-      "Email or username cannot contain spaces"
-    ),
+  emailOrUsername: z.string().min(1, "Email or username is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
 
 type SignInFormValues = z.infer<typeof signInSchema>
 
 export default function SignInForm() {
-  const [auth, setAuth] = useQueryState("auth")
+  const [, setAuth] = useQueryState("auth")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { isLoaded, signIn, setActive } = useSignIn()
   const [isLoading, setIsLoading] = useState(false)
+  const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
+  const postSignInStarted = useRef(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
+  const ensureCurrent = useMutation(api.profiles.ensureCurrent)
+  const claimCurrent = useMutation(api.profiles.claimCurrent)
   const router = useRouter()
 
   const {
@@ -43,41 +42,66 @@ export default function SignInForm() {
     formState: { errors },
   } = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
-    defaultValues: {
-      emailOrUsername: "",
-      password: "",
-    },
+    defaultValues: { emailOrUsername: "", password: "" },
   })
 
-  const onSubmit = async (data: SignInFormValues) => {
-    if (!isLoaded) return
-    setIsLoading(true)
-    // Start the sign-in process using the email and password provided
-    try {
-      const signInAttempt = await signIn.create({
-        identifier: data.emailOrUsername,
-        password: data.password,
-      })
+  useEffect(() => {
+    if (
+      !isAwaitingConvexAuth ||
+      isAuthLoading ||
+      !isAuthenticated ||
+      postSignInStarted.current
+    ) {
+      return
+    }
 
-      // If sign-in process is complete, set the created session as active
-      // and redirect the user
-      if (signInAttempt.status === "complete") {
-        setIsLoading(false)
-        await setActive({ session: signInAttempt.createdSessionId })
+    postSignInStarted.current = true
+    void (async () => {
+      try {
+        await ensureCurrent({})
+        await claimCurrent()
+        setAuth(null)
         router.refresh()
-        // setAuth(null);
-      } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
+      } catch (err) {
+        postSignInStarted.current = false
+        setIsAwaitingConvexAuth(false)
+        setError(err instanceof Error ? err.message : "Sign in failed")
+      } finally {
         setIsLoading(false)
-        console.error(JSON.stringify(signInAttempt, null, 2))
       }
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
+    })()
+  }, [
+    claimCurrent,
+    ensureCurrent,
+    isAuthenticated,
+    isAuthLoading,
+    isAwaitingConvexAuth,
+    router,
+    setAuth,
+  ])
+
+  const onSubmit = async (data: SignInFormValues) => {
+    setIsLoading(true)
+    postSignInStarted.current = false
+    setIsAwaitingConvexAuth(false)
+    setError(null)
+    try {
+      const payload = { password: data.password, callbackURL: "/" }
+      const response = data.emailOrUsername.includes("@")
+        ? await (authClient as any).signIn.email({
+            ...payload,
+            email: data.emailOrUsername,
+          })
+        : await (authClient as any).signIn.username({
+            ...payload,
+            username: data.emailOrUsername,
+          })
+      if (response?.error) throw new Error(response.error.message)
+      await authClient.getSession({ fetchOptions: { throw: false } })
+      setIsAwaitingConvexAuth(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign in failed")
       setIsLoading(false)
-      console.error(JSON.stringify(err, null, 2))
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
     }
   }
 
@@ -98,7 +122,6 @@ export default function SignInForm() {
           errorMessage={errors.emailOrUsername?.message}
           autoComplete="username"
         />
-
         <MyInput
           label="Password"
           type={showPassword ? "text" : "password"}
@@ -127,10 +150,9 @@ export default function SignInForm() {
             Reset password
           </button>
         </p>
-
-        <div id="clerk-captcha" />
         <button
           type="submit"
+          disabled={isLoading}
           className="w-full mt-2 lg:mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"
         >
           {isLoading && (

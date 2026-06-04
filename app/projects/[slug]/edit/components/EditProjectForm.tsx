@@ -2,14 +2,15 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { api } from "@/convex/_generated/api"
 import { Form, SelectItem } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { arrayMoveImmutable } from "array-move"
+import { useMutation } from "convex/react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-import { updateProjectAdmin } from "@/lib/supabase/actions/projects"
 import tagsJSON from "@/lib/tags.json"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
@@ -45,6 +46,13 @@ export default function EditProjectForm({
   const [elementImages, setElementImages] = useState<string[]>(
     project.elements_url || []
   )
+  const [elementStorageIds, setElementStorageIds] = useState<
+    string[] | null | undefined
+  >(project.element_storage_ids)
+  const [mainImageStorageId, setMainImageStorageId] = useState<string | null>()
+  const [bannerStorageId, setBannerStorageId] = useState<string | null>()
+  const [previewStorageId, setPreviewStorageId] = useState<string | null>()
+  const updateProject = useMutation(api.projects.update)
   const router = useRouter()
 
   const {
@@ -79,23 +87,16 @@ export default function EditProjectForm({
 
   async function handleUpdateProject(data: ProjectFormValues) {
     try {
-      // Generate slug from title if title changed
-      const slug = data.title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .substring(0, 50)
-
-      const updatedProject = await updateProjectAdmin(project.id, {
+      const updatedProject = await updateProject({
+        projectId: project.id as any,
         title: data.title,
         tags: data.tags,
-        main_img_url: data.main_img_url,
-        preview_url: data.preview_url || null,
-        banner_url: data.banner_url,
-        elements_url: elementImages.length > 0 ? elementImages : null,
-        slug: slug,
+        mainImageStorageId: mainImageStorageId as any,
+        previewStorageId: previewStorageId as any,
+        bannerStorageId: bannerStorageId as any,
+        elementStorageIds: elementStorageIds as any,
         category: data.category,
-        live_url: data.live_url || null,
+        liveUrl: data.live_url || undefined,
       })
 
       // Redirect to the updated project page after successful update
@@ -119,17 +120,23 @@ export default function EditProjectForm({
     })
   }
 
-  const addElementImage = (url: string) => {
+  const addElementImage = (url: string, storageId?: string) => {
     setElementImages((prev) => {
       const newElements = [...prev, url]
       setValue("elements_url", newElements)
       return newElements
     })
+    if (storageId) {
+      setElementStorageIds((prev) => [...(prev || []), storageId])
+    }
   }
 
   const removeElementImage = (index: number) => {
     const newElements = elementImages.filter((_, i) => i !== index)
     setElementImages(newElements)
+    setElementStorageIds((ids) =>
+      ids ? ids.filter((_, i) => i !== index) : null
+    )
     setValue("elements_url", newElements)
   }
 
@@ -143,8 +150,14 @@ export default function EditProjectForm({
         <ProjectImageUpload
           label="Project Banner *"
           currentImages={bannerUrl ? [bannerUrl] : []}
-          onImageAdded={(url) => setValue("banner_url", url)}
-          onImageRemoved={() => setValue("banner_url", "")}
+          onImageAdded={(url, storageId) => {
+            setValue("banner_url", url)
+            setBannerStorageId(storageId)
+          }}
+          onImageRemoved={() => {
+            setValue("banner_url", "")
+            setBannerStorageId(null)
+          }}
           bucketName="project-images"
           folder="banners"
           aspectRatio="aspect-3/1"
@@ -225,8 +238,14 @@ export default function EditProjectForm({
             <ProjectImageUpload
               label="Main Project Image *"
               currentImages={mainImageUrl ? [mainImageUrl] : []}
-              onImageAdded={(url) => setValue("main_img_url", url)}
-              onImageRemoved={() => setValue("main_img_url", "")}
+              onImageAdded={(url, storageId) => {
+                setValue("main_img_url", url)
+                setMainImageStorageId(storageId)
+              }}
+              onImageRemoved={() => {
+                setValue("main_img_url", "")
+                setMainImageStorageId(null)
+              }}
               bucketName="project-images"
               folder="main"
               aspectRatio="aspect-video"
@@ -251,8 +270,14 @@ export default function EditProjectForm({
               <ProjectImageUpload
                 label="Preview Video *"
                 currentImages={previewUrl ? [previewUrl] : []}
-                onImageAdded={(url) => setValue("preview_url", url)}
-                onImageRemoved={() => setValue("preview_url", "")}
+                onImageAdded={(url, storageId) => {
+                  setValue("preview_url", url)
+                  setPreviewStorageId(storageId)
+                }}
+                onImageRemoved={() => {
+                  setValue("preview_url", "")
+                  setPreviewStorageId(null)
+                }}
                 bucketName="project-images"
                 folder="previews"
                 aspectRatio="aspect-video"
@@ -304,6 +329,9 @@ export default function EditProjectForm({
             onImagesReordered={(oldIndex: number, newIndex: number) => {
               setElementImages((array) =>
                 arrayMoveImmutable(array, oldIndex, newIndex)
+              )
+              setElementStorageIds((array) =>
+                array ? arrayMoveImmutable(array, oldIndex, newIndex) : array
               )
               setValue("elements_url", elementImages)
             }}

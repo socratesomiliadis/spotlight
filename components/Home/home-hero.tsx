@@ -1,14 +1,15 @@
 import { Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Tables } from "@/database.types"
+
+import type { ProjectCardView } from "@/lib/spotlight-types"
 
 import ProjectCard from "./project-card"
 
 export default function HomeHero({
   project,
 }: {
-  project: (Tables<"project"> & { user: Tables<"profile"> }) | null
+  project: ProjectCardView | null
 }) {
   return (
     <div className="w-full p-3 lg:p-4 relative flex items-center justify-center">
@@ -16,11 +17,11 @@ export default function HomeHero({
         {project && (
           <div className="absolute flex flex-col items-center gap-3 lg:gap-5 -mt-16 lg:-mt-20">
             <Link
-              href={`/${project?.user.username}`}
+              href={`/${project.user?.username || ""}`}
               className="flex flex-col items-center gap-1 mt-6"
             >
               <Image
-                src={project?.user.avatar_url || ""}
+                src={project.user?.avatar_url || ""}
                 alt="User Avatar"
                 width={40}
                 height={40}
@@ -28,14 +29,13 @@ export default function HomeHero({
               />
               <p className="text-sm text-white">
                 By{" "}
-                <span className="underline">{project?.user.display_name}</span>
+                <span className="underline">
+                  {project.user?.display_name || project.user?.username}
+                </span>
               </p>
             </Link>
 
-            <ProjectCard
-              project={project as Tables<"project">}
-              className="w-[70%] lg:w-[20vw]"
-            />
+            <ProjectCard project={project} className="w-[70%] lg:w-[20vw]" />
           </div>
         )}
       </Suspense>

@@ -1,59 +1,85 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useSignUp } from "@clerk/nextjs"
+import { api } from "@/convex/_generated/api"
 import { Form, InputOtp, Spinner } from "@heroui/react"
+import { useConvexAuth, useMutation } from "convex/react"
 import { motion } from "motion/react"
 import { useQueryState } from "nuqs"
 
+import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
-export default function SignUpVerify() {
-  const { isLoaded, signUp, setActive } = useSignUp()
+export default function SignUpVerify({
+  pendingUser,
+}: {
+  pendingUser: { email: string; username: string; displayName: string }
+}) {
   const [code, setCode] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [auth, setAuth] = useQueryState("auth")
+  const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
+  const ensureCurrentStarted = useRef(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
+  const [, setAuth] = useQueryState("auth")
+  const ensureCurrent = useMutation(api.profiles.ensureCurrent)
   const router = useRouter()
+
+  useEffect(() => {
+    if (
+      !isAwaitingConvexAuth ||
+      isAuthLoading ||
+      !isAuthenticated ||
+      ensureCurrentStarted.current
+    ) {
+      return
+    }
+
+    ensureCurrentStarted.current = true
+    void (async () => {
+      try {
+        await ensureCurrent({
+          username: pendingUser.username,
+          displayName: pendingUser.displayName,
+        })
+        setAuth(null)
+        router.push("/welcome")
+      } catch (err) {
+        ensureCurrentStarted.current = false
+        setIsAwaitingConvexAuth(false)
+        setError(err instanceof Error ? err.message : "Verification failed")
+      } finally {
+        setIsLoading(false)
+      }
+    })()
+  }, [
+    ensureCurrent,
+    isAuthenticated,
+    isAuthLoading,
+    isAwaitingConvexAuth,
+    pendingUser.displayName,
+    pendingUser.username,
+    router,
+    setAuth,
+  ])
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!isLoaded) return
     router.prefetch("/welcome")
     setIsLoading(true)
+    ensureCurrentStarted.current = false
+    setIsAwaitingConvexAuth(false)
+    setError(null)
 
     try {
-      // Use the code the user provided to attempt verification
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code: code || "",
+      const response = await (authClient as any).emailOtp.verifyEmail({
+        email: pendingUser.email,
+        otp: code || "",
       })
-
-      // If verification was completed, set the session to active
-      // and redirect the user
-      if (signUpAttempt.status === "complete") {
-        await setActive({
-          session: signUpAttempt.createdSessionId,
-          navigate: async ({ session }) => {
-            if (session?.currentTask) {
-              // Check for session tasks and navigate to custom UI to help users resolve them
-              // See https://clerk.com/docs/guides/development/custom-flows/overview#session-tasks
-              console.log(session?.currentTask)
-            }
-
-            router.push("/welcome")
-          },
-        })
-        setIsLoading(false)
-      } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
-        console.error(JSON.stringify(signUpAttempt, null, 2))
-        setIsLoading(false)
-      }
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error("Error:", JSON.stringify(err, null, 2))
+      if (response?.error) throw new Error(response.error.message)
+      await authClient.getSession({ fetchOptions: { throw: false } })
+      setIsAwaitingConvexAuth(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Verification failed")
       setIsLoading(false)
     }
   }
@@ -72,26 +98,6 @@ export default function SignUpVerify() {
           unleash your dreams.
         </h1>
         <InputOtp
-          classNames={{
-            segmentWrapper: "gap-x-0",
-            segment: [
-              "relative",
-              "h-10",
-              "w-10",
-              "border-y",
-              "border-r",
-              "first:rounded-l-md",
-              "first:border-l",
-              "last:rounded-r-md",
-              "border-default-200",
-              "bg-transparent",
-              "data-[active=true]:border",
-              "data-[active=true]:z-20",
-              "data-[active=true]:ring-2",
-              "data-[active=true]:ring-offset-2",
-              "data-[active=true]:ring-black",
-            ],
-          }}
           description="Enter the 6 digit code sent to your email"
           length={6}
           value={code || ""}
@@ -100,6 +106,7 @@ export default function SignUpVerify() {
         />
         <button
           type="submit"
+          disabled={isLoading}
           className="w-full mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"
         >
           {isLoading && (

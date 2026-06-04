@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation"
-import { auth } from "@clerk/nextjs/server"
 
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import Lanyard from "@/components/Lanyard/Lanyard"
 
 export default async function Welcome() {
-  const { userId } = await auth()
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
-  if (!userId) {
+  if (!user) {
     redirect("/")
   }
 

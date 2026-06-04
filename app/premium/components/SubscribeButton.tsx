@@ -2,18 +2,18 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@clerk/nextjs"
 
+import { authClient } from "@/lib/auth-client"
 import CustomButton from "@/components/custom-button"
 
 export function SubscribeButton() {
   const [isLoading, setIsLoading] = useState(false)
-  const { isSignedIn } = useAuth()
+  const { data: session } = authClient.useSession()
   const router = useRouter()
 
   const handleSubscribe = async () => {
-    if (!isSignedIn) {
-      router.push("/sign-in")
+    if (!session) {
+      router.push("/?auth=sign-in")
       return
     }
 

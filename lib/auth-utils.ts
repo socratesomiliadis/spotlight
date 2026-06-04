@@ -1,20 +1,20 @@
-import { auth } from "@clerk/nextjs/server"
+import { api } from "@/convex/_generated/api"
 
-import { isUserPremium } from "./supabase/actions/subscriptions"
+import { fetchAuthQuery } from "./auth-server"
 
 export async function requireAuth() {
-  const { userId } = await auth()
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
-  if (!userId) {
+  if (!user) {
     throw new Error("Authentication required")
   }
 
-  return userId
+  return user.user_id
 }
 
 export async function requirePremium() {
   const userId = await requireAuth()
-  const isPremium = await isUserPremium(userId)
+  const isPremium = await fetchAuthQuery(api.subscriptions.isCurrentPremium)
 
   if (!isPremium) {
     throw new Error("Premium subscription required")
@@ -24,13 +24,13 @@ export async function requirePremium() {
 }
 
 export async function getCurrentUserPremiumStatus() {
-  const { userId } = await auth()
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
-  if (!userId) {
+  if (!user) {
     return { isAuthenticated: false, isPremium: false }
   }
 
-  const isPremium = await isUserPremium(userId)
+  const isPremium = await fetchAuthQuery(api.subscriptions.isCurrentPremium)
 
   return { isAuthenticated: true, isPremium }
 }

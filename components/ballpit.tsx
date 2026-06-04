@@ -232,12 +232,20 @@ class X {
 
   #onIntersection(entries: IntersectionObserverEntry[]) {
     this.#isAnimating = entries[0].isIntersecting
-    this.#isAnimating ? this.#startAnimation() : this.#stopAnimation()
+    if (this.#isAnimating) {
+      this.#startAnimation()
+    } else {
+      this.#stopAnimation()
+    }
   }
 
   #onVisibilityChange() {
     if (this.#isAnimating) {
-      document.hidden ? this.#stopAnimation() : this.#startAnimation()
+      if (document.hidden) {
+        this.#stopAnimation()
+      } else {
+        this.#startAnimation()
+      }
     }
   }
 
@@ -464,7 +472,6 @@ class Y extends MeshPhysicalMaterial {
 
   constructor(params: any) {
     super(params)
-    //@ts-expect-error test msg
     this.defines = { USE_UV: "" }
     this.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.uniforms)
@@ -954,7 +961,6 @@ const Ballpit: React.FC<BallpitProps> = ({
         spheresInstanceRef.current.dispose()
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return <canvas className={`${className} w-full h-full`} ref={canvasRef} />

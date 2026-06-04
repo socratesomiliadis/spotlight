@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 
-import { getProfile } from "@/lib/supabase/actions/profile"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
 import ClaimAccountForm from "./components/ClaimAccountForm"
@@ -13,12 +14,7 @@ export default async function ClaimPage({ params }: ClaimPageProps) {
   const { username } = await params
 
   // Get the unclaimed user profile
-  let user
-  try {
-    user = await getProfile(username)
-  } catch (error) {
-    notFound()
-  }
+  const user = await fetchAuthQuery(api.profiles.getByUsername, { username })
 
   if (!user || !user.is_unclaimed) {
     notFound()

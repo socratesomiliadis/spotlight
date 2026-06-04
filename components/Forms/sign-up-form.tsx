@@ -1,9 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { useSignUp } from "@clerk/nextjs"
 import { Form, Spinner } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { motion } from "motion/react"
@@ -11,13 +8,13 @@ import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 import { Eye, EyeClosed } from "../icons"
 import MyInput from "./components/Input"
 import SignUpVerify from "./sign-up-verify"
 
-// Define validation schema with Zod
 const signUpSchema = z.object({
   displayName: z.string().min(2, "Display name must be at least 2 characters"),
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -28,12 +25,11 @@ const signUpSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpSchema>
 
 export default function SignUpForm() {
-  const [auth, setAuth] = useQueryState("auth")
+  const [, setAuth] = useQueryState("auth")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { isLoaded, signUp, setActive } = useSignUp()
   const [isLoading, setIsLoading] = useState(false)
-  const [verifying, setVerifying] = useState(false)
+  const [pendingUser, setPendingUser] = useState<SignUpFormValues | null>(null)
 
   const {
     register,
@@ -41,48 +37,31 @@ export default function SignUpForm() {
     formState: { errors },
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      displayName: "",
-      username: "",
-      email: "",
-      password: "",
-    },
+    defaultValues: { displayName: "", username: "", email: "", password: "" },
   })
 
   const onSubmit = async (data: SignUpFormValues) => {
-    if (!isLoaded) return
     setIsLoading(true)
-    const isFullName = data.displayName.includes(" ")
-    const firstName = isFullName ? data.displayName.split(" ")[0] : ""
-    const lastName = isFullName ? data.displayName.split(" ")[1] : ""
+    setError(null)
     try {
-      await signUp.create({
-        firstName: isFullName ? firstName : data.displayName,
-        lastName: isFullName ? lastName : "",
+      const response = await (authClient as any).signUp.email({
+        name: data.displayName,
         username: data.username,
-        emailAddress: data.email,
+        email: data.email,
         password: data.password,
+        callbackURL: "/welcome",
       })
-
-      // Handle successful sign-up (e.g., redirect)
-      await signUp.prepareEmailAddressVerification({
-        strategy: "email_code",
-      })
-
-      setVerifying(true)
-    } catch (error) {
-      console.log("Error signing up:", error)
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
-      )
-      // Handle error
+      if (response?.error) throw new Error(response.error.message)
+      setPendingUser(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign up failed")
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (verifying) {
-    return <SignUpVerify />
+  if (pendingUser) {
+    return <SignUpVerify pendingUser={pendingUser} />
   }
 
   return (
@@ -136,8 +115,6 @@ export default function SignUpForm() {
             </button>
           }
         />
-
-        <div id="clerk-captcha" />
         <button
           type="submit"
           className="w-full mt-4 py-3 px-4 bg-black text-white rounded-xl flex items-center justify-center"

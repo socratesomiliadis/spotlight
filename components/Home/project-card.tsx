@@ -3,34 +3,45 @@
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Tables } from "@/database.types"
 import { useMediaQuery } from "usehooks-ts"
 
+import type { ProjectCardView } from "@/lib/spotlight-types"
 import { cn } from "@/lib/utils"
 
 export default function ProjectCard({
   project,
   className,
 }: {
-  project: Tables<"project">
+  project: ProjectCardView
   className?: string
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const isMobile = useMediaQuery("(max-width: 1023px)")
-  const hasPreview = project.preview_url !== null
+  const hasPreview = !!project.preview_url
   const [isPreviewing, setIsPreviewing] = useState(false)
+  const shouldUseVideo = !isMobile && hasPreview
+  const shouldLoadVideo = shouldUseVideo && isPreviewing
 
   useEffect(() => {
-    if (isMobile || !hasPreview) return
+    const video = videoRef.current
+    if (!video) return
 
-    if (videoRef.current && isPreviewing) {
-      videoRef.current.currentTime = 0
-      videoRef.current.play()
-    } else {
-      videoRef.current?.pause()
-      videoRef.current?.load()
+    if (!shouldLoadVideo) {
+      video.pause()
+      video.removeAttribute("src")
+      video.load()
+      return
     }
-  }, [isPreviewing, isMobile, hasPreview])
+
+    video.currentTime = 0
+    void video.play().catch((error: unknown) => {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return
+      }
+
+      console.error("Project preview playback failed:", error)
+    })
+  }, [shouldLoadVideo])
 
   return (
     <Link
@@ -43,18 +54,21 @@ export default function ProjectCard({
         className
       )}
     >
-      <video
-        ref={videoRef}
-        muted
-        loop
-        playsInline
-        preload="none"
-        poster={project.main_img_url}
-        className="w-full w-max-none aspect-video object-cover rounded-xl"
-      >
-        {/* @ts-expect-error */}
-        <source src={project.preview_url || null} type="video/mp4" />
-      </video>
+      {shouldUseVideo && (
+        <video
+          ref={videoRef}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={project.main_img_url}
+          className="absolute inset-0 z-10 w-full w-max-none aspect-video object-cover rounded-xl lg:rounded-2xl"
+        >
+          {shouldLoadVideo && (
+            <source src={project.preview_url!} type="video/mp4" />
+          )}
+        </video>
+      )}
 
       <Image
         src={project.main_img_url}

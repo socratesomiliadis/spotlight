@@ -32,6 +32,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# migration exports containing sensitive auth data
+exported_users.csv
+urls.json
+convex-asset-manifest.json
+convex-asset-manifest-failures.json
+convex-import-results.json
+convex-clerk-import-results.json
 
 # vercel
 .vercel

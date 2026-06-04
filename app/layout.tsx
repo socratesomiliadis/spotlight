@@ -3,16 +3,15 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
 import localFont from "next/font/local"
-import { ProjectVisitProvider } from "@/contexts/project-visit-context"
-import { ClerkProvider } from "@clerk/nextjs"
-import { HeroUIProvider } from "@heroui/react"
-import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { Toaster } from "sonner"
 
+import { getToken } from "@/lib/auth-server"
 import BottomNav from "@/components/BottomNav"
 import Header from "@/components/Header"
 import CloseCursor from "@/components/Home/close-cursor"
 import MainLayout from "@/components/main-layout"
+
+import Providers from "./providers"
 
 const helveticaNow = localFont({
   src: "../fonts/HelveticaNowVar.woff2",
@@ -53,38 +52,28 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const token = await getToken()
+
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          fontFamily: "var(--font-helvetica-now)",
-        },
-      }}
-    >
-      <html lang="en">
-        <body
-          className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-screen`}
-        >
-          <NuqsAdapter>
-            <HeroUIProvider>
-              <ProjectVisitProvider>
-                <Header />
-                <MainLayout>
-                  <Toaster richColors />
-                  {children}
-                  <CloseCursor />
-                </MainLayout>
-                <BottomNav />
-              </ProjectVisitProvider>
-            </HeroUIProvider>
-          </NuqsAdapter>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body
+        className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-screen`}
+      >
+        <Providers initialToken={token}>
+          <Header />
+          <MainLayout>
+            <Toaster richColors />
+            {children}
+            <CloseCursor />
+          </MainLayout>
+          <BottomNav />
+        </Providers>
+      </body>
+    </html>
   )
 }

@@ -1,16 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useUser } from "@clerk/nextjs"
+import { useDeferredValue, useMemo, useState } from "react"
+import { api } from "@/convex/_generated/api"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQuery } from "convex/react"
 import { AnimatePresence, motion } from "motion/react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-import { createUser } from "@/lib/supabase/actions/clerk"
-import { getUnclaimedUsers } from "@/lib/supabase/actions/profile"
-import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 import ImageUpload from "@/app/[username]/edit/components/ImageUpload"
 
@@ -42,13 +40,12 @@ export default function UnclaimedUserSelector({
   selectedUserId,
 }: UnclaimedUserSelectorProps) {
   const [mode, setMode] = useState<"select" | "create">("select")
-  const [unclaimedUsers, setUnclaimedUsers] = useState<UnclaimedUser[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [avatarStorageId, setAvatarStorageId] = useState<string>()
   const [isCreating, setIsCreating] = useState(false)
-  const [loadingUsers, setLoadingUsers] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [hasSearched, setHasSearched] = useState(false)
-  const { user } = useUser()
+  const allUnclaimedUsers = useQuery(api.profiles.getUnclaimed)
+  const createUser = useMutation(api.admin.createUnclaimedUser)
+  const deferredSearchQuery = useDeferredValue(searchQuery)
 
   const {
     register,
@@ -66,47 +63,20 @@ export default function UnclaimedUserSelector({
 
   // Watch the avatar URL to update preview
   const avatarUrl = watch("avatar_url")
+  const unclaimedUsers = (allUnclaimedUsers || []) as UnclaimedUser[]
+  const normalizedSearchQuery = deferredSearchQuery.trim().toLowerCase()
+  const hasSearched = searchQuery.trim().length > 0
+  const filteredUnclaimedUsers = useMemo(() => {
+    if (!normalizedSearchQuery) return []
 
-  const searchUnclaimedUsers = async (query: string) => {
-    if (!query.trim()) {
-      setUnclaimedUsers([])
-      setHasSearched(false)
-      return
-    }
-
-    try {
-      setLoadingUsers(true)
-      setHasSearched(true)
-      const users = await getUnclaimedUsers()
-      const filtered = (users || []).filter((user) => {
-        const searchLower = query.toLowerCase()
-        return (
-          user.username.toLowerCase().includes(searchLower) ||
-          user.display_name?.toLowerCase().includes(searchLower) ||
-          user.user_id.toLowerCase().includes(searchLower)
-        )
-      })
-      setUnclaimedUsers(filtered)
-    } catch (error) {
-      console.error("Error searching unclaimed users:", error)
-      toast.error("Failed to search unclaimed users")
-    } finally {
-      setLoadingUsers(false)
-    }
-  }
-
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      searchUnclaimedUsers(searchQuery)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  if (!user || !user.id) {
-    return <div>Loading...</div>
-  }
+    return unclaimedUsers.filter(
+      (user) =>
+        user.username.toLowerCase().includes(normalizedSearchQuery) ||
+        user.display_name?.toLowerCase().includes(normalizedSearchQuery) ||
+        user.user_id.toLowerCase().includes(normalizedSearchQuery)
+    )
+  }, [normalizedSearchQuery, unclaimedUsers])
+  const loadingUsers = allUnclaimedUsers === undefined
 
   const handleCreateUser = async (data: NewUserFormValues) => {
     try {
@@ -119,26 +89,17 @@ export default function UnclaimedUserSelector({
       const firstName = isFullName ? data.display_name.split(" ")[0] : ""
       const lastName = isFullName ? data.display_name.split(" ")[1] : ""
 
-      // Create the user in Clerk
+      // Create the auth user and app profile.
       const newUser = await createUser({
         email: data.email,
-        first_name: isFullName ? firstName : data.display_name,
-        last_name: isFullName ? lastName : "",
+        firstName: isFullName ? firstName : data.display_name,
+        lastName: isFullName ? lastName : "",
         password: randomPassword,
         username: data.username,
-        avatar_url: data.avatar_url || "",
+        avatarUrl: data.avatar_url || "",
+        avatarStorageId: avatarStorageId as any,
       })
 
-      // Add the new user to the local list
-      const newUnclaimedUser: UnclaimedUser = {
-        user_id: newUser.id,
-        username: data.username,
-        avatar_url: data.avatar_url || newUser.imageUrl || null,
-        display_name: data.display_name,
-        is_unclaimed: true,
-      }
-
-      setUnclaimedUsers((prev) => [newUnclaimedUser, ...prev])
       onUserSelected(newUser.id)
 
       // Reset form and switch back to select mode
@@ -293,13 +254,13 @@ export default function UnclaimedUserSelector({
                   <div className="p-8 text-center text-gray-500">
                     Searching...
                   </div>
-                ) : unclaimedUsers.length === 0 ? (
+                ) : filteredUnclaimedUsers.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">
                     No unclaimed users found matching &quot;{searchQuery}&quot;
                   </div>
                 ) : (
                   <div className="grid gap-2 max-h-60 overflow-y-auto">
-                    {unclaimedUsers.map((user) => (
+                    {filteredUnclaimedUsers.map((user) => (
                       <button
                         key={user.user_id}
                         type="button"
@@ -372,16 +333,20 @@ export default function UnclaimedUserSelector({
                   <ImageUpload
                     label="Profile Picture"
                     currentImageUrl={avatarUrl}
-                    onImageUploaded={(url: string) =>
+                    onImageUploaded={(url: string, storageId?: string) => {
                       setValue("avatar_url", url)
-                    }
-                    onImageRemoved={() => setValue("avatar_url", "")}
+                      setAvatarStorageId(storageId)
+                    }}
+                    onImageRemoved={() => {
+                      setValue("avatar_url", "")
+                      setAvatarStorageId(undefined)
+                    }}
                     bucketName="unclaimed-profiles"
                     folder="avatars"
                     aspectRatio="aspect-square"
                     className="size-32 rounded-xl"
                     displayAreaClassName="rounded-xl"
-                    userId={user.id}
+                    userId="staff"
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-4 w-96">

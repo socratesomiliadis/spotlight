@@ -3,14 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { api } from "@/convex/_generated/api"
 import { Form, SelectItem } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { arrayMoveImmutable } from "array-move"
+import { useMutation } from "convex/react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-import { createProject } from "@/lib/supabase/actions/projects"
 import tagsJSON from "@/lib/tags.json"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
@@ -46,7 +47,12 @@ export default function NewProjectForm({
 }: NewProjectFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [elementImages, setElementImages] = useState<string[]>([])
+  const [elementStorageIds, setElementStorageIds] = useState<string[]>([])
+  const [mainImageStorageId, setMainImageStorageId] = useState<string>()
+  const [bannerStorageId, setBannerStorageId] = useState<string>()
+  const [previewStorageId, setPreviewStorageId] = useState<string>()
   const [selectedUserId, setSelectedUserId] = useState<string>("")
+  const createProject = useMutation(api.projects.create)
   const router = useRouter()
 
   const {
@@ -81,25 +87,16 @@ export default function NewProjectForm({
 
   async function insertProject(data: ProjectFormValues) {
     try {
-      // Generate slug from title
-      const slug = data.title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .substring(0, 50)
-
       const projectData = await createProject({
         title: data.title,
         tags: data.tags,
-        main_img_url: data.main_img_url,
-        // @ts-expect-error - preview_url is optional
-        preview_url: data.preview_url,
-        banner_url: data.banner_url,
-        elements_url: elementImages.length > 0 ? elementImages : null,
-        user_id: isStaff && selectedUserId ? selectedUserId : userId,
-        slug: slug,
+        mainImageStorageId: mainImageStorageId as any,
+        previewStorageId: previewStorageId as any,
+        bannerStorageId: bannerStorageId as any,
+        elementStorageIds: elementStorageIds as any,
+        ownerAuthUserId: isStaff && selectedUserId ? selectedUserId : userId,
         category: data.category,
-        live_url: data.live_url || null,
+        liveUrl: data.live_url || undefined,
       })
 
       // Redirect to the new project page after successful creation
@@ -128,17 +125,21 @@ export default function NewProjectForm({
     })
   }
 
-  const addElementImage = (url: string) => {
+  const addElementImage = (url: string, storageId?: string) => {
     setElementImages((prev) => {
       const newElements = [...prev, url]
       setValue("elements_url", newElements)
       return newElements
     })
+    if (storageId) {
+      setElementStorageIds((prev) => [...prev, storageId])
+    }
   }
 
   const removeElementImage = (index: number) => {
     const newElements = elementImages.filter((_, i) => i !== index)
     setElementImages(newElements)
+    setElementStorageIds((ids) => ids.filter((_, i) => i !== index))
     setValue("elements_url", newElements)
   }
 
@@ -152,7 +153,10 @@ export default function NewProjectForm({
         <ProjectImageUpload
           label="Project Banner *"
           currentImages={bannerUrl ? [bannerUrl] : []}
-          onImageAdded={(url) => setValue("banner_url", url)}
+          onImageAdded={(url, storageId) => {
+            setValue("banner_url", url)
+            setBannerStorageId(storageId)
+          }}
           onImageRemoved={() => setValue("banner_url", "")}
           bucketName="project-images"
           folder="banners"
@@ -246,7 +250,10 @@ export default function NewProjectForm({
             <ProjectImageUpload
               label="Main Project Image *"
               currentImages={mainImageUrl ? [mainImageUrl] : []}
-              onImageAdded={(url) => setValue("main_img_url", url)}
+              onImageAdded={(url, storageId) => {
+                setValue("main_img_url", url)
+                setMainImageStorageId(storageId)
+              }}
               onImageRemoved={() => setValue("main_img_url", "")}
               bucketName="project-images"
               folder="main"
@@ -283,7 +290,10 @@ export default function NewProjectForm({
               <ProjectImageUpload
                 label="Preview Video *"
                 currentImages={previewUrl ? [previewUrl] : []}
-                onImageAdded={(url) => setValue("preview_url", url)}
+                onImageAdded={(url, storageId) => {
+                  setValue("preview_url", url)
+                  setPreviewStorageId(storageId)
+                }}
                 onImageRemoved={() => setValue("preview_url", "")}
                 bucketName="project-images"
                 folder="previews"
@@ -335,6 +345,9 @@ export default function NewProjectForm({
             onImageRemoved={(url, index) => removeElementImage(index)}
             onImagesReordered={(oldIndex: number, newIndex: number) => {
               setElementImages((array) =>
+                arrayMoveImmutable(array, oldIndex, newIndex)
+              )
+              setElementStorageIds((array) =>
                 arrayMoveImmutable(array, oldIndex, newIndex)
               )
               setValue("elements_url", elementImages)

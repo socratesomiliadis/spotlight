@@ -1,5 +1,6 @@
-"use client";
-import { extendVariants, Input } from "@heroui/react";
+"use client"
+
+import { extendVariants, Input } from "@heroui/react"
 
 const MyInput = extendVariants(Input, {
   variants: {
@@ -69,6 +70,6 @@ const MyInput = extendVariants(Input, {
     color: "stone",
     textSize: "base",
   },
-});
+})
 
-export default MyInput;
+export default MyInput
