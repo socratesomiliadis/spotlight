@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { useLenis } from "lenis/react"
 import { useQueryState } from "nuqs"
 import { Drawer } from "vaul"
@@ -11,17 +11,29 @@ import SignUp from "@/components/AuthPages/sign-up"
 import ResetPassword from "./AuthPages/reset-password"
 import CustomButton from "./custom-button"
 
+const authTypes = ["sign-in", "sign-up", "reset-password"] as const
+
+type AuthType = (typeof authTypes)[number]
+
+function isAuthType(value: string | null): value is AuthType {
+  return authTypes.includes(value as AuthType)
+}
+
 export default function DrawerComp({ userExists }: { userExists: boolean }) {
-  const [isHovered, setIsHovered] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const ref = useRef<HTMLButtonElement>(null)
+  const [activeAuth, setActiveAuth] = useState<AuthType>("sign-in")
   const [auth, setAuth] = useQueryState("auth")
   const lenis = useLenis()
 
-  const authTypes = ["sign-in", "sign-up", "reset-password"]
+  const openAuthDrawer = (authType: AuthType) => {
+    setActiveAuth(authType)
+    setIsOpen(true)
+    void setAuth(authType)
+  }
 
   useEffect(() => {
-    if (authTypes?.includes(auth ?? "") && !userExists) {
+    if (isAuthType(auth) && !userExists) {
+      setActiveAuth(auth)
       setIsOpen(true)
     } else {
       setIsOpen(false)
@@ -43,34 +55,37 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open)
-        if (!open) setAuth(null)
+        if (!open) void setAuth(null)
       }}
     >
       <Drawer.Trigger asChild>
         {!userExists ? (
-          <CustomButton text="Sign In" onClick={() => setAuth("sign-in")} />
+          <CustomButton
+            text="Sign In"
+            onClick={() => openAuthDrawer("sign-in")}
+          />
         ) : null}
       </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Title className="sr-only">
-          {auth === "sign-in"
+          {activeAuth === "sign-in"
             ? "Sign In"
-            : auth === "sign-up"
+            : activeAuth === "sign-up"
               ? "Sign Up"
               : "Reset Password"}
         </Drawer.Title>
         <Drawer.Description className="sr-only">
-          {auth === "sign-in"
+          {activeAuth === "sign-in"
             ? "Sign In"
-            : auth === "sign-up"
+            : activeAuth === "sign-up"
               ? "Sign Up"
               : "Reset Password"}
         </Drawer.Description>
         <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100" />
         <Drawer.Content className="bg-white rounded-b-3xl w-screen lg:w-[56vw] h-fit fixed top-0 left-0 lg:left-[22%] outline-hidden z-101 transform-gpu">
-          {auth === "sign-in" ? (
+          {activeAuth === "sign-in" ? (
             <SignIn />
-          ) : auth === "sign-up" ? (
+          ) : activeAuth === "sign-up" ? (
             <SignUp />
           ) : (
             <ResetPassword />
