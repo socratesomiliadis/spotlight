@@ -1,20 +1,20 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { auth } from "@clerk/nextjs/server"
 
-import { isUserPremium } from "@/lib/supabase/actions/subscriptions"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import CustomButton from "@/components/custom-button"
 import PageWrapper from "@/components/page-wrapper"
 
 async function SuccessContent() {
-  const { userId } = await auth()
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
-  if (!userId) {
-    redirect("/sign-in")
+  if (!user) {
+    redirect("/?auth=sign-in")
   }
 
-  const isPremium = await isUserPremium(userId)
+  const isPremium = await fetchAuthQuery(api.subscriptions.isCurrentPremium)
 
   if (!isPremium) {
     redirect("/premium")

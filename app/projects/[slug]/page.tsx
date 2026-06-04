@@ -1,9 +1,9 @@
 import { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { currentUser } from "@clerk/nextjs/server"
 
-import { getProjectBySlug } from "@/lib/supabase/actions/projects"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
 import ProjectAwards from "./components/ProjectAwards"
@@ -21,15 +21,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params
 
-  let project
-  try {
-    const data = await getProjectBySlug(slug)
-
-    project = data
-  } catch (error) {
-    console.error(error)
-    notFound()
-  }
+  const project = await fetchAuthQuery(api.projects.getBySlug, { slug })
 
   if (!project) {
     notFound()
@@ -54,25 +46,17 @@ export async function generateMetadata({
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params
 
-  let project
-  try {
-    const data = await getProjectBySlug(slug)
-
-    project = data
-  } catch (error) {
-    console.error(error)
-    notFound()
-  }
+  const project = await fetchAuthQuery(api.projects.getBySlug, { slug })
 
   if (!project) {
     notFound()
   }
 
   // Check if user can edit this project
-  const user = await currentUser()
-  const userRole = user?.publicMetadata.role as string
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
+  const userRole = user?.role
   const isStaff = userRole === "staff"
-  const isOwner = user?.id === project.user_id
+  const isOwner = user?.user_id === project.user_id
   const canEdit = isOwner || isStaff
 
   return (
@@ -82,9 +66,9 @@ export default async function ProjectPage({ params }: PageProps) {
         bannerUrl={project.banner_url || ""}
         title={project.title}
         createdAt={project.created_at}
-        userAvatarUrl={project.profile.avatar_url}
-        userDisplayName={project.profile.display_name}
-        userUsername={project.profile.username}
+        userAvatarUrl={project.profile?.avatar_url || ""}
+        userDisplayName={project.profile?.display_name || project.profile?.username || ""}
+        userUsername={project.profile?.username || ""}
         slug={project.slug}
         canEdit={canEdit}
       />

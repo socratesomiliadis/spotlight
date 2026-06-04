@@ -1,14 +1,15 @@
 import { redirect } from "next/navigation"
-import { currentUser } from "@clerk/nextjs/server"
 
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
 import NewProjectForm from "../components/NewProjectForm"
 import NewProjectHeader from "../components/NewProjectHeader"
 
 export default async function StaffPage() {
-  const user = await currentUser()
-  const userRole = user?.publicMetadata.role as string
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
+  const userRole = user?.role
 
   if (!user || userRole !== "staff") {
     redirect("/")
@@ -17,7 +18,7 @@ export default async function StaffPage() {
   return (
     <PageWrapper className="w-full flex flex-col pb-0">
       <NewProjectHeader />
-      <NewProjectForm userId={user.id} isStaff={true} />
+      <NewProjectForm userId={user.user_id} isStaff={true} />
     </PageWrapper>
   )
 }

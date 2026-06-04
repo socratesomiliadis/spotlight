@@ -1,8 +1,8 @@
-import { Tables } from "@/database.types"
+import type { SocialsView } from "@/lib/spotlight-types"
 
 interface ProfileNavigationProps {
   websiteUrl?: string
-  socialLinks?: Tables<"socials">
+  socialLinks?: SocialsView
 }
 
 export function SocialLink({

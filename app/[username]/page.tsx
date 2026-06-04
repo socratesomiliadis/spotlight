@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation"
-import { auth } from "@clerk/nextjs/server"
 
-import { getProfileFull } from "@/lib/supabase/actions/profile"
-import { getFollowStatusAction } from "@/lib/supabase/follow-actions"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import { cn } from "@/lib/utils"
 import PreviewCursor from "@/components/Home/preview-cursor"
 import PageWrapper from "@/components/page-wrapper"
@@ -16,26 +15,23 @@ interface PageProps {
 
 export default async function UsernamePage({ params }: PageProps) {
   const { username } = await params
-  const { userId } = await auth()
 
   // Get user by username
-  let user
-  try {
-    const data = await getProfileFull(username)
-
-    user = data
-  } catch (error) {
-    notFound()
-  }
+  const user = await fetchAuthQuery(api.profiles.getFullByUsername, {
+    username,
+  })
 
   if (!user) {
     notFound()
   }
 
-  const isOwnProfile = userId === user.user_id
+  const viewer = await fetchAuthQuery(api.profiles.getCurrentSafe)
+  const isOwnProfile = viewer?.user_id === user.user_id
 
   // Get initial follow status
-  const { isFollowing } = await getFollowStatusAction(user.user_id)
+  const { isFollowing } = await fetchAuthQuery(api.follows.getStatus, {
+    targetAuthUserId: user.user_id,
+  })
 
   return (
     <PageWrapper className="w-full pb-3 lg:pb-11 flex flex-col">

@@ -2,7 +2,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useClerk } from "@clerk/nextjs"
 import {
   Environment,
   Lightformer,
@@ -23,12 +22,15 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from "meshline"
 import * as THREE from "three"
 
+import { authClient } from "@/lib/auth-client"
+
 extend({ MeshLineGeometry, MeshLineMaterial })
 useGLTF.preload("/models/tag.glb")
 useTexture.preload("/static/images/lanyard.png")
 
 export default function LanyardWelcome({ transparent = true }) {
-  const { user } = useClerk()
+  const { data: session } = authClient.useSession()
+  const nameParts = session?.user?.name?.split(" ") || []
 
   return (
     <Canvas
@@ -42,8 +44,8 @@ export default function LanyardWelcome({ transparent = true }) {
       <ambientLight intensity={Math.PI} />
       <Physics interpolate gravity={[0, -60, 0]} timeStep={1 / 60}>
         <Band
-          firstName={user?.firstName ?? "John"}
-          lastName={user?.lastName ?? "Doe"}
+          firstName={nameParts[0] ?? "John"}
+          lastName={nameParts[1] ?? "Doe"}
         />
       </Physics>
       <Environment blur={0.5}>

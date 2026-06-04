@@ -3,16 +3,16 @@
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Tables } from "@/database.types"
 import { useMediaQuery } from "usehooks-ts"
 
+import type { ProjectView } from "@/lib/spotlight-types"
 import { cn } from "@/lib/utils"
 
 export default function ProjectCard({
   project,
   className,
 }: {
-  project: Tables<"project">
+  project: ProjectView
   className?: string
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -52,8 +52,9 @@ export default function ProjectCard({
         poster={project.main_img_url}
         className="w-full w-max-none aspect-video object-cover rounded-xl"
       >
-        {/* @ts-expect-error */}
-        <source src={project.preview_url || null} type="video/mp4" />
+        {project.preview_url && (
+          <source src={project.preview_url} type="video/mp4" />
+        )}
       </video>
 
       <Image

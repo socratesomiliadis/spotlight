@@ -2,17 +2,17 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
-import { useSession } from "@clerk/nextjs"
+import { useMutation } from "convex/react"
 import { AnimatePresence, motion, Reorder } from "motion/react"
 import SortableList, { SortableItem, SortableKnob } from "react-easy-sort"
 
-import { createClient } from "@/lib/supabase/client"
+import { api } from "@/convex/_generated/api"
 import { cn } from "@/lib/utils"
 
 interface ProjectImageUploadProps {
   label?: string
   currentImages?: string[]
-  onImageAdded: (url: string) => void
+  onImageAdded: (url: string, storageId?: string) => void
   onImageRemoved?: (url: string, index: number) => void
   onImagesReordered?: (oldIndex: number, newIndex: number) => void
   bucketName: string
@@ -57,8 +57,7 @@ export default function ProjectImageUpload({
     [key: string]: number
   }>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { session } = useSession()
-  const supabase = createClient({ session })
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -141,14 +140,6 @@ export default function ProjectImageUpload({
     setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }))
 
     try {
-      // Generate unique filename
-      const timestamp = Date.now()
-      const fileExtension = file.name.split(".").pop()
-      const filename = `${userId}/${folder}/${timestamp}-${Math.random()
-        .toString(36)
-        .substring(7)}.${fileExtension}`
-
-      // Simulate upload progress (since Supabase doesn't provide real progress)
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => ({
           ...prev,
@@ -156,40 +147,31 @@ export default function ProjectImageUpload({
         }))
       }, 200)
 
-      // Upload to Supabase storage
-      const { data, error: uploadError } = await supabase.storage
-        .from(bucketName)
-        .upload(filename, file, {
-          cacheControl: "3600",
-          upsert: false,
-        })
+      const uploadUrl = await generateUploadUrl()
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      })
 
       clearInterval(progressInterval)
 
-      if (uploadError) {
-        throw uploadError
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.status}`)
       }
 
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(filename)
+      const { storageId } = await uploadResponse.json()
+      setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }))
+      setTimeout(() => {
+        setUploadProgress((prev) => {
+          const newProgress = { ...prev }
+          delete newProgress[fileId]
+          return newProgress
+        })
+      }, 500)
 
-      if (publicUrlData?.publicUrl) {
-        setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }))
-        setTimeout(() => {
-          setUploadProgress((prev) => {
-            const newProgress = { ...prev }
-            delete newProgress[fileId]
-            return newProgress
-          })
-        }, 500)
-
-        onImageAdded(publicUrlData.publicUrl)
-        setError(null)
-      } else {
-        throw new Error("Failed to get public URL")
-      }
+      onImageAdded(URL.createObjectURL(file), storageId)
+      setError(null)
     } catch (err: any) {
       console.error("Upload error:", err)
       setError(err.message || `Failed to upload "${file.name}"`)
@@ -247,18 +229,6 @@ export default function ProjectImageUpload({
     if (!onImageRemoved) return
 
     try {
-      // Extract filename from URL and delete from storage
-      const filename = extractFilenameFromUrl(url)
-      if (filename) {
-        const { error: deleteError } = await supabase.storage
-          .from(bucketName)
-          .remove([filename])
-
-        if (deleteError) {
-          console.error("Error deleting file:", deleteError)
-        }
-      }
-
       onImageRemoved(url, index)
     } catch (err: any) {
       console.error("Error removing image:", err)

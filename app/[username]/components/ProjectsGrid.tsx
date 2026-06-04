@@ -1,25 +1,17 @@
-import { Tables } from "@/database.types"
-
-import { createClient } from "@/lib/supabase/server"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
+import type { ProjectView } from "@/lib/spotlight-types"
 import ProjectCard from "@/components/Home/project-card"
 
 export default async function ProjectsGrid({
   projects,
 }: {
-  projects: Tables<"project">[] | null
+  projects: ProjectView[] | null
 }) {
-  const supabase = await createClient()
-
-  let reccomendedProjects: Tables<"project">[] | null = null
+  let reccomendedProjects: ProjectView[] | null = null
 
   if (!projects || projects.length <= 0) {
-    const { data, error } = await supabase.from("project").select("*").limit(4)
-
-    if (error) {
-      console.error(error)
-    }
-
-    reccomendedProjects = data
+    reccomendedProjects = await fetchAuthQuery(api.projects.list, { limit: 4 })
   }
 
   return (

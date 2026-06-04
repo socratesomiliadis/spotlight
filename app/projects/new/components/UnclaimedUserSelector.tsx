@@ -1,15 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useUser } from "@clerk/nextjs"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQuery } from "convex/react"
 import { AnimatePresence, motion } from "motion/react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-import { createUser } from "@/lib/supabase/actions/clerk"
-import { getUnclaimedUsers } from "@/lib/supabase/actions/profile"
+import { api } from "@/convex/_generated/api"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 import ImageUpload from "@/app/[username]/edit/components/ImageUpload"
@@ -43,12 +42,14 @@ export default function UnclaimedUserSelector({
 }: UnclaimedUserSelectorProps) {
   const [mode, setMode] = useState<"select" | "create">("select")
   const [unclaimedUsers, setUnclaimedUsers] = useState<UnclaimedUser[]>([])
+  const [avatarStorageId, setAvatarStorageId] = useState<string>()
   const [isLoading, setIsLoading] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [loadingUsers, setLoadingUsers] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [hasSearched, setHasSearched] = useState(false)
-  const { user } = useUser()
+  const allUnclaimedUsers = useQuery(api.profiles.getUnclaimed)
+  const createUser = useMutation(api.admin.createUnclaimedUser)
 
   const {
     register,
@@ -77,8 +78,7 @@ export default function UnclaimedUserSelector({
     try {
       setLoadingUsers(true)
       setHasSearched(true)
-      const users = await getUnclaimedUsers()
-      const filtered = (users || []).filter((user) => {
+      const filtered = ((allUnclaimedUsers || []) as UnclaimedUser[]).filter((user) => {
         const searchLower = query.toLowerCase()
         return (
           user.username.toLowerCase().includes(searchLower) ||
@@ -102,11 +102,7 @@ export default function UnclaimedUserSelector({
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [searchQuery])
-
-  if (!user || !user.id) {
-    return <div>Loading...</div>
-  }
+  }, [searchQuery, allUnclaimedUsers])
 
   const handleCreateUser = async (data: NewUserFormValues) => {
     try {
@@ -119,14 +115,15 @@ export default function UnclaimedUserSelector({
       const firstName = isFullName ? data.display_name.split(" ")[0] : ""
       const lastName = isFullName ? data.display_name.split(" ")[1] : ""
 
-      // Create the user in Clerk
+      // Create the auth user and app profile.
       const newUser = await createUser({
         email: data.email,
-        first_name: isFullName ? firstName : data.display_name,
-        last_name: isFullName ? lastName : "",
+        firstName: isFullName ? firstName : data.display_name,
+        lastName: isFullName ? lastName : "",
         password: randomPassword,
         username: data.username,
-        avatar_url: data.avatar_url || "",
+        avatarUrl: data.avatar_url || "",
+        avatarStorageId: avatarStorageId as any,
       })
 
       // Add the new user to the local list
@@ -372,16 +369,20 @@ export default function UnclaimedUserSelector({
                   <ImageUpload
                     label="Profile Picture"
                     currentImageUrl={avatarUrl}
-                    onImageUploaded={(url: string) =>
+                    onImageUploaded={(url: string, storageId?: string) => {
                       setValue("avatar_url", url)
-                    }
-                    onImageRemoved={() => setValue("avatar_url", "")}
+                      setAvatarStorageId(storageId)
+                    }}
+                    onImageRemoved={() => {
+                      setValue("avatar_url", "")
+                      setAvatarStorageId(undefined)
+                    }}
                     bucketName="unclaimed-profiles"
                     folder="avatars"
                     aspectRatio="aspect-square"
                     className="size-32 rounded-xl"
                     displayAreaClassName="rounded-xl"
-                    userId={user.id}
+                    userId="staff"
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-4 w-96">

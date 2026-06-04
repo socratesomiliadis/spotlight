@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { Button } from "@heroui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react"
+import { useMutation } from "convex/react"
 import { CalendarDays } from "lucide-react"
 
-import { giveAward, removeAwardAction } from "@/lib/supabase/actions/projects"
+import { api } from "@/convex/_generated/api"
 
 type AwardType = "otd" | "otm" | "oty" | "honorable"
 
@@ -151,6 +152,8 @@ export default function AwardButtons({
   const [isLoading, setIsLoading] = useState<AwardType | null>(null)
   const [showDatePicker, setShowDatePicker] = useState<AwardType | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>("")
+  const giveAward = useMutation(api.awards.give)
+  const removeAward = useMutation(api.awards.remove)
 
   const hasAward = (awardType: AwardType) => {
     return currentAwards.some((award) => award.award_type === awardType)
@@ -179,7 +182,7 @@ export default function AwardButtons({
       // Remove award directly
       setIsLoading(awardType)
       try {
-        await removeAwardAction(projectId, awardType)
+        await removeAward({ projectId: projectId as any, awardType })
       } catch (error) {
         console.error("Award removal failed:", error)
         alert("Failed to remove award. Please try again.")
@@ -253,7 +256,11 @@ export default function AwardButtons({
         awardedAt = new Date(selectedDate).toISOString()
       }
 
-      await giveAward(projectId, awardType, awardedAt)
+      await giveAward({
+        projectId: projectId as any,
+        awardType,
+        awardedAt,
+      })
       setShowDatePicker(null)
       setSelectedDate("")
     } catch (error) {
@@ -324,8 +331,7 @@ export default function AwardButtons({
 
     setIsLoading(awardType)
     try {
-      // Remove old award and create new one with updated date
-      await removeAwardAction(projectId, awardType)
+      await removeAward({ projectId: projectId as any, awardType })
 
       let awardedAt = ""
 
@@ -340,7 +346,11 @@ export default function AwardButtons({
         awardedAt = new Date(selectedDate).toISOString()
       }
 
-      await giveAward(projectId, awardType, awardedAt)
+      await giveAward({
+        projectId: projectId as any,
+        awardType,
+        awardedAt,
+      })
       setShowDatePicker(null)
       setSelectedDate("")
     } catch (error) {

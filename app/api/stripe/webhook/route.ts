@@ -1,12 +1,14 @@
 import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
+import { api } from "@/convex/_generated/api"
+import { ConvexHttpClient } from "convex/browser"
 import Stripe from "stripe"
 
 import { stripe, STRIPE_CONFIG } from "@/lib/stripe"
-import {
-  deleteSubscription,
-  upsertSubscription,
-} from "@/lib/supabase/actions/subscriptions"
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
+const convexStripeWebhookSecret =
+  process.env.CONVEX_STRIPE_WEBHOOK_SECRET || STRIPE_CONFIG.WEBHOOK_SECRET
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -54,7 +56,10 @@ export async function POST(req: NextRequest) {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription
-        await deleteSubscription(subscription.id)
+        await convex.mutation(api.subscriptions.deleteByStripeSubscriptionId, {
+          webhookSecret: convexStripeWebhookSecret,
+          stripeSubscriptionId: subscription.id,
+        })
         console.log(`Subscription deleted: ${subscription.id}`)
         break
       }
@@ -108,32 +113,34 @@ async function handleSubscriptionChange(subscription: any) {
       return
     }
 
-    const clerkUserId = customer.metadata?.clerk_user_id
+    const authUserId =
+      customer.metadata?.auth_user_id || customer.metadata?.clerk_user_id
 
-    if (!clerkUserId) {
-      console.error("No clerk_user_id found in customer metadata")
+    if (!authUserId) {
+      console.error("No auth user id found in customer metadata")
       return
     }
 
     const priceId = subscription.items?.data?.[0]?.price?.id
 
-    await upsertSubscription({
-      user_id: clerkUserId,
-      stripe_customer_id: customer.id,
-      stripe_subscription_id: subscription.id,
-      stripe_price_id: priceId,
+    await convex.mutation(api.subscriptions.upsert, {
+      webhookSecret: convexStripeWebhookSecret,
+      userAuthUserId: authUserId,
+      stripeCustomerId: customer.id,
+      stripeSubscriptionId: subscription.id,
+      stripePriceId: priceId,
       status: subscription.status,
-      current_period_start: subscription.current_period_start
+      currentPeriodStart: subscription.current_period_start
         ? new Date(subscription.current_period_start * 1000).toISOString()
         : undefined,
-      current_period_end: subscription.current_period_end
+      currentPeriodEnd: subscription.current_period_end
         ? new Date(subscription.current_period_end * 1000).toISOString()
         : undefined,
-      cancel_at_period_end: subscription.cancel_at_period_end,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
     })
 
     console.log(
-      `Subscription ${subscription.status}: ${subscription.id} for user: ${clerkUserId}`
+      `Subscription ${subscription.status}: ${subscription.id} for user: ${authUserId}`
     )
   } catch (error) {
     console.error("Error handling subscription change:", error)

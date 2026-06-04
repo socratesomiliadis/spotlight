@@ -3,13 +3,14 @@
 import { useState, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Tables } from "@/database.types"
+import { useMutation } from "convex/react"
 
-import { toggleFollowAction } from "@/lib/supabase/follow-actions"
+import { api } from "@/convex/_generated/api"
+import type { ProfileView } from "@/lib/spotlight-types"
 import CustomButton from "@/components/custom-button"
 
 interface ProfileHeaderProps {
-  user: Tables<"profile">
+  user: ProfileView
   isOwnProfile: boolean
   initialFollowStatus: boolean
 }
@@ -25,12 +26,13 @@ export default function ProfileHeader({
 }: ProfileHeaderProps) {
   const [isFollowing, setIsFollowing] = useState(initialFollowStatus)
   const [isPending, startTransition] = useTransition()
+  const toggleFollow = useMutation(api.follows.toggle)
   const displayName = user.display_name || user.username || "User"
 
   const handleFollowClick = () => {
     startTransition(async () => {
       try {
-        const result = await toggleFollowAction(user.user_id)
+        const result = await toggleFollow({ targetAuthUserId: user.user_id })
         setIsFollowing(result.isFollowing)
       } catch (error) {
         console.error("Error toggling follow status:", error)

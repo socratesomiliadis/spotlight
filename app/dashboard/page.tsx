@@ -1,9 +1,9 @@
 import Image from "next/image"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { currentUser } from "@clerk/nextjs/server"
 
-import { getAllProjectsWithAwards } from "@/lib/supabase/actions"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
 import AwardButtons from "./components/AwardButtons"
@@ -14,14 +14,14 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const user = await currentUser()
-  const userRole = user?.publicMetadata.role as string
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
+  const userRole = user?.role
 
   if (!user || userRole !== "staff") {
     redirect("/")
   }
 
-  const allProjects = await getAllProjectsWithAwards()
+  const allProjects = await fetchAuthQuery(api.projects.listWithAwardsForStaff)
   const resolvedSearchParams = await searchParams
 
   // Get filter parameters

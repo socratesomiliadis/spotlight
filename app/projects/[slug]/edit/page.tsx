@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
-import { currentUser } from "@clerk/nextjs/server"
 
-import { getProjectBySlug } from "@/lib/supabase/actions/projects"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
 import EditProjectForm from "./components/EditProjectForm"
@@ -12,29 +12,24 @@ interface PageProps {
 
 export default async function EditProjectPage({ params }: PageProps) {
   const { slug } = await params
-  const user = await currentUser()
+  const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!user) {
     redirect("/")
   }
 
-  const userRole = user?.publicMetadata.role as string
+  const userRole = user.role
   const isStaff = userRole === "staff"
 
   // Get the project
-  let project
-  try {
-    project = await getProjectBySlug(slug)
-  } catch (error) {
-    redirect("/")
-  }
+  const project = await fetchAuthQuery(api.projects.getBySlug, { slug })
 
   if (!project) {
     redirect("/")
   }
 
   // Check if user is the project owner or staff
-  const isOwner = project.user_id === user.id
+  const isOwner = project.user_id === user.user_id
   if (!isOwner && !isStaff) {
     redirect(`/projects/${slug}`)
   }
@@ -44,7 +39,7 @@ export default async function EditProjectPage({ params }: PageProps) {
       <div className="px-6 py-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold tracking-tight">Edit Project</h1>
       </div>
-      <EditProjectForm project={project} userId={user.id} />
+      <EditProjectForm project={project} userId={user.user_id} />
     </PageWrapper>
   )
 }

@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Tables } from "@/database.types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { sendClaimEmail } from "@/lib/supabase/actions/claim"
+import { authClient } from "@/lib/auth-client"
+import type { ProfileView } from "@/lib/spotlight-types"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 
@@ -19,7 +19,7 @@ const claimSchema = z.object({
 type ClaimFormValues = z.infer<typeof claimSchema>
 
 interface ClaimAccountFormProps {
-  user: Tables<"profile">
+  user: ProfileView
 }
 
 export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
@@ -51,15 +51,12 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
     setError(null)
 
     try {
-      const result = await sendClaimEmail(data.email, user.username)
-
-      if (result.success) {
-        setEmailSent(true)
-        toast.success("Claim initiated! Follow the instructions below.")
-      } else {
-        setError(result.message)
-        toast.error(result.message)
-      }
+      const result = await (authClient as any).emailOtp.requestPasswordReset({
+        email: data.email,
+      })
+      if (result?.error) throw new Error(result.error.message)
+      setEmailSent(true)
+      toast.success("Claim initiated! Follow the instructions below.")
     } catch (err: any) {
       const errorMessage = err.message || "Failed to send claim email"
       setError(errorMessage)
@@ -122,7 +119,7 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
         <div className="space-y-3">
           <CustomButton
             text="Go to Sign In"
-            href="/sign-in"
+            href="/?auth=sign-in"
             className="w-full"
           />
           <div className="grid grid-cols-2 gap-2">

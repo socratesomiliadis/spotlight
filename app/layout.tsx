@@ -4,15 +4,16 @@ import "./globals.css"
 
 import localFont from "next/font/local"
 import { ProjectVisitProvider } from "@/contexts/project-visit-context"
-import { ClerkProvider } from "@clerk/nextjs"
 import { HeroUIProvider } from "@heroui/react"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { Toaster } from "sonner"
 
 import BottomNav from "@/components/BottomNav"
+import ConvexClientProvider from "@/components/ConvexClientProvider"
 import Header from "@/components/Header"
 import CloseCursor from "@/components/Home/close-cursor"
 import MainLayout from "@/components/main-layout"
+import { getToken } from "@/lib/auth-server"
 
 const helveticaNow = localFont({
   src: "../fonts/HelveticaNowVar.woff2",
@@ -53,23 +54,19 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const token = await getToken()
+
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          fontFamily: "var(--font-helvetica-now)",
-        },
-      }}
-    >
-      <html lang="en">
-        <body
-          className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-screen`}
-        >
+    <html lang="en">
+      <body
+        className={`${helveticaNow.variable} font-helvetica antialiased relative w-screen max-w-screen`}
+      >
+        <ConvexClientProvider initialToken={token}>
           <NuqsAdapter>
             <HeroUIProvider>
               <ProjectVisitProvider>
@@ -83,8 +80,8 @@ export default function RootLayout({
               </ProjectVisitProvider>
             </HeroUIProvider>
           </NuqsAdapter>
-        </body>
-      </html>
-    </ClerkProvider>
+        </ConvexClientProvider>
+      </body>
+    </html>
   )
 }

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation"
-import { auth } from "@clerk/nextjs/server"
 
-import { getProfile } from "@/lib/supabase/actions/profile"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthMutation, fetchAuthQuery } from "@/lib/auth-server"
 import CustomButton from "@/components/custom-button"
 import PageWrapper from "@/components/page-wrapper"
 
@@ -13,29 +13,26 @@ export default async function ClaimSuccessPage({
   params,
 }: ClaimSuccessPageProps) {
   const { username } = await params
-  const { userId } = await auth()
+  const viewer = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   // Get the user profile
-  let user
-  try {
-    user = await getProfile(username)
-  } catch (error) {
-    notFound()
-  }
+  const user = await fetchAuthQuery(api.profiles.getByUsername, { username })
 
   if (!user) {
     notFound()
   }
 
-  // If the account is still unclaimed, redirect to claim page
-  if (user.is_unclaimed) {
-    redirect(`/claim/${username}`)
+  if (viewer?.user_id === user.user_id && user.is_unclaimed) {
+    await fetchAuthMutation(api.profiles.claimCurrent)
+    redirect(`/${username}`)
   }
 
   // If user is signed in and it's their profile, redirect to profile
-  if (userId === user.user_id) {
+  if (viewer?.user_id === user.user_id) {
     redirect(`/${username}`)
   }
+
+  if (user.is_unclaimed) redirect(`/claim/${username}`)
 
   return (
     <PageWrapper className="min-h-screen flex items-center justify-center p-4">

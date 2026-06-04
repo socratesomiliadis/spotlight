@@ -1,15 +1,15 @@
 "use client"
 
 import {
-  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from "react"
+import { useQuery } from "convex/react"
 import { useDebounceValue } from "usehooks-ts"
 
-import { handleSearch } from "@/lib/supabase/actions/search"
+import { api } from "@/convex/_generated/api"
 import { cn } from "@/lib/utils"
 
 export interface User {
@@ -53,49 +53,30 @@ export default function Search({
   const [isOpen, setIsOpen] = useState(false)
   const [debouncedQuery, setQuery] = useDebounceValue("", 300)
   const inputRef = useRef<HTMLInputElement>(null)
+  const searchResults = useQuery(api.search.all, {
+    query: debouncedQuery || "",
+  })
 
   useLayoutEffect(() => {
     if (isExpanded) setIsOpen(true)
     else setIsOpen(false)
   }, [isExpanded])
 
-  const performSearch = useCallback(
-    async (searchQuery: string) => {
-      if (!searchQuery.trim() || searchQuery.length < 2) {
-        const emptyResults = { users: [], projects: [] }
-
-        onSearchResults(emptyResults)
-        onSearchActive(false)
-        return
-      }
-
-      setIsExpanded(true)
-      onSearchActive(true)
-      try {
-        const results = await handleSearch(searchQuery)
-
-        onSearchResults(results as SearchResults)
-      } catch (error) {
-        console.error("Search failed:", error)
-        const emptyResults = { users: [], projects: [] }
-
-        onSearchResults(emptyResults)
-      }
-    },
-    [onSearchResults, onSearchActive]
-  )
-
   useLayoutEffect(() => {
-    console.log("debouncedQuery", debouncedQuery)
-    if (debouncedQuery) {
-      performSearch(debouncedQuery)
-    } else {
+    if (!debouncedQuery || debouncedQuery.length < 2) {
       const emptyResults = { users: [], projects: [] }
 
       onSearchResults(emptyResults)
       onSearchActive(false)
+      return
     }
-  }, [debouncedQuery, performSearch, onSearchResults, onSearchActive])
+
+    setIsExpanded(true)
+    onSearchActive(true)
+    if (searchResults) {
+      onSearchResults(searchResults as SearchResults)
+    }
+  }, [debouncedQuery, searchResults, onSearchResults, onSearchActive, setIsExpanded])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)

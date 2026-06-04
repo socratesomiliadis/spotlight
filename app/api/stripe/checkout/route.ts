@@ -1,41 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
 
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import { stripe, STRIPE_CONFIG } from "@/lib/stripe"
-import { createAdminClient } from "@/lib/supabase/server"
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth()
+    const checkoutState = await fetchAuthQuery(
+      api.subscriptions.getCurrentForCheckout
+    ).catch(() => null)
 
-    if (!userId) {
+    if (!checkoutState) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get user profile from Supabase
-    const supabase = await createAdminClient()
-    const { data: profile, error: profileError } = await supabase
-      .from("profile")
-      .select("email, username")
-      .eq("user_id", userId)
-      .single()
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: "User profile not found" },
-        { status: 404 }
-      )
-    }
-
-    // Check if user already has an active subscription
-    const { data: existingSubscription } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("status", "active")
-      .single()
-
-    if (existingSubscription) {
+    if (checkoutState.activeSubscription) {
       return NextResponse.json(
         { error: "User already has an active subscription" },
         { status: 400 }
@@ -44,23 +23,15 @@ export async function POST(req: NextRequest) {
 
     // Create or retrieve Stripe customer
     let customer
-    const { data: existingCustomer } = await supabase
-      .from("subscriptions")
-      .select("stripe_customer_id")
-      .eq("user_id", userId)
-      .limit(1)
-      .single()
-
-    if (existingCustomer?.stripe_customer_id) {
-      customer = await stripe.customers.retrieve(
-        existingCustomer.stripe_customer_id
-      )
+    if (checkoutState.stripeCustomerId) {
+      customer = await stripe.customers.retrieve(checkoutState.stripeCustomerId)
     } else {
       customer = await stripe.customers.create({
-        email: profile.email,
+        email: checkoutState.email,
         metadata: {
-          clerk_user_id: userId,
-          username: profile.username,
+          clerk_user_id: checkoutState.userId,
+          auth_user_id: checkoutState.userId,
+          username: checkoutState.username,
         },
       })
     }
@@ -79,7 +50,8 @@ export async function POST(req: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/premium/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/premium`,
       metadata: {
-        clerk_user_id: userId,
+        clerk_user_id: checkoutState.userId,
+        auth_user_id: checkoutState.userId,
       },
     })
 

@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Tables } from "@/database.types"
-import { useSession } from "@clerk/nextjs"
+import { api } from "@/convex/_generated/api"
 import { Form, user } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "convex/react"
 import { AnimatePresence, motion } from "motion/react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import * as z from "zod"
 
-import { createClient } from "@/lib/supabase/client"
+import type { ProfileView } from "@/lib/spotlight-types"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 import LocationAutocomplete from "@/components/Forms/components/LocationAutocomplete"
@@ -54,7 +54,7 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>
 
 interface EditProfileFormProps {
-  userAndSocials: Tables<"profile"> & { socials: Tables<"socials"> | null }
+  userAndSocials: ProfileView
 }
 
 export default function EditProfileForm({
@@ -63,9 +63,10 @@ export default function EditProfileForm({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [avatarStorageId, setAvatarStorageId] = useState<string | null>()
+  const [bannerStorageId, setBannerStorageId] = useState<string | null>()
+  const updateCurrent = useMutation(api.profiles.updateCurrent)
   const router = useRouter()
-  const { session } = useSession()
-  const supabase = createClient({ session })
 
   const {
     register,
@@ -89,41 +90,16 @@ export default function EditProfileForm({
 
   async function updateProfile(data: ProfileFormValues) {
     try {
-      // Update profile data
-      const { error: profileError } = await supabase
-        .from("profile")
-        .update({
-          display_name: data.display_name,
-          location: data.location || null,
-          website_url: data.website_url || null,
-          avatar_url: data.avatar_url || null,
-          banner_url: data.banner_url || null,
-        })
-        .eq("user_id", userAndSocials.user_id)
-
-      if (profileError) {
-        console.log(profileError)
-        throw profileError
-      }
-
-      // Handle social links - upsert a single record with all social links
-      const socialLinksData = {
-        user_id: userAndSocials.user_id,
-        linked_in: data.linkedin || null,
-        instagram: data.instagram || null,
-        twitter: data.twitter || null,
-      }
-
-      const { error: socialsError } = await supabase
-        .from("socials")
-        .upsert(socialLinksData, {
-          onConflict: "user_id",
-        })
-
-      if (socialsError) {
-        console.log(socialsError)
-        throw socialsError
-      }
+      await updateCurrent({
+        displayName: data.display_name,
+        location: data.location || undefined,
+        websiteUrl: data.website_url || undefined,
+        avatarStorageId: avatarStorageId as any,
+        bannerStorageId: bannerStorageId as any,
+        linkedIn: data.linkedin || undefined,
+        instagram: data.instagram || undefined,
+        twitter: data.twitter || undefined,
+      })
 
       // Redirect back to profile page after successful update
       setTimeout(() => {
@@ -160,8 +136,14 @@ export default function EditProfileForm({
         <ImageUpload
           label="Banner Image"
           currentImageUrl={bannerUrl}
-          onImageUploaded={(url) => setValue("banner_url", url)}
-          onImageRemoved={() => setValue("banner_url", "")}
+          onImageUploaded={(url, storageId) => {
+            setValue("banner_url", url)
+            setBannerStorageId(storageId)
+          }}
+          onImageRemoved={() => {
+            setValue("banner_url", "")
+            setBannerStorageId(null)
+          }}
           bucketName="profile-images"
           folder="banners"
           aspectRatio="aspect-3/1"
@@ -178,8 +160,14 @@ export default function EditProfileForm({
           <ImageUpload
             label="Profile Image"
             currentImageUrl={avatarUrl}
-            onImageUploaded={(url) => setValue("avatar_url", url)}
-            onImageRemoved={() => setValue("avatar_url", "")}
+            onImageUploaded={(url, storageId) => {
+              setValue("avatar_url", url)
+              setAvatarStorageId(storageId)
+            }}
+            onImageRemoved={() => {
+              setValue("avatar_url", "")
+              setAvatarStorageId(null)
+            }}
             bucketName="profile-images"
             folder="avatars"
             aspectRatio="aspect-square"

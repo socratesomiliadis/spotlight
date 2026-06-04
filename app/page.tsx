@@ -1,17 +1,14 @@
 import type { Metadata } from "next"
-import { Database } from "@/database.types"
 
-import { getTodaysOfTheDayByCategory } from "@/lib/supabase/actions"
-import { createClient } from "@/lib/supabase/server"
+import { api } from "@/convex/_generated/api"
+import { fetchAuthQuery } from "@/lib/auth-server"
+import type { AwardType, CategoryType } from "@/lib/spotlight-types"
 import GradientText from "@/components/gradient-text"
 import HomeHero from "@/components/Home/home-hero"
 import HomeNavigation from "@/components/Home/home-navigation"
 import PreviewCursor from "@/components/Home/preview-cursor"
 import ProjectsGrid from "@/components/Home/projects-grid"
 import PageWrapper from "@/components/page-wrapper"
-
-type CategoryType = Database["public"]["Enums"]["category"]
-type AwardType = Database["public"]["Enums"]["awards"]
 
 const validCategories: CategoryType[] = [
   "websites",
@@ -59,7 +56,6 @@ export default async function Home({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const supabase = await createClient()
   const resolvedSearchParams = await searchParams
 
   // Parse filter parameters
@@ -84,45 +80,15 @@ export default async function Home({
 
   // Get today's of the day for the category (default to "websites")
   const categoryForHero = category || "websites"
-  const ofTheDay = await getTodaysOfTheDayByCategory(categoryForHero)
+  const ofTheDay = await fetchAuthQuery(api.projects.getTodaysOfTheDayByCategory, {
+    category: categoryForHero,
+  })
 
-  // Build base query
-  let query = supabase
-    .from("project")
-    .select(
-      `
-      *,
-      user:user_id(username, avatar_url, display_name),
-      award(award_type, awarded_at)
-    `
-    )
-    .order("created_at", { ascending: false })
-
-  // Add category filter if specified
-  if (category) {
-    query = query.eq("category", category)
-  }
-
-  // Add tags filter if specified
-  if (tags.length > 0) {
-    // Use overlaps operator to check if any of the selected tags exist in the project's tags array
-    query = query.overlaps("tags", tags)
-  }
-
-  // Execute the main query
-  const { data: allProjects } = await query
-
-  // Filter by award if specified (done in JavaScript since we need to join awards)
-  let projects = allProjects || []
-
-  if (award && projects) {
-    projects = projects.filter(
-      (project) =>
-        project.award &&
-        Array.isArray(project.award) &&
-        project.award.some((a: any) => a.award_type === award)
-    )
-  }
+  const projects = await fetchAuthQuery(api.projects.list, {
+    category,
+    tags,
+    award,
+  })
 
   // Use of the day as featured project
   const featuredProject = ofTheDay
