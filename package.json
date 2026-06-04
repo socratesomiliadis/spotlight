@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "eslint ."
   },
+  "pnpm": {
+    "overrides": {
+      "kysely": "0.28.17"
+    }
+  },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.2",
     "@gsap/react": "^2.1.2",

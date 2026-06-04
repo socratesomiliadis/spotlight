@@ -11,6 +11,93 @@ import {
 } from "./lib"
 import { awardValidator, categoryValidator } from "./schema"
 
+async function listProjectViews(
+  ctx: any,
+  args: {
+    category?: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
+    tags?: string[]
+    award?: "otd" | "otm" | "oty" | "honorable"
+    limit?: number
+  }
+) {
+  const limit = args.limit ?? 100
+  const hasInMemoryFilters = !!args.tags?.length || !!args.award
+  const projectsQuery = args.category
+    ? ctx.db
+        .query("projects")
+        .withIndex("by_category_created", (q: any) =>
+          q.eq("category", args.category!)
+        )
+        .order("desc")
+    : ctx.db.query("projects").withIndex("by_created").order("desc")
+
+  if (!hasInMemoryFilters) {
+    const projects = await projectsQuery.take(limit)
+    return Promise.all(
+      projects.map((project: any) => projectView(ctx, project))
+    )
+  }
+
+  let projects = await projectsQuery.collect()
+
+  if (args.tags?.length) {
+    const selected = new Set(args.tags)
+    projects = projects.filter((project: any) =>
+      project.tags.some((tag: string) => selected.has(tag))
+    )
+  }
+
+  if (args.award) {
+    const awardedProjectIds = new Set(
+      (
+        await ctx.db
+          .query("awards")
+          .withIndex("by_type_date", (q: any) => q.eq("awardType", args.award!))
+          .collect()
+      ).map((award: any) => award.projectId)
+    )
+    projects = projects.filter((project: any) =>
+      awardedProjectIds.has(project._id)
+    )
+  }
+
+  return Promise.all(
+    projects.slice(0, limit).map((project: any) => projectView(ctx, project))
+  )
+}
+
+async function getTodaysOfTheDayByCategoryView(
+  ctx: any,
+  category: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
+) {
+  async function findForCategory(
+    category: "websites" | "design" | "films" | "crypto" | "startups" | "ai"
+  ) {
+    const projects = await ctx.db
+      .query("projects")
+      .withIndex("by_category_created", (q: any) => q.eq("category", category))
+      .collect()
+    const projectIds = new Set(projects.map((project: any) => project._id))
+    const awards = (
+      await ctx.db
+        .query("awards")
+        .withIndex("by_type_date", (q: any) => q.eq("awardType", "otd"))
+        .collect()
+    )
+      .filter((award: any) => projectIds.has(award.projectId))
+      .sort((a: any, b: any) => b.awardedAt.localeCompare(a.awardedAt))
+    const award = awards[0]
+    if (!award) return null
+    const project = await ctx.db.get(award.projectId)
+    return project ? projectView(ctx, project) : null
+  }
+
+  return (
+    (await findForCategory(category)) ||
+    (category !== "websites" ? await findForCategory("websites") : null)
+  )
+}
+
 export const list = query({
   args: {
     category: v.optional(categoryValidator),
@@ -19,43 +106,7 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let projects = args.category
-      ? await ctx.db
-          .query("projects")
-          .withIndex("by_category_created", (q) =>
-            q.eq("category", args.category!)
-          )
-          .collect()
-      : await ctx.db.query("projects").withIndex("by_created").collect()
-
-    projects = projects.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-
-    if (args.tags?.length) {
-      const selected = new Set(args.tags)
-      projects = projects.filter((project) =>
-        project.tags.some((tag) => selected.has(tag))
-      )
-    }
-
-    if (args.award) {
-      const awardedProjectIds = new Set(
-        (
-          await ctx.db
-            .query("awards")
-            .withIndex("by_type_date", (q) => q.eq("awardType", args.award!))
-            .collect()
-        ).map((award) => award.projectId)
-      )
-      projects = projects.filter((project) =>
-        awardedProjectIds.has(project._id)
-      )
-    }
-
-    return Promise.all(
-      projects
-        .slice(0, args.limit || 100)
-        .map((project) => projectView(ctx, project))
-    )
+    return listProjectViews(ctx, args)
   },
 })
 
@@ -73,30 +124,55 @@ export const getBySlug = query({
 export const getTodaysOfTheDayByCategory = query({
   args: { category: categoryValidator },
   handler: async (ctx, args) => {
-    async function findForCategory(category: typeof args.category) {
-      const projects = await ctx.db
-        .query("projects")
-        .withIndex("by_category_created", (q) => q.eq("category", category))
-        .collect()
-      const projectIds = new Set(projects.map((project) => project._id))
-      const awards = (
-        await ctx.db
-          .query("awards")
-          .withIndex("by_type_date", (q) => q.eq("awardType", "otd"))
-          .collect()
-      )
-        .filter((award) => projectIds.has(award.projectId))
-        .sort((a, b) => b.awardedAt.localeCompare(a.awardedAt))
-      const award = awards[0]
-      if (!award) return null
-      const project = await ctx.db.get(award.projectId)
-      return project ? projectView(ctx, project) : null
-    }
+    return getTodaysOfTheDayByCategoryView(ctx, args.category)
+  },
+})
 
-    return (
-      (await findForCategory(args.category)) ||
-      (args.category !== "websites" ? await findForCategory("websites") : null)
-    )
+export const getHomePage = query({
+  args: {
+    category: v.optional(categoryValidator),
+    tags: v.optional(v.array(v.string())),
+    award: v.optional(awardValidator),
+  },
+  handler: async (ctx, args) => {
+    const categoryForHero = args.category || "websites"
+    const [featuredProject, projects] = await Promise.all([
+      getTodaysOfTheDayByCategoryView(ctx, categoryForHero),
+      listProjectViews(ctx, args),
+    ])
+
+    return { featuredProject, projects }
+  },
+})
+
+export const getPageBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    const project = await ctx.db
+      .query("projects")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first()
+    if (!project) return null
+
+    const authUser = await requireAuthUser(ctx).catch(() => null)
+    const viewerAuthUserId = authUser ? authUserId(authUser) : null
+    const viewerProfile = viewerAuthUserId
+      ? await ctx.db
+          .query("profiles")
+          .withIndex("by_auth_user_id", (q) =>
+            q.eq("authUserId", viewerAuthUserId)
+          )
+          .first()
+      : null
+    const canEdit =
+      viewerAuthUserId === project.ownerAuthUserId ||
+      viewerProfile?.role === "staff" ||
+      viewerProfile?.role === "admin"
+
+    return {
+      project: await projectView(ctx, project),
+      canEdit,
+    }
   },
 })
 

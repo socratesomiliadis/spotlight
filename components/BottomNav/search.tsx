@@ -1,15 +1,10 @@
 "use client"
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react"
+import { useLayoutEffect, useRef, useState } from "react"
+import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { useDebounceValue } from "usehooks-ts"
 
-import { api } from "@/convex/_generated/api"
 import { cn } from "@/lib/utils"
 
 export interface User {
@@ -53,9 +48,12 @@ export default function Search({
   const [isOpen, setIsOpen] = useState(false)
   const [debouncedQuery, setQuery] = useDebounceValue("", 300)
   const inputRef = useRef<HTMLInputElement>(null)
-  const searchResults = useQuery(api.search.all, {
-    query: debouncedQuery || "",
-  })
+  const normalizedQuery = debouncedQuery.trim()
+  const shouldSearch = normalizedQuery.length >= 2
+  const searchResults = useQuery(
+    api.search.all,
+    shouldSearch ? { query: normalizedQuery } : "skip"
+  )
 
   useLayoutEffect(() => {
     if (isExpanded) setIsOpen(true)
@@ -63,7 +61,7 @@ export default function Search({
   }, [isExpanded])
 
   useLayoutEffect(() => {
-    if (!debouncedQuery || debouncedQuery.length < 2) {
+    if (!shouldSearch) {
       const emptyResults = { users: [], projects: [] }
 
       onSearchResults(emptyResults)
@@ -76,7 +74,13 @@ export default function Search({
     if (searchResults) {
       onSearchResults(searchResults as SearchResults)
     }
-  }, [debouncedQuery, searchResults, onSearchResults, onSearchActive, setIsExpanded])
+  }, [
+    shouldSearch,
+    searchResults,
+    onSearchResults,
+    onSearchActive,
+    setIsExpanded,
+  ])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)

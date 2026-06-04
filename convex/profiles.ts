@@ -124,6 +124,61 @@ export const getFullByUsername = query({
   },
 })
 
+export const getProfilePage = query({
+  args: { username: v.string() },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_username", (q) => q.eq("username", args.username))
+      .first()
+    if (!profile) return null
+
+    const authUser = await requireAuthUser(ctx).catch(() => null)
+    const viewerAuthUserId = authUser ? authUserId(authUser) : null
+    const isOwnProfile = viewerAuthUserId === profile.authUserId
+    const follow = viewerAuthUserId
+      ? await ctx.db
+          .query("follows")
+          .withIndex("by_follower_following", (q) =>
+            q
+              .eq("followerAuthUserId", viewerAuthUserId)
+              .eq("followingAuthUserId", profile.authUserId)
+          )
+          .first()
+      : null
+    const projects = (
+      await ctx.db
+        .query("projects")
+        .withIndex("by_owner", (q) =>
+          q.eq("ownerAuthUserId", profile.authUserId)
+        )
+        .collect()
+    ).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const recommendedProjects =
+      projects.length > 0
+        ? []
+        : await ctx.db
+            .query("projects")
+            .withIndex("by_created")
+            .order("desc")
+            .take(4)
+
+    return {
+      user: {
+        ...(await profileView(ctx, profile)),
+        project: await Promise.all(
+          projects.map((project) => projectView(ctx, project))
+        ),
+      },
+      isOwnProfile,
+      isFollowing: !isOwnProfile && !!follow,
+      recommendedProjects: await Promise.all(
+        recommendedProjects.map((project) => projectView(ctx, project))
+      ),
+    }
+  },
+})
+
 export const getUnclaimed = query({
   args: {},
   handler: async (ctx) => {

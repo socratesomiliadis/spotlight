@@ -7,6 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/react"
 import { useMutation } from "convex/react"
 import { CalendarDays } from "lucide-react"
 
+import type { AwardView, ProjectView } from "@/lib/spotlight-types"
+
 type AwardType = "otd" | "otm" | "oty" | "honorable"
 
 interface AwardButtonsProps {
@@ -30,6 +32,53 @@ const awardColors = {
   otm: "bg-blue-500 text-white",
   oty: "bg-purple-500 text-white",
   honorable: "bg-green-500 text-white",
+}
+
+function updateDashboardAwardQueries(
+  localStore: any,
+  projectId: string,
+  awardType: AwardType,
+  awardedAt: string | null
+) {
+  for (const query of localStore.getAllQueries(
+    api.projects.listWithAwardsForStaff
+  )) {
+    if (!query.value) continue
+
+    const projects = query.value as ProjectView[]
+
+    localStore.setQuery(
+      api.projects.listWithAwardsForStaff,
+      query.args,
+      projects.map((project) => {
+        if (project.id !== projectId) return project
+
+        const currentAwards = project.award || []
+        const nextAwards =
+          awardedAt === null
+            ? currentAwards.filter(
+                (award: AwardView) => award.award_type !== awardType
+              )
+            : [
+                ...currentAwards.filter(
+                  (award: AwardView) => award.award_type !== awardType
+                ),
+                {
+                  id: `optimistic-${projectId}-${awardType}`,
+                  project_id: projectId,
+                  award_type: awardType,
+                  awarded_at: awardedAt,
+                  created_at: new Date().toISOString(),
+                },
+              ]
+
+        return {
+          ...project,
+          award: nextAwards,
+        }
+      })
+    )
+  }
 }
 
 interface DatePickerPopoverProps {
@@ -151,8 +200,26 @@ export default function AwardButtons({
   const [isLoading, setIsLoading] = useState<AwardType | null>(null)
   const [showDatePicker, setShowDatePicker] = useState<AwardType | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>("")
-  const giveAward = useMutation(api.awards.give)
-  const removeAward = useMutation(api.awards.remove)
+  const giveAward = useMutation(api.awards.give).withOptimisticUpdate(
+    (localStore, args) => {
+      updateDashboardAwardQueries(
+        localStore,
+        args.projectId,
+        args.awardType,
+        args.awardedAt || new Date().toISOString()
+      )
+    }
+  )
+  const removeAward = useMutation(api.awards.remove).withOptimisticUpdate(
+    (localStore, args) => {
+      updateDashboardAwardQueries(
+        localStore,
+        args.projectId,
+        args.awardType,
+        null
+      )
+    }
+  )
 
   const hasAward = (awardType: AwardType) => {
     return currentAwards.some((award) => award.award_type === awardType)
@@ -330,8 +397,6 @@ export default function AwardButtons({
 
     setIsLoading(awardType)
     try {
-      await removeAward({ projectId: projectId as any, awardType })
-
       let awardedAt = ""
 
       if (awardType === "oty") {
