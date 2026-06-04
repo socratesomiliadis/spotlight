@@ -1,13 +1,18 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth"
 import { convex } from "@convex-dev/better-auth/plugins"
-import { betterAuth } from "better-auth"
-import { adminAc, userAc } from "better-auth/plugins/admin/access"
-import { admin, emailOTP, username } from "better-auth/plugins"
 import bcrypt from "bcryptjs"
+import { betterAuth } from "better-auth"
+import { admin, emailOTP, username } from "better-auth/plugins"
+import { adminAc, userAc } from "better-auth/plugins/admin/access"
 import { Resend } from "resend"
 
 import { components } from "../_generated/api"
 import type { DataModel } from "../_generated/dataModel"
+import {
+  otpEmail,
+  resetPasswordLinkEmail,
+  verificationLinkEmail,
+} from "../../lib/email-templates"
 import authConfig from "../auth.config"
 import schema from "./schema"
 
@@ -27,7 +32,9 @@ const trustedOrigins = [
   "http://127.0.0.1:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3001",
-].filter((origin, index, origins) => origin && origins.indexOf(origin) === index)
+].filter(
+  (origin, index, origins) => origin && origins.indexOf(origin) === index
+)
 
 export const authComponent = createClient<DataModel, typeof schema>(
   components.betterAuth,
@@ -74,10 +81,11 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
       enabled: true,
       requireEmailVerification: true,
       sendResetPassword: async ({ user, url }: any) => {
+        const email = resetPasswordLinkEmail({ url })
         await sendEmail({
           to: user.email,
-          subject: "Reset your Spotlight password",
-          html: `<p>Reset your Spotlight password by opening this link:</p><p><a href="${url}">${url}</a></p>`,
+          subject: email.subject,
+          html: email.html,
         })
       },
       password: {
@@ -93,10 +101,11 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
     },
     emailVerification: {
       sendVerificationEmail: async ({ user, url }: any) => {
+        const email = verificationLinkEmail({ url })
         await sendEmail({
           to: user.email,
-          subject: "Verify your Spotlight email",
-          html: `<p>Verify your Spotlight email by opening this link:</p><p><a href="${url}">${url}</a></p>`,
+          subject: email.subject,
+          html: email.html,
         })
       },
       sendOnSignUp: true,
@@ -110,14 +119,11 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
         otpLength: 6,
         expiresIn: 300,
         sendVerificationOTP: async ({ email, otp, type }: any) => {
-          const subject =
-            type === "forget-password"
-              ? "Reset your Spotlight password"
-              : "Your Spotlight verification code"
+          const template = otpEmail({ otp, type })
           await sendEmail({
             to: email,
-            subject,
-            html: `<p>Your Spotlight code is <strong>${otp}</strong>.</p>`,
+            subject: template.subject,
+            html: template.html,
           })
         },
         sendVerificationOnSignUp: true,

@@ -108,7 +108,7 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
             <li>
               Enter your email: <strong>{emailValue}</strong>
             </li>
-            <li>Check your email for the password reset link</li>
+            <li>Check your email for the password reset code</li>
             <li>Set a new password to complete the claim</li>
             <li>
               You&apos;ll be automatically signed in to your claimed account!
