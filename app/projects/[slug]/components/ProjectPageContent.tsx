@@ -45,7 +45,7 @@ export default function ProjectPageContent({
       <div className="px-4 lg:px-8">
         <Image
           src={project.main_img_url}
-          alt="Project Image"
+          alt={`${project.title} project preview`}
           width={2560}
           height={1440}
           className="w-full aspect-video object-cover rounded-2xl"

@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation"
 
 import { emailPreviewSamples } from "@/lib/email-templates"
+import { privateRobots } from "@/lib/seo"
 
 export const metadata = {
   title: "Email previews - Spotlight",
-  robots: "noindex, nofollow",
+  robots: privateRobots,
 }
 
 function canPreviewEmails() {

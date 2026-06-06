@@ -49,7 +49,7 @@ export default function ProjectHeader({
       <div className="w-full aspect-[3/1.5] lg:aspect-3/1 bg-[#f6f6f6] rounded-2xl overflow-hidden banner-image flex items-center justify-center">
         <Image
           src={bannerUrl || ""}
-          alt="Project Banner"
+          alt={`${title} project banner`}
           width={3000}
           height={1000}
           priority
@@ -70,7 +70,7 @@ export default function ProjectHeader({
         >
           <Image
             src={userAvatarUrl || ""}
-            alt="User Avatar"
+            alt={userDisplayName || userUsername}
             width={40}
             height={40}
             className="rounded-full size-10"

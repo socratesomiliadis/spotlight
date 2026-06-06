@@ -1,8 +1,27 @@
+import type { Metadata } from "next"
+
 import GradientText from "@/components/gradient-text"
+import { publicRobots } from "@/lib/seo"
 import PageWrapper from "@/components/page-wrapper"
 import SpotlightLogo from "@/components/SVGs/spotlight-logo"
 
 import { PremiumComingSoonActions } from "./components/PremiumComingSoonActions"
+
+export const metadata: Metadata = {
+  title: "Premium",
+  description:
+    "A Spotlight subscription for freelancers, creative studios, and entrepreneurs.",
+  alternates: {
+    canonical: "/premium",
+  },
+  openGraph: {
+    title: "Premium - Spotlight",
+    description:
+      "A Spotlight subscription for freelancers, creative studios, and entrepreneurs.",
+    url: "/premium",
+  },
+  robots: publicRobots,
+}
 
 export default function PremiumPage() {
   return (

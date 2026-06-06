@@ -272,6 +272,23 @@ export const getPageBySlug = query({
   },
 })
 
+export const listSitemapEntries = query({
+  args: {},
+  handler: async (ctx) => {
+    const projects = await ctx.db
+      .query("projects")
+      .withIndex("by_created")
+      .order("desc")
+      .collect()
+
+    return projects.map((project) => ({
+      slug: project.slug,
+      updatedAt: project.updatedAt,
+      createdAt: project.createdAt,
+    }))
+  },
+})
+
 export const create = mutation({
   args: {
     ownerAuthUserId: v.optional(v.string()),

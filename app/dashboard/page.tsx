@@ -1,9 +1,11 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 
 import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery, preloadAuthQuery } from "@/lib/auth-server"
 import { hasStaffAccess } from "@/lib/roles"
+import { privateRobots } from "@/lib/seo"
 import type { AwardType, CategoryType } from "@/lib/spotlight-types"
 import PageWrapper from "@/components/page-wrapper"
 
@@ -19,6 +21,11 @@ const validCategories: CategoryType[] = [
 ]
 
 const validAwards: AwardType[] = ["otd", "otm", "oty", "honorable"]
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  robots: privateRobots,
+}
 
 export default async function DashboardPage({
   searchParams,

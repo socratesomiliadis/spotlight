@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
 import { fetchAuthQuery } from "@/lib/auth-server"
+import { privateRobots } from "@/lib/seo"
 import PageWrapper from "@/components/page-wrapper"
 
 import ClaimAccountForm from "./components/ClaimAccountForm"
@@ -35,5 +36,6 @@ export async function generateMetadata({ params }: ClaimPageProps) {
   return {
     title: `Claim @${username} | Spotlight`,
     description: `Claim the unclaimed account @${username} on Spotlight`,
+    robots: privateRobots,
   }
 }

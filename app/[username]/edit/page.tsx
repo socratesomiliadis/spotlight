@@ -1,14 +1,21 @@
+import type { Metadata } from "next"
 import { notFound, redirect } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
 import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
+import { privateRobots } from "@/lib/seo"
 import PageWrapper from "@/components/page-wrapper"
 
 import EditProfileForm from "./components/EditProfileForm"
 
 interface PageProps {
   params: Promise<{ username: string }>
+}
+
+export const metadata: Metadata = {
+  title: "Edit Profile",
+  robots: privateRobots,
 }
 
 export default async function EditPage({ params }: PageProps) {

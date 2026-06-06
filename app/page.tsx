@@ -2,6 +2,14 @@ import type { Metadata } from "next"
 import { api } from "@/convex/_generated/api"
 
 import { fetchAuthQuery } from "@/lib/auth-server"
+import {
+  absoluteUrl,
+  defaultDescription,
+  defaultOgImage,
+  publicRobots,
+  serializeJsonLd,
+  siteName,
+} from "@/lib/seo"
 import type { AwardType, CategoryType } from "@/lib/spotlight-types"
 import HomeContent from "@/components/Home/home-content"
 import PageWrapper from "@/components/page-wrapper"
@@ -18,21 +26,25 @@ const validCategories: CategoryType[] = [
 const validAwards: AwardType[] = ["otd", "otm", "oty", "honorable"]
 
 export const metadata: Metadata = {
-  title: "Spotlight",
-  description:
-    "A platform that awards creativity and innovation across industries worldwide.",
+  title: {
+    absolute: siteName,
+  },
+  description: defaultDescription,
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Spotlight",
+    title: siteName,
     type: "website",
-    url: "https://spotlight.day",
-    description:
-      "A platform that awards creativity and innovation across industries worldwide.",
+    url: "/",
+    siteName,
+    description: defaultDescription,
     images: [
       {
-        url: "https://spotlight-awards.vercel.app/ogImage.png",
+        url: defaultOgImage,
         width: 1600,
         height: 900,
         alt: "Preview image for Spotlight",
@@ -43,8 +55,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@SpotlightDay",
+    title: siteName,
+    description: defaultDescription,
+    images: [defaultOgImage],
   },
-  robots: "index, follow",
+  robots: publicRobots,
 }
 
 export default async function Home({
@@ -79,13 +94,36 @@ export default async function Home({
     tags,
     award,
   })
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: siteName,
+      url: absoluteUrl("/"),
+      description: defaultDescription,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: siteName,
+      url: absoluteUrl("/"),
+      logo: absoluteUrl("/logo.png"),
+      sameAs: ["https://x.com/SpotlightDay"],
+    },
+  ]
 
   return (
-    <PageWrapper className="flex flex-col pb-3 lg:pb-8">
-      <HomeContent
-        home={home}
-        filters={{ category, tags, award }}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
-    </PageWrapper>
+      <PageWrapper className="flex flex-col pb-3 lg:pb-8">
+        <HomeContent
+          home={home}
+          filters={{ category, tags, award }}
+        />
+      </PageWrapper>
+    </>
   )
 }

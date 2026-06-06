@@ -172,6 +172,19 @@ export const getProfilePage = query({
   },
 })
 
+export const listSitemapEntries = query({
+  args: {},
+  handler: async (ctx) => {
+    const profiles = await ctx.db.query("profiles").collect()
+
+    return profiles.map((profile) => ({
+      username: profile.username,
+      updatedAt: profile.updatedAt,
+      createdAt: profile.createdAt,
+    }))
+  },
+})
+
 export const listProjectCardsPage = query({
   args: {
     username: v.string(),

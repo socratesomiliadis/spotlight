@@ -6,6 +6,13 @@ import localFont from "next/font/local"
 import { Toaster } from "sonner"
 
 import { getToken } from "@/lib/auth-server"
+import {
+  defaultDescription,
+  defaultOgImage,
+  publicRobots,
+  siteName,
+  siteUrl,
+} from "@/lib/seo"
 import BottomNav from "@/components/BottomNav"
 import Header from "@/components/Header"
 import CloseCursor from "@/components/Home/close-cursor"
@@ -19,21 +26,24 @@ const helveticaNow = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "Spotlight",
-  description:
-    "A platform that awards creativity and innovation across industries worldwide.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteName,
+    template: `%s | ${siteName}`,
+  },
+  description: defaultDescription,
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Spotlight",
+    title: siteName,
     type: "website",
-    url: "https://spotlight.day",
-    description:
-      "A platform that awards creativity and innovation across industries worldwide.",
+    url: "/",
+    siteName,
+    description: defaultDescription,
     images: [
       {
-        url: "https://spotlight-awards.vercel.app/ogImage.png",
+        url: defaultOgImage,
         width: 1600,
         height: 900,
         alt: "Preview image for Spotlight",
@@ -44,8 +54,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@SpotlightDay",
+    title: siteName,
+    description: defaultDescription,
+    images: [defaultOgImage],
   },
-  robots: "index, follow",
+  robots: publicRobots,
 }
 
 export const viewport: Viewport = {

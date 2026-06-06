@@ -1,12 +1,19 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
 import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
+import { privateRobots } from "@/lib/seo"
 import PageWrapper from "@/components/page-wrapper"
 
 import NewProjectForm from "./components/NewProjectForm"
 import NewProjectHeader from "./components/NewProjectHeader"
+
+export const metadata: Metadata = {
+  title: "New Project",
+  robots: privateRobots,
+}
 
 export default async function NewProjectPage() {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)

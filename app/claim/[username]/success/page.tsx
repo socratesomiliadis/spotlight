@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
 import { fetchAuthMutation, fetchAuthQuery } from "@/lib/auth-server"
+import { privateRobots } from "@/lib/seo"
 import CustomButton from "@/components/custom-button"
 import PageWrapper from "@/components/page-wrapper"
 
@@ -100,5 +101,6 @@ export async function generateMetadata({ params }: ClaimSuccessPageProps) {
   return {
     title: `@${username} Claimed | Spotlight`,
     description: `The account @${username} has been successfully claimed on Spotlight`,
+    robots: privateRobots,
   }
 }

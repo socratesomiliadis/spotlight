@@ -6,12 +6,13 @@ import { api } from "@/convex/_generated/api"
 import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
 import { hasStaffAccess } from "@/lib/roles"
+import { privateRobots } from "@/lib/seo"
 import PageWrapper from "@/components/page-wrapper"
 
 export const metadata: Metadata = {
   title: "Staff Guide - Spotlight",
   description: "Internal Spotlight staff guide for submissions and awards.",
-  robots: "noindex, nofollow",
+  robots: privateRobots,
 }
 
 const emailSources = [

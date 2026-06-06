@@ -16,16 +16,22 @@ export default function ProjectCard({
   sizes?: string
 }) {
   const hasPreview = !!project.preview_url
+  const creator = project.user?.display_name || project.user?.username
+  const linkLabel = creator
+    ? `View ${project.title} by ${creator}`
+    : `View ${project.title}`
 
   return (
     <Link
       href={`/projects/${project.slug}`}
       key={project.id}
+      aria-label={linkLabel}
       className={cn(
         "w-full aspect-video overflow-hidden rounded-xl group show-preview-cursor project-card-link relative",
         className
       )}
     >
+      <span className="sr-only">{linkLabel}</span>
       {hasPreview && (
         <video
           data-project-preview
@@ -41,7 +47,7 @@ export default function ProjectCard({
 
       <Image
         src={project.main_img_url}
-        alt={project.title}
+        alt={`${project.title} project preview`}
         width={1920}
         height={1080}
         sizes={sizes}

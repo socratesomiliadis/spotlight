@@ -22,7 +22,7 @@ export default function HomeHero({
             >
               <Image
                 src={project.user?.avatar_url || ""}
-                alt="User Avatar"
+                alt={project.user?.display_name || project.user?.username || ""}
                 width={40}
                 height={40}
                 sizes="(min-width: 1024px) 40px, 32px"
