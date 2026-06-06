@@ -15,6 +15,7 @@ import type * as follows from "../follows.js";
 import type * as http from "../http.js";
 import type * as lib from "../lib.js";
 import type * as migration from "../migration.js";
+import type * as profileHelpers from "../profileHelpers.js";
 import type * as profiles from "../profiles.js";
 import type * as projects from "../projects.js";
 import type * as search from "../search.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   lib: typeof lib;
   migration: typeof migration;
+  profileHelpers: typeof profileHelpers;
   profiles: typeof profiles;
   projects: typeof projects;
   search: typeof search;

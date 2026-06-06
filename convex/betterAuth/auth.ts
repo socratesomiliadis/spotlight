@@ -6,7 +6,7 @@ import { admin, emailOTP, username } from "better-auth/plugins"
 import { adminAc, defaultAc, userAc } from "better-auth/plugins/admin/access"
 import { Resend } from "resend"
 
-import { components } from "../_generated/api"
+import { components, internal } from "../_generated/api"
 import type { DataModel } from "../_generated/dataModel"
 import {
   otpEmail,
@@ -102,6 +102,20 @@ async function findAuthUserById(ctx: GenericCtx<DataModel>, userId: string) {
   })
 }
 
+function authUserId(user: any) {
+  const id = user.clerkUserId ?? user.id ?? user._id
+  return id ? String(id) : null
+}
+
+async function claimProfileForAuthUser(ctx: GenericCtx<DataModel>, user: any) {
+  const userId = authUserId(user)
+  if (!userId) return
+
+  await (ctx as any).runMutation((internal as any).profiles.claimByAuthUserId, {
+    authUserId: userId,
+  })
+}
+
 function requestPath(request?: Request) {
   if (!request) return ""
   try {
@@ -155,6 +169,7 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
         })
       },
       onPasswordReset: async ({ user }: any) => {
+        await claimProfileForAuthUser(_ctx, user)
         await sendSecurityNotification({
           to: user.email,
           title: "Your Spotlight password was changed",

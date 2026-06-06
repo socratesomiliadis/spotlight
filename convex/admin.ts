@@ -79,7 +79,7 @@ async function createCredentialAuthUser(
         accountId: userId,
         providerId: "credential",
         userId,
-        password: await bcrypt.hash(args.password, 10),
+        password: bcrypt.hashSync(args.password, 10),
         createdAt: now,
         updatedAt: now,
       },

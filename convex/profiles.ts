@@ -1,6 +1,6 @@
 import { v } from "convex/values"
 
-import { mutation, query } from "./_generated/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 import {
   authUserId,
   normalizeRole,
@@ -12,6 +12,20 @@ import {
   requireProfile,
 } from "./lib"
 import { ensureProfileForAuthUser } from "./profileHelpers"
+
+async function claimProfile(ctx: any, profile: any) {
+  if (!profile.isUnclaimed) return { success: true, claimed: false }
+
+  await ctx.db.patch(profile._id, {
+    isUnclaimed: false,
+    publicMetadata: {
+      ...(profile.publicMetadata || {}),
+      is_unclaimed: false,
+    },
+    updatedAt: nowIso(),
+  })
+  return { success: true, claimed: true }
+}
 
 export const getCurrent = query({
   args: {},
@@ -256,14 +270,21 @@ export const claimCurrent = mutation({
   args: {},
   handler: async (ctx) => {
     const { profile } = await requireProfile(ctx)
-    await ctx.db.patch(profile._id, {
-      isUnclaimed: false,
-      publicMetadata: {
-        ...(profile.publicMetadata || {}),
-        is_unclaimed: false,
-      },
-      updatedAt: nowIso(),
-    })
-    return { success: true }
+    return claimProfile(ctx, profile)
+  },
+})
+
+export const claimByAuthUserId = internalMutation({
+  args: {
+    authUserId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", args.authUserId))
+      .first()
+
+    if (!profile) return { success: false, claimed: false }
+    return claimProfile(ctx, profile)
   },
 })
