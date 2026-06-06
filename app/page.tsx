@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { api } from "@/convex/_generated/api"
 
-import { preloadAuthQuery } from "@/lib/auth-server"
+import { fetchAuthQuery } from "@/lib/auth-server"
 import type { AwardType, CategoryType } from "@/lib/spotlight-types"
 import HomeContent from "@/components/Home/home-content"
 import PageWrapper from "@/components/page-wrapper"
@@ -74,7 +74,7 @@ export default async function Home({
       ? (awardParam as AwardType)
       : undefined
 
-  const preloadedHome = await preloadAuthQuery(api.projects.getHomePage, {
+  const home = await fetchAuthQuery(api.projects.getHomePage, {
     category,
     tags,
     award,
@@ -83,7 +83,7 @@ export default async function Home({
   return (
     <PageWrapper className="flex flex-col pb-3 lg:pb-8">
       <HomeContent
-        preloadedHome={preloadedHome}
+        home={home}
         filters={{ category, tags, award }}
       />
     </PageWrapper>

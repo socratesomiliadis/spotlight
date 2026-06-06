@@ -10,15 +10,15 @@ import tagsData from "@/lib/tags.json"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogOverlay,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 
 interface FilterDialogProps {
-  children: React.ReactNode
+  children?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const categories = [
@@ -37,25 +37,6 @@ const awards = [
   { key: "honorable", label: "Honorable Mention" },
 ]
 
-// Hook to get current filter state
-export function useFilters() {
-  const searchParams = useSearchParams()
-
-  const category = searchParams.get("category") || ""
-  const tags = searchParams.get("tags")?.split(",").filter(Boolean) || []
-  const award = searchParams.get("award") || ""
-
-  const activeFilterCount = (category ? 1 : 0) + tags.length + (award ? 1 : 0)
-  const hasActiveFilters = activeFilterCount > 0
-
-  return {
-    category,
-    tags,
-    activeFilterCount,
-    hasActiveFilters,
-  }
-}
-
 const variants = {
   open: {
     height: "auto",
@@ -65,8 +46,12 @@ const variants = {
   },
 }
 
-export default function FilterDialog({ children }: FilterDialogProps) {
-  const [open, setOpen] = useState(false)
+export default function FilterDialog({
+  children,
+  open: controlledOpen,
+  onOpenChange,
+}: FilterDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
   const [selectedAward, setSelectedAward] = useState("")
@@ -75,6 +60,8 @@ export default function FilterDialog({ children }: FilterDialogProps) {
 
   const searchParams = useSearchParams()
   const router = useRouter()
+  const open = controlledOpen ?? internalOpen
+  const setOpen = onOpenChange ?? setInternalOpen
 
   // Initialize state from URL params
   useEffect(() => {
@@ -158,7 +145,7 @@ export default function FilterDialog({ children }: FilterDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
 
       <DialogContent className="bg-[#1E1E1E]/70 backdrop-blur-xl rounded-2xl border-0 p-0 gap-0 text-white w-[calc(100%-2rem)] max-w-4xl lg:w-160 lg:max-w-none max-h-[80vh] sm:max-h-[85vh] lg:max-h-none z-[999]">
         <DialogTitle className="sr-only">Filter</DialogTitle>

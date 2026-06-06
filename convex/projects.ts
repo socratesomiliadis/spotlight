@@ -242,7 +242,7 @@ export const getHomePage = query({
     const categoryForHero = args.category || "websites"
     const [featuredProject, projectsPage] = await Promise.all([
       getTodaysOfTheDayByCategoryView(ctx, categoryForHero),
-      listProjectCardPage(ctx, args),
+      listProjectCardPage(ctx, { ...args, limit: 12 }),
     ])
 
     return { featuredProject, ...projectsPage }

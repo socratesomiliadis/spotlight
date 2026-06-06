@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 
 import type { ProjectCardView } from "@/lib/spotlight-types"
+import ProjectPreviewController from "@/components/Home/project-preview-controller"
 import ProjectCard from "@/components/Home/project-card"
 
 export default function ProjectsGrid({
@@ -95,6 +96,7 @@ export default function ProjectsGrid({
           </button>
         </div>
       )}
+      <ProjectPreviewController />
     </>
   )
 }

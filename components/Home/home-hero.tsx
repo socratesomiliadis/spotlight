@@ -25,6 +25,7 @@ export default function HomeHero({
                 alt="User Avatar"
                 width={40}
                 height={40}
+                sizes="(min-width: 1024px) 40px, 32px"
                 className="rounded-full size-8 lg:size-10"
               />
               <p className="text-sm text-white">
@@ -35,7 +36,12 @@ export default function HomeHero({
               </p>
             </Link>
 
-            <ProjectCard project={project} className="w-[70%] lg:w-[20vw]" />
+            <ProjectCard
+              project={project}
+              className="w-[70%] lg:w-[20vw]"
+              priority
+              sizes="(min-width: 1024px) 20vw, 70vw"
+            />
           </div>
         )}
       </Suspense>
@@ -43,7 +49,9 @@ export default function HomeHero({
         src="/static/images/hero.png"
         width={1800}
         height={1100}
-        quality={100}
+        quality={80}
+        priority
+        sizes="(min-width: 1024px) 56vw, calc(100vw - 1.5rem)"
         alt=""
         className="w-full aspect-[2.5/3] lg:aspect-auto h-auto object-cover rounded-2xl"
       />
