@@ -11,7 +11,7 @@ export default async function NewProjectPage() {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!user) {
-    redirect("/")
+    redirect("/?auth=sign-in")
   }
 
   return (

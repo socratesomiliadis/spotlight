@@ -11,6 +11,7 @@ import {
   requireAuthUser,
   requireProfile,
 } from "./lib"
+import { ensureProfileForAuthUser } from "./profileHelpers"
 
 export const getCurrent = query({
   args: {},
@@ -54,48 +55,7 @@ export const ensureCurrent = mutation({
   },
   handler: async (ctx, args) => {
     const authUser = await requireAuthUser(ctx)
-    const userId = authUserId(authUser)
-    const existing = await ctx.db
-      .query("profiles")
-      .withIndex("by_auth_user_id", (q) => q.eq("authUserId", userId))
-      .first()
-    const now = nowIso()
-    const email =
-      typeof authUser.email === "string" && authUser.email
-        ? authUser.email
-        : existing?.email || `${userId}@users.spotlight.local`
-    const username =
-      args.username ||
-      (authUser as any).username ||
-      email.split("@")[0].replace(/[^a-zA-Z0-9_.]/g, "") ||
-      `user-${userId.slice(-8)}`
-    const displayName = args.displayName || authUser.name || username
-    const image =
-      typeof authUser.image === "string" && authUser.image
-        ? authUser.image
-        : undefined
-
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        email,
-        username,
-        displayName,
-        updatedAt: now,
-      })
-      return existing._id
-    }
-
-    return await ctx.db.insert("profiles", {
-      authUserId: userId,
-      email,
-      username,
-      displayName,
-      businessType: "",
-      isUnclaimed: false,
-      legacyAvatarUrl: image,
-      createdAt: now,
-      updatedAt: now,
-    })
+    return await ensureProfileForAuthUser(ctx, authUser, args)
   },
 })
 

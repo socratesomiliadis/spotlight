@@ -15,7 +15,7 @@ export default async function EditPage({ params }: PageProps) {
   const viewer = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!viewer) {
-    redirect("/")
+    redirect("/?auth=sign-in")
   }
 
   // Get user by username with socials

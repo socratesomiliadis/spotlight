@@ -16,7 +16,7 @@ export default async function EditProjectPage({ params }: PageProps) {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!user) {
-    redirect("/")
+    redirect("/?auth=sign-in")
   }
 
   const userRole = user.role

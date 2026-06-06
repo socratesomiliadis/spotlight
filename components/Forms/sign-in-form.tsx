@@ -58,8 +58,10 @@ export default function SignInForm() {
     postSignInStarted.current = true
     void (async () => {
       try {
-        await ensureCurrent({})
-        await claimCurrent()
+        const profile = await ensureCurrent({})
+        if (profile.isUnclaimed) {
+          await claimCurrent()
+        }
         setAuth(null)
         router.refresh()
       } catch (err) {

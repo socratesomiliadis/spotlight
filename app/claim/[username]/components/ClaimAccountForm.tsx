@@ -1,8 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { api } from "@/convex/_generated/api"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useConvexAuth, useMutation } from "convex/react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -12,162 +15,167 @@ import type { ProfileView } from "@/lib/spotlight-types"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 
-const claimSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+const claimEmailSchema = z.object({
+  email: z.email("Please enter a valid email address"),
 })
 
-type ClaimFormValues = z.infer<typeof claimSchema>
+const claimResetSchema = z
+  .object({
+    code: z.string().min(6, "Reset code must be at least 6 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+
+type ClaimEmailValues = z.infer<typeof claimEmailSchema>
+type ClaimResetValues = z.infer<typeof claimResetSchema>
 
 interface ClaimAccountFormProps {
   user: ProfileView
 }
 
 export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
+  const router = useRouter()
+  const [step, setStep] = useState<"email" | "reset">("email")
+  const [claimEmail, setClaimEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
+  const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const postClaimStarted = useRef(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
+  const ensureCurrent = useMutation(api.profiles.ensureCurrent)
+  const claimCurrent = useMutation(api.profiles.claimCurrent)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<ClaimFormValues>({
-    resolver: zodResolver(claimSchema),
+  const emailForm = useForm<ClaimEmailValues>({
+    resolver: zodResolver(claimEmailSchema),
     defaultValues: {
       email: "",
     },
   })
+  const resetForm = useForm<ClaimResetValues>({
+    resolver: zodResolver(claimResetSchema),
+    defaultValues: {
+      code: "",
+      password: "",
+      confirmPassword: "",
+    },
+  })
 
-  const emailValue = watch("email")
+  useEffect(() => {
+    if (
+      !isAwaitingConvexAuth ||
+      isAuthLoading ||
+      !isAuthenticated ||
+      postClaimStarted.current
+    ) {
+      return
+    }
 
-  const onSubmit = async (data: ClaimFormValues) => {
-    if (data.email !== user.email) {
+    postClaimStarted.current = true
+    void (async () => {
+      try {
+        await ensureCurrent({})
+        await claimCurrent()
+        toast.success("Account claimed successfully.")
+        router.refresh()
+        router.push(`/${user.username}`)
+      } catch (err) {
+        postClaimStarted.current = false
+        setIsAwaitingConvexAuth(false)
+        setError(err instanceof Error ? err.message : "Failed to claim account")
+      } finally {
+        setIsLoading(false)
+      }
+    })()
+  }, [
+    claimCurrent,
+    ensureCurrent,
+    isAuthenticated,
+    isAuthLoading,
+    isAwaitingConvexAuth,
+    router,
+    user.username,
+  ])
+
+  const onEmailSubmit = async (data: ClaimEmailValues) => {
+    const normalizedEmail = data.email.trim().toLowerCase()
+    if (normalizedEmail !== user.email.trim().toLowerCase()) {
       setError("Email address does not match the account email")
       return
     }
 
     setIsLoading(true)
     setError(null)
+    setSuccessMessage(null)
 
     try {
       const result = await (authClient as any).emailOtp.requestPasswordReset({
-        email: data.email,
+        email: normalizedEmail,
       })
       if (result?.error) throw new Error(result.error.message)
-      setEmailSent(true)
-      toast.success("Claim initiated! Follow the instructions below.")
-    } catch (err: any) {
-      const errorMessage = err.message || "Failed to send claim email"
-      setError(errorMessage)
-      toast.error(errorMessage)
+      setClaimEmail(normalizedEmail)
+      setStep("reset")
+      setSuccessMessage(`Reset code sent to ${normalizedEmail}.`)
+      toast.success("Claim code sent.")
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to send claim code"
+      setError(message)
+      toast.error(message)
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (emailSent) {
-    return (
-      <div className="text-center space-y-6">
-        <div className="space-y-4">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-            <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Ready to Claim Your Account
-          </h1>
-          <p className="text-gray-600">
-            We&apos;ve verified your email address:{" "}
-            <span className="font-medium">{emailValue}</span>
-          </p>
-        </div>
+  const onResetSubmit = async (data: ClaimResetValues) => {
+    setIsLoading(true)
+    postClaimStarted.current = false
+    setIsAwaitingConvexAuth(false)
+    setError(null)
 
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-left">
-          <h3 className="font-medium text-blue-900 mb-2">
-            Complete Your Claim:
-          </h3>
-          <ol className="text-blue-800 text-sm space-y-2 list-decimal list-inside">
-            <li>
-              Go to the <strong>Sign In</strong> page
-            </li>
-            <li>
-              Click <strong>&quot;Forgot Password&quot;</strong>
-            </li>
-            <li>
-              Enter your email: <strong>{emailValue}</strong>
-            </li>
-            <li>Check your email for the password reset code</li>
-            <li>Set a new password to complete the claim</li>
-            <li>
-              You&apos;ll be automatically signed in to your claimed account!
-            </li>
-          </ol>
-        </div>
+    try {
+      const resetResponse = await (authClient as any).emailOtp.resetPassword({
+        email: claimEmail,
+        otp: data.code,
+        password: data.password,
+      })
+      if (resetResponse?.error) throw new Error(resetResponse.error.message)
 
-        <div className="space-y-3">
-          <CustomButton
-            text="Go to Sign In"
-            href="/?auth=sign-in"
-            className="w-full"
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <CustomButton
-              text="Open Email"
-              onClick={() => window.open("mailto:", "_blank")}
-              inverted
-              className="text-sm"
-            />
-            <CustomButton
-              text="Back to Profile"
-              href={`/${user.username}`}
-              inverted
-              className="text-sm"
-            />
-          </div>
-        </div>
+      const signInResponse = await (authClient as any).signIn.email({
+        email: claimEmail,
+        password: data.password,
+        callbackURL: `/${user.username}`,
+      })
+      if (signInResponse?.error) throw new Error(signInResponse.error.message)
 
-        <p className="text-sm text-gray-500">
-          Didn&apos;t receive the email?{" "}
-          <button
-            onClick={() => {
-              setEmailSent(false)
-              setError(null)
-            }}
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            Try again
-          </button>
-        </p>
-      </div>
-    )
+      await authClient.getSession({ fetchOptions: { throw: false } })
+      setIsAwaitingConvexAuth(true)
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to complete claim"
+      setError(message)
+      toast.error(message)
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex  justify-center">
+      <div className="space-y-4 text-center">
+        <div className="flex justify-center">
           <div className="relative">
             <Image
-              src={user.avatar_url || ""}
+              src={user.avatar_url || "/logo.png"}
               alt={user.display_name || user.username}
               width={80}
               height={80}
-              className="rounded-xl aspect-square object-cover"
+              className="aspect-square rounded-xl object-cover"
             />
-            <div className="absolute -top-4 bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
+            <div className="absolute -top-4 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
               Unclaimed
             </div>
           </div>
@@ -177,7 +185,7 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
           <h1 className="text-2xl font-semibold text-gray-900">
             Claim @{user.username}
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1 text-gray-600">
             {user.display_name && user.display_name !== user.username
               ? user.display_name
               : "This account appears to be unclaimed"}
@@ -185,46 +193,102 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
         </div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
+      {step === "email" ? (
+        <form
+          onSubmit={emailForm.handleSubmit(onEmailSubmit)}
+          className="space-y-4"
+        >
           <MyInput
-            {...register("email")}
+            {...emailForm.register("email")}
             label="Email Address"
             type="email"
-            isInvalid={!!errors.email || !!error}
-            errorMessage={errors.email?.message || error || undefined}
+            isInvalid={!!emailForm.formState.errors.email || !!error}
+            errorMessage={
+              emailForm.formState.errors.email?.message || error || undefined
+            }
             description="Enter the email address associated with this account"
             placeholder="your.email@example.com"
           />
-        </div>
 
-        <CustomButton
-          text="Send Claim Email"
-          type="submit"
-          isLoading={isLoading}
-          disabled={isLoading}
-          className="w-full"
-        />
-      </form>
+          <CustomButton
+            text="Send Claim Code"
+            type="submit"
+            isLoading={isLoading}
+            disabled={isLoading}
+            className="w-full"
+          />
+        </form>
+      ) : (
+        <form
+          onSubmit={resetForm.handleSubmit(onResetSubmit)}
+          className="space-y-4"
+        >
+          {successMessage && (
+            <p className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+              {successMessage}
+            </p>
+          )}
+          <MyInput
+            {...resetForm.register("code")}
+            label="Claim Code"
+            isInvalid={!!resetForm.formState.errors.code}
+            errorMessage={resetForm.formState.errors.code?.message}
+            autoComplete="one-time-code"
+            inputMode="numeric"
+          />
+          <MyInput
+            {...resetForm.register("password")}
+            label="New Password"
+            type="password"
+            isInvalid={!!resetForm.formState.errors.password}
+            errorMessage={resetForm.formState.errors.password?.message}
+            autoComplete="new-password"
+          />
+          <MyInput
+            {...resetForm.register("confirmPassword")}
+            label="Confirm New Password"
+            type="password"
+            isInvalid={!!resetForm.formState.errors.confirmPassword}
+            errorMessage={resetForm.formState.errors.confirmPassword?.message}
+            autoComplete="new-password"
+          />
+          <CustomButton
+            text="Complete Claim"
+            type="submit"
+            isLoading={isLoading}
+            disabled={isLoading}
+            className="w-full"
+          />
+          <button
+            type="button"
+            className="w-full text-sm font-medium text-gray-600 underline"
+            onClick={() => {
+              setStep("email")
+              setError(null)
+              setSuccessMessage(null)
+            }}
+          >
+            Use a different email
+          </button>
+        </form>
+      )}
 
-      {/* Info */}
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <h3 className="font-medium text-gray-900 mb-2">How claiming works:</h3>
-        <ul className="text-gray-600 text-sm space-y-1">
-          <li>
-            • We&apos;ll verify you have access to the account&apos;s email
-          </li>
-          <li>• You&apos;ll receive a secure password reset link</li>
-          <li>• Set a new password to complete the claim</li>
-          <li>• The account will then be fully yours!</li>
+      {error && step === "reset" && (
+        <p className="text-sm text-[#FA5A59]">{error}</p>
+      )}
+
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <h3 className="mb-2 font-medium text-gray-900">How claiming works:</h3>
+        <ul className="space-y-1 text-sm text-gray-600">
+          <li>Enter the email attached to this account.</li>
+          <li>Use the claim code to set your password.</li>
+          <li>We will sign you in and mark the account as claimed.</li>
         </ul>
       </div>
 
-      {/* Back link */}
       <div className="text-center">
         <CustomButton
-          text="← Back to Profile"
+          text="Back to Profile"
           href={`/${user.username}`}
           inverted
           className="text-sm"

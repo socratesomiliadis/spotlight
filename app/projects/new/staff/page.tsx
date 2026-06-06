@@ -12,7 +12,11 @@ export default async function StaffPage() {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
   const userRole = user?.role
 
-  if (!user || !hasStaffAccess(userRole)) {
+  if (!user) {
+    redirect("/?auth=sign-in")
+  }
+
+  if (!hasStaffAccess(userRole)) {
     redirect("/")
   }
 

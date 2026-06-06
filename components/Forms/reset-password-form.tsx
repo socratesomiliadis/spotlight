@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 import { Form, Spinner } from "@heroui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "convex/react"
+import { useConvexAuth, useMutation } from "convex/react"
 import { motion } from "motion/react"
 import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
@@ -42,8 +42,12 @@ export default function ResetPasswordForm() {
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
   const [step, setStep] = useState<"email" | "reset">("email")
   const [email, setEmail] = useState("")
+  const postResetStarted = useRef(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
+  const ensureCurrent = useMutation(api.profiles.ensureCurrent)
   const claimCurrent = useMutation(api.profiles.claimCurrent)
   const router = useRouter()
 
@@ -55,6 +59,44 @@ export default function ResetPasswordForm() {
     resolver: zodResolver(resetSchema),
     defaultValues: { password: "", confirmPassword: "", code: "" },
   })
+
+  useEffect(() => {
+    if (
+      !isAwaitingConvexAuth ||
+      isAuthLoading ||
+      !isAuthenticated ||
+      postResetStarted.current
+    ) {
+      return
+    }
+
+    postResetStarted.current = true
+    void (async () => {
+      try {
+        const profile = await ensureCurrent({})
+        if (profile.isUnclaimed) {
+          await claimCurrent()
+        }
+        setAuth(null)
+        router.refresh()
+        router.push("/")
+      } catch (err) {
+        postResetStarted.current = false
+        setIsAwaitingConvexAuth(false)
+        setError(err instanceof Error ? err.message : "Failed to reset password")
+      } finally {
+        setIsLoading(false)
+      }
+    })()
+  }, [
+    claimCurrent,
+    ensureCurrent,
+    isAuthenticated,
+    isAuthLoading,
+    isAwaitingConvexAuth,
+    router,
+    setAuth,
+  ])
 
   const onEmailSubmit = async (data: EmailFormValues) => {
     setIsLoading(true)
@@ -78,6 +120,8 @@ export default function ResetPasswordForm() {
 
   const onResetSubmit = async (data: ResetFormValues) => {
     setIsLoading(true)
+    postResetStarted.current = false
+    setIsAwaitingConvexAuth(false)
     setError(null)
     try {
       const response = await (authClient as any).emailOtp.resetPassword({
@@ -86,11 +130,16 @@ export default function ResetPasswordForm() {
         password: data.password,
       })
       if (response?.error) throw new Error(response.error.message)
-      await claimCurrent().catch(() => null)
-      router.push("/")
+      const signInResponse = await (authClient as any).signIn.email({
+        email,
+        password: data.password,
+        callbackURL: "/",
+      })
+      if (signInResponse?.error) throw new Error(signInResponse.error.message)
+      await authClient.getSession({ fetchOptions: { throw: false } })
+      setIsAwaitingConvexAuth(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to reset password")
-    } finally {
       setIsLoading(false)
     }
   }
@@ -134,7 +183,11 @@ export default function ResetPasswordForm() {
           {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
           <p className="text-sm text-[#787878] lg:mt-4 tracking-tight">
             Remember your password?{" "}
-            <button className="underline" onClick={() => setAuth("sign-in")}>
+            <button
+              type="button"
+              className="underline"
+              onClick={() => setAuth("sign-in")}
+            >
               Sign in
             </button>
           </p>

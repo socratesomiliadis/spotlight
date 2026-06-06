@@ -11,9 +11,9 @@ import type { DataModel } from "../_generated/dataModel"
 import {
   otpEmail,
   resetPasswordLinkEmail,
-  verificationLinkEmail,
 } from "../../lib/email-templates"
 import authConfig from "../auth.config"
+import { ensureProfileForAuthUser } from "../profileHelpers"
 import schema from "./schema"
 
 const siteUrl =
@@ -57,8 +57,7 @@ async function sendEmail({
   const from = process.env.AUTH_EMAIL_FROM || "Spotlight <auth@spotlight.day>"
 
   if (!apiKey) {
-    console.warn(`Skipping auth email to ${to}: RESEND_API_KEY is not set`)
-    return
+    throw new Error("Auth email delivery is not configured")
   }
 
   const resend = new Resend(apiKey)
@@ -100,15 +99,11 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
       },
     },
     emailVerification: {
-      sendVerificationEmail: async ({ user, url }: any) => {
-        const email = verificationLinkEmail({ url })
-        await sendEmail({
-          to: user.email,
-          subject: email.subject,
-          html: email.html,
-        })
+      sendOnSignUp: false,
+      autoSignInAfterVerification: true,
+      afterEmailVerification: async (user: any) => {
+        await ensureProfileForAuthUser(_ctx, user)
       },
-      sendOnSignUp: true,
     },
     plugins: [
       username({
@@ -130,6 +125,7 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
           })
         },
         sendVerificationOnSignUp: true,
+        overrideDefaultEmailVerification: true,
       }),
       admin({
         adminRoles: ["staff", "admin"],
