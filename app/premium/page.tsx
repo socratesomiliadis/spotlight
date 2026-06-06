@@ -1,9 +1,8 @@
-import CustomButton from "@/components/custom-button"
 import GradientText from "@/components/gradient-text"
 import PageWrapper from "@/components/page-wrapper"
 import SpotlightLogo from "@/components/SVGs/spotlight-logo"
 
-import { SubscribeButton } from "./components/SubscribeButton"
+import { PremiumComingSoonActions } from "./components/PremiumComingSoonActions"
 
 export default function PremiumPage() {
   return (
@@ -41,10 +40,7 @@ export default function PremiumPage() {
             per month
           </p>
         </GradientText>
-        <div className="lg:absolute bottom-10 flex flex-row items-center gap-2 mt-8 lg:mt-0">
-          <CustomButton text="Benefits" className="text-[#1e1e1e] bg-white" />
-          <SubscribeButton />
-        </div>
+        <PremiumComingSoonActions />
       </div>
       {/* <div className="absolute left-0 top-0 w-[548px] h-full p-4 md:p-8 flex flex-col justify-between">
         <div className="mt-6">
