@@ -26,7 +26,6 @@ export const importProfile = mutation({
     bannerStorageId: v.optional(v.id("_storage")),
     legacyAvatarUrl: v.optional(v.string()),
     legacyBannerUrl: v.optional(v.string()),
-    role: v.optional(v.string()),
     isUnclaimed: v.optional(v.boolean()),
     publicMetadata: v.optional(v.any()),
     instagram: v.optional(v.string()),
@@ -54,9 +53,8 @@ export const importProfile = mutation({
       bannerStorageId: args.bannerStorageId,
       legacyAvatarUrl: args.legacyAvatarUrl,
       legacyBannerUrl: args.legacyBannerUrl,
-      role: args.role || "user",
       isUnclaimed: args.isUnclaimed || false,
-      publicMetadata: args.publicMetadata,
+      publicMetadata: stripProfileRole(args.publicMetadata),
       instagram: args.instagram,
       linkedIn: args.linkedIn,
       twitter: args.twitter,
@@ -70,6 +68,34 @@ export const importProfile = mutation({
     return await ctx.db.insert("profiles", doc)
   },
 })
+
+export const clearProfileRoleFields = mutation({
+  args: { secret: v.string() },
+  handler: async (ctx, args) => {
+    requireMigrationSecret(args.secret)
+    const profiles = await ctx.db.query("profiles").collect()
+
+    for (const profile of profiles) {
+      const publicMetadata = stripProfileRole(profile.publicMetadata)
+      await ctx.db.patch(profile._id, {
+        role: undefined,
+        publicMetadata,
+      } as any)
+    }
+
+    return { updated: profiles.length }
+  },
+})
+
+function stripProfileRole(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return value
+  }
+
+  const metadata = { ...(value as Record<string, unknown>) }
+  delete metadata.role
+  return Object.keys(metadata).length ? metadata : undefined
+}
 
 export const importProject = mutation({
   args: {

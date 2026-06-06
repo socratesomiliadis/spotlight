@@ -53,7 +53,6 @@ Use Better Auth’s Clerk migration flow with bcrypt verification enabled. Prese
 - `emailVerified`
 - `name`
 - `username`
-- `role`
 - password hash
 
 After import, active sessions are reset, but users with valid imported hashes can keep their passwords.

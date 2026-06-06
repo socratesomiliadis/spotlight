@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 
 import { fetchAuthQuery, preloadAuthQuery } from "@/lib/auth-server"
+import { hasStaffAccess } from "@/lib/roles"
 import type { AwardType, CategoryType } from "@/lib/spotlight-types"
 import PageWrapper from "@/components/page-wrapper"
 
@@ -26,7 +27,7 @@ export default async function DashboardPage({
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
   const userRole = user?.role
 
-  if (!user || userRole !== "staff") {
+  if (!user || !hasStaffAccess(userRole)) {
     redirect("/")
   }
 

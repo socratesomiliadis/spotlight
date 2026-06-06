@@ -3,6 +3,7 @@ import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import {
   authUserId,
+  normalizeRole,
   nowIso,
   profileView,
   projectCardView,
@@ -20,7 +21,11 @@ export const getCurrent = query({
       .query("profiles")
       .withIndex("by_auth_user_id", (q) => q.eq("authUserId", userId))
       .first()
-    return profile ? profileView(ctx, profile) : null
+    if (!profile) return null
+    return {
+      ...(await profileView(ctx, profile)),
+      role: normalizeRole((authUser as any).role),
+    }
   },
 })
 
@@ -34,7 +39,11 @@ export const getCurrentSafe = query({
       .query("profiles")
       .withIndex("by_auth_user_id", (q) => q.eq("authUserId", userId))
       .first()
-    return profile ? profileView(ctx, profile) : null
+    if (!profile) return null
+    return {
+      ...(await profileView(ctx, profile)),
+      role: normalizeRole((authUser as any).role),
+    }
   },
 })
 
@@ -71,7 +80,6 @@ export const ensureCurrent = mutation({
         email,
         username,
         displayName,
-        role: (authUser as any).role || existing.role || "user",
         updatedAt: now,
       })
       return existing._id
@@ -83,7 +91,6 @@ export const ensureCurrent = mutation({
       username,
       displayName,
       businessType: "",
-      role: (authUser as any).role || "user",
       isUnclaimed: false,
       legacyAvatarUrl: image,
       createdAt: now,

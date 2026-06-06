@@ -3,7 +3,7 @@ import { convex } from "@convex-dev/better-auth/plugins"
 import bcrypt from "bcryptjs"
 import { betterAuth } from "better-auth"
 import { admin, emailOTP, username } from "better-auth/plugins"
-import { adminAc, userAc } from "better-auth/plugins/admin/access"
+import { adminAc, defaultAc, userAc } from "better-auth/plugins/admin/access"
 import { Resend } from "resend"
 
 import { components } from "../_generated/api"
@@ -133,7 +133,10 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
         defaultRole: "user",
         roles: {
           user: userAc,
-          staff: adminAc,
+          staff: defaultAc.newRole({
+            user: [],
+            session: [],
+          }),
           admin: adminAc,
         },
       }),

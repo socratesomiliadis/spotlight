@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation"
-
 import { api } from "@/convex/_generated/api"
+
 import { fetchAuthQuery } from "@/lib/auth-server"
+import { hasStaffAccess } from "@/lib/roles"
 import PageWrapper from "@/components/page-wrapper"
 
 import EditProjectForm from "./components/EditProjectForm"
@@ -19,7 +20,7 @@ export default async function EditProjectPage({ params }: PageProps) {
   }
 
   const userRole = user.role
-  const isStaff = userRole === "staff"
+  const isStaff = hasStaffAccess(userRole)
 
   // Get the project
   const project = await fetchAuthQuery(api.projects.getBySlug, { slug })

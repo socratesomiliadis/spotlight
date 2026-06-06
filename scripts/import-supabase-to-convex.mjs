@@ -3,8 +3,12 @@ import { spawnSync } from "node:child_process"
 import fs from "node:fs/promises"
 import path from "node:path"
 
-const [, , manifestPath = "convex-asset-manifest.json", outputPath = "convex-import-results.json"] =
-  process.argv
+const [
+  ,
+  ,
+  manifestPath = "convex-asset-manifest.json",
+  outputPath = "convex-import-results.json",
+] = process.argv
 
 await loadEnvFile(path.join(process.cwd(), ".env.local"))
 
@@ -54,16 +58,23 @@ results.counts.source = {
 }
 await writeJsonFile(outputPath, results)
 
-const socialsByUserId = new Map(socials.map((social) => [social.user_id, social]))
+const socialsByUserId = new Map(
+  socials.map((social) => [social.user_id, social])
+)
 
 for (const profile of profiles) {
   const social = socialsByUserId.get(profile.user_id) || {}
-  const publicMetadata = parseJsonish(profile.public_metadata) || {}
+  const publicMetadata = stripProfileRole(
+    parseJsonish(profile.public_metadata) || {}
+  )
   const id = runConvex("migration:importProfile", {
     secret: migrationSecret,
     authUserId: required(profile.user_id, "profile.user_id"),
     email: required(profile.email, `profile.email for ${profile.user_id}`),
-    username: required(profile.username, `profile.username for ${profile.user_id}`),
+    username: required(
+      profile.username,
+      `profile.username for ${profile.user_id}`
+    ),
     displayName: optionalString(profile.display_name),
     businessType: optionalString(profile.business_type),
     location: optionalString(profile.location),
@@ -72,7 +83,6 @@ for (const profile of profiles) {
     bannerStorageId: storageIdFor(profile.banner_url),
     legacyAvatarUrl: optionalString(profile.avatar_url),
     legacyBannerUrl: optionalString(profile.banner_url),
-    role: optionalString(publicMetadata.role),
     isUnclaimed: Boolean(profile.is_unclaimed),
     publicMetadata,
     instagram: optionalString(social.instagram),
@@ -91,7 +101,10 @@ for (const project of projects) {
   const elementUrls = asArray(project.elements_url)
   const id = runConvex("migration:importProject", {
     secret: migrationSecret,
-    ownerAuthUserId: required(project.user_id, `project.user_id for ${legacyProjectId}`),
+    ownerAuthUserId: required(
+      project.user_id,
+      `project.user_id for ${legacyProjectId}`
+    ),
     title: required(project.title, `project.title for ${legacyProjectId}`),
     slug: required(project.slug, `project.slug for ${legacyProjectId}`),
     category: parseCategory(project.category, legacyProjectId),
@@ -115,10 +128,15 @@ for (const project of projects) {
 }
 
 for (const award of awards) {
-  const legacyProjectId = required(award.project_id, `award.project_id for ${award.id}`)
+  const legacyProjectId = required(
+    award.project_id,
+    `award.project_id for ${award.id}`
+  )
   const projectId = results.projects[legacyProjectId]
   if (!projectId) {
-    throw new Error(`Missing migrated project ID for award project ${legacyProjectId}`)
+    throw new Error(
+      `Missing migrated project ID for award project ${legacyProjectId}`
+    )
   }
   const id = runConvex("migration:importAward", {
     secret: migrationSecret,
@@ -127,14 +145,19 @@ for (const award of awards) {
     awardedAt: required(award.awarded_at, `award.awarded_at for ${award.id}`),
     createdAt: optionalString(award.created_at),
   })
-  results.awards[award.id || `${legacyProjectId}:${award.award_type}:${award.awarded_at}`] = id
+  results.awards[
+    award.id || `${legacyProjectId}:${award.award_type}:${award.awarded_at}`
+  ] = id
   await writeJsonFile(outputPath, results)
   console.log(`award ${award.id || legacyProjectId} -> ${id}`)
 }
 
 for (const follow of follows) {
   const followerAuthUserId = required(follow.user_id, "follows.user_id")
-  const followingAuthUserId = required(follow.following_id, "follows.following_id")
+  const followingAuthUserId = required(
+    follow.following_id,
+    "follows.following_id"
+  )
   const key = `${followerAuthUserId}:${followingAuthUserId}`
   const id = runConvex("migration:importFollow", {
     secret: migrationSecret,
@@ -148,18 +171,33 @@ for (const follow of follows) {
 }
 
 if (subscriptions.length > 0 && !stripeWebhookSecret) {
-  throw new Error("Subscriptions exist, but CONVEX_STRIPE_WEBHOOK_SECRET/STRIPE_WEBHOOK_SECRET is missing")
+  throw new Error(
+    "Subscriptions exist, but CONVEX_STRIPE_WEBHOOK_SECRET/STRIPE_WEBHOOK_SECRET is missing"
+  )
 }
 
 for (const subscription of subscriptions) {
-  const stripeSubscriptionId = optionalString(subscription.stripe_subscription_id)
-  const key = stripeSubscriptionId || required(subscription.stripe_customer_id, "subscription.stripe_customer_id")
+  const stripeSubscriptionId = optionalString(
+    subscription.stripe_subscription_id
+  )
+  const key =
+    stripeSubscriptionId ||
+    required(subscription.stripe_customer_id, "subscription.stripe_customer_id")
   const id = runConvex("subscriptions:upsert", {
     webhookSecret: stripeWebhookSecret,
-    userAuthUserId: required(subscription.user_id, `subscription.user_id for ${key}`),
-    stripeCustomerId: required(subscription.stripe_customer_id, `subscription.stripe_customer_id for ${key}`),
+    userAuthUserId: required(
+      subscription.user_id,
+      `subscription.user_id for ${key}`
+    ),
+    stripeCustomerId: required(
+      subscription.stripe_customer_id,
+      `subscription.stripe_customer_id for ${key}`
+    ),
     stripeSubscriptionId,
-    stripePriceId: required(subscription.stripe_price_id, `subscription.stripe_price_id for ${key}`),
+    stripePriceId: required(
+      subscription.stripe_price_id,
+      `subscription.stripe_price_id for ${key}`
+    ),
     status: required(subscription.status, `subscription.status for ${key}`),
     currentPeriodStart: optionalString(subscription.current_period_start),
     currentPeriodEnd: optionalString(subscription.current_period_end),
@@ -206,7 +244,9 @@ async function fetchRows(table) {
     })
 
     if (!response.ok) {
-      throw new Error(`${table} fetch failed: ${response.status} ${await response.text()}`)
+      throw new Error(
+        `${table} fetch failed: ${response.status} ${await response.text()}`
+      )
     }
 
     const page = await response.json()
@@ -216,12 +256,18 @@ async function fetchRows(table) {
 }
 
 function runConvex(functionName, args) {
-  const result = spawnSync("pnpm", ["convex", "run", functionName, JSON.stringify(args)], {
-    encoding: "utf8",
-  })
+  const result = spawnSync(
+    "pnpm",
+    ["convex", "run", functionName, JSON.stringify(args)],
+    {
+      encoding: "utf8",
+    }
+  )
 
   if (result.status !== 0) {
-    throw new Error(result.stderr || result.stdout || `convex run ${functionName} failed`)
+    throw new Error(
+      result.stderr || result.stdout || `convex run ${functionName} failed`
+    )
   }
 
   return parseConvexValue(result.stdout)
@@ -276,7 +322,12 @@ function asStringArray(value) {
   const parsed = parseJsonish(value)
   if (Array.isArray(parsed)) return parsed.filter(Boolean).map(String)
   const stringValue = optionalString(value)
-  return stringValue ? stringValue.split(",").map((item) => item.trim()).filter(Boolean) : []
+  return stringValue
+    ? stringValue
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : []
 }
 
 function parseJsonish(value) {
@@ -288,17 +339,33 @@ function parseJsonish(value) {
   }
 }
 
+function stripProfileRole(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return value
+  const metadata = { ...value }
+  delete metadata.role
+  return Object.keys(metadata).length ? metadata : undefined
+}
+
 function parseCategory(value, label) {
   const category = required(value, `project.category for ${label}`)
-  const valid = new Set(["websites", "design", "films", "crypto", "startups", "ai"])
-  if (!valid.has(category)) throw new Error(`Invalid category ${category} for project ${label}`)
+  const valid = new Set([
+    "websites",
+    "design",
+    "films",
+    "crypto",
+    "startups",
+    "ai",
+  ])
+  if (!valid.has(category))
+    throw new Error(`Invalid category ${category} for project ${label}`)
   return category
 }
 
 function parseAwardType(value, label) {
   const awardType = required(value, `award.award_type for ${label}`)
   const valid = new Set(["otd", "otm", "oty", "honorable"])
-  if (!valid.has(awardType)) throw new Error(`Invalid award type ${awardType} for award ${label}`)
+  if (!valid.has(awardType))
+    throw new Error(`Invalid award type ${awardType} for award ${label}`)
   return awardType
 }
 
@@ -334,8 +401,6 @@ async function loadEnvFile(filePath) {
     const [, key, rawValue] = match
     if (process.env[key] !== undefined) continue
 
-    process.env[key] = rawValue
-      .trim()
-      .replace(/^(['"])(.*)\1$/, "$2")
+    process.env[key] = rawValue.trim().replace(/^(['"])(.*)\1$/, "$2")
   }
 }

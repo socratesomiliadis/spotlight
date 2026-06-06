@@ -28,7 +28,6 @@ export default defineSchema({
     websiteUrl: v.optional(v.string()),
     avatarStorageId: v.optional(v.id("_storage")),
     bannerStorageId: v.optional(v.id("_storage")),
-    role: v.optional(v.string()),
     isUnclaimed: v.boolean(),
     publicMetadata: v.optional(v.any()),
     instagram: v.optional(v.string()),
@@ -101,4 +100,14 @@ export default defineSchema({
     .index("by_user_status", ["userAuthUserId", "status"])
     .index("by_stripe_customer", ["stripeCustomerId"])
     .index("by_stripe_subscription", ["stripeSubscriptionId"]),
+  roleAuditEvents: defineTable({
+    actorAuthUserId: v.string(),
+    targetAuthUserId: v.string(),
+    targetBetterAuthUserId: v.string(),
+    previousRole: v.string(),
+    newRole: v.string(),
+    createdAt: v.string(),
+  })
+    .index("by_actor_created", ["actorAuthUserId", "createdAt"])
+    .index("by_target_created", ["targetAuthUserId", "createdAt"]),
 })

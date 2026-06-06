@@ -3,6 +3,7 @@ import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 import {
   authUserId,
+  hasStaffAccess,
   nowIso,
   projectCardView,
   projectView,
@@ -260,18 +261,9 @@ export const getPageBySlug = query({
 
     const authUser = await requireAuthUser(ctx).catch(() => null)
     const viewerAuthUserId = authUser ? authUserId(authUser) : null
-    const viewerProfile = viewerAuthUserId
-      ? await ctx.db
-          .query("profiles")
-          .withIndex("by_auth_user_id", (q) =>
-            q.eq("authUserId", viewerAuthUserId)
-          )
-          .first()
-      : null
     const canEdit =
       viewerAuthUserId === project.ownerAuthUserId ||
-      viewerProfile?.role === "staff" ||
-      viewerProfile?.role === "admin"
+      hasStaffAccess((authUser as any)?.role)
 
     return {
       project: await projectView(ctx, project),

@@ -1,5 +1,8 @@
+import { hasAdminAccess, hasStaffAccess, normalizeRole } from "../lib/roles"
 import type { Doc, Id } from "./_generated/dataModel"
 import { authComponent } from "./betterAuth/auth"
+
+export { hasAdminAccess, hasStaffAccess, normalizeRole }
 
 export async function getCurrentAuthUser(ctx: any) {
   return authComponent.safeGetAuthUser(ctx)
@@ -35,9 +38,16 @@ export async function requireProfile(ctx: any) {
 
 export async function requireStaff(ctx: any) {
   const { authUser, profile } = await requireProfile(ctx)
-  const role = profile.role || authUser.role
-  if (role !== "staff" && role !== "admin") {
+  if (!hasStaffAccess(authUser.role)) {
     throw new Error("Only staff can access this resource")
+  }
+  return { authUser, profile }
+}
+
+export async function requireAdmin(ctx: any) {
+  const { authUser, profile } = await requireProfile(ctx)
+  if (!hasAdminAccess(authUser.role)) {
+    throw new Error("Only admins can access this resource")
   }
   return { authUser, profile }
 }
@@ -85,7 +95,6 @@ export async function profileView(ctx: any, profile: Doc<"profiles">) {
       profile.bannerStorageId,
       profile.legacyBannerUrl
     ),
-    role: profile.role || "user",
     is_unclaimed: profile.isUnclaimed,
     public_metadata: profile.publicMetadata || null,
     created_at: profile.createdAt,
