@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
+import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
@@ -11,7 +12,7 @@ export default async function NewProjectPage() {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!user) {
-    redirect("/?auth=sign-in")
+    redirect(signInUrl("/projects/new"))
   }
 
   return (

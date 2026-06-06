@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
+import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
 import PageWrapper from "@/components/page-wrapper"
 
@@ -15,7 +16,7 @@ export default async function EditPage({ params }: PageProps) {
   const viewer = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!viewer) {
-    redirect("/?auth=sign-in")
+    redirect(signInUrl(`/${username}/edit`))
   }
 
   // Get user by username with socials

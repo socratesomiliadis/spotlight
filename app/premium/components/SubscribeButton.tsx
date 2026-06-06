@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
+import { signInUrl } from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import CustomButton from "@/components/custom-button"
 
@@ -13,7 +14,7 @@ export function SubscribeButton() {
 
   const handleSubscribe = async () => {
     if (!session) {
-      router.push("/?auth=sign-in")
+      router.push(signInUrl("/premium"))
       return
     }
 

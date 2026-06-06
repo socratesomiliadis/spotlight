@@ -23,6 +23,7 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeAuth, setActiveAuth] = useState<AuthType>("sign-in")
   const [auth, setAuth] = useQueryState("auth")
+  const [, setReturnTo] = useQueryState("returnTo")
   const lenis = useLenis()
 
   const openAuthDrawer = (authType: AuthType) => {
@@ -55,7 +56,10 @@ export default function DrawerComp({ userExists }: { userExists: boolean }) {
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open)
-        if (!open) void setAuth(null)
+        if (!open) {
+          void setAuth(null)
+          void setReturnTo(null)
+        }
       }}
     >
       <Drawer.Trigger asChild>

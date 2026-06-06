@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 
+import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery, preloadAuthQuery } from "@/lib/auth-server"
 import { hasStaffAccess } from "@/lib/roles"
 import type { AwardType, CategoryType } from "@/lib/spotlight-types"
@@ -28,7 +29,7 @@ export default async function DashboardPage({
   const userRole = user?.role
 
   if (!user) {
-    redirect("/?auth=sign-in")
+    redirect(signInUrl("/dashboard"))
   }
 
   if (!hasStaffAccess(userRole)) {

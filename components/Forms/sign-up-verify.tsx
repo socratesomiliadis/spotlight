@@ -6,8 +6,10 @@ import { useConvexAuth, useMutation } from "convex/react"
 import { motion } from "motion/react"
 import { useQueryState } from "nuqs"
 
+import { OTP_COOLDOWN_SECONDS, authErrorMessage } from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
+import { useCooldown } from "@/hooks/useCooldown"
 
 export default function SignUpVerify({
   pendingUser,
@@ -19,6 +21,7 @@ export default function SignUpVerify({
   const [isLoading, setIsLoading] = useState(false)
   const [isAwaitingConvexAuth, setIsAwaitingConvexAuth] = useState(false)
   const ensureCurrentStarted = useRef(false)
+  const resendCooldown = useCooldown(OTP_COOLDOWN_SECONDS)
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
   const [, setAuth] = useQueryState("auth")
   const ensureCurrent = useMutation(api.profiles.ensureCurrent)
@@ -46,7 +49,7 @@ export default function SignUpVerify({
       } catch (err) {
         ensureCurrentStarted.current = false
         setIsAwaitingConvexAuth(false)
-        setError(err instanceof Error ? err.message : "Verification failed")
+        setError(authErrorMessage(err, "Verification failed"))
       } finally {
         setIsLoading(false)
       }
@@ -79,8 +82,22 @@ export default function SignUpVerify({
       await authClient.getSession({ fetchOptions: { throw: false } })
       setIsAwaitingConvexAuth(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed")
+      setError(authErrorMessage(err, "Verification failed"))
       setIsLoading(false)
+    }
+  }
+
+  const handleResend = async () => {
+    setError(null)
+    try {
+      const response = await (authClient as any).emailOtp.sendVerificationOtp({
+        email: pendingUser.email,
+        type: "email-verification",
+      })
+      if (response?.error) throw new Error(response.error.message)
+      resendCooldown.start()
+    } catch (err) {
+      setError(authErrorMessage(err, "Failed to resend code"))
     }
   }
 
@@ -115,6 +132,16 @@ export default function SignUpVerify({
           <span className={cn("-mb-1", isLoading && "opacity-0")}>
             Verify Email
           </span>
+        </button>
+        <button
+          type="button"
+          disabled={isLoading || resendCooldown.isCoolingDown}
+          onClick={handleResend}
+          className="w-full text-sm text-[#787878] underline disabled:no-underline disabled:opacity-60"
+        >
+          {resendCooldown.isCoolingDown
+            ? `Resend code in ${resendCooldown.remaining}s`
+            : "Resend code"}
         </button>
         {error && <p className="text-danger">{error}</p>}
       </Form>

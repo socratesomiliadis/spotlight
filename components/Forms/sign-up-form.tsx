@@ -8,6 +8,7 @@ import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { authErrorMessage } from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
@@ -54,7 +55,7 @@ export default function SignUpForm() {
       if (response?.error) throw new Error(response.error.message)
       setPendingUser(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign up failed")
+      setError(authErrorMessage(err, "Sign up failed"))
     } finally {
       setIsLoading(false)
     }
@@ -127,7 +128,11 @@ export default function SignUpForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-[#787878] lg:mt-4 tracking-tight">
           Already have an account?{" "}
-          <button className="underline" onClick={() => setAuth("sign-in")}>
+          <button
+            type="button"
+            className="underline"
+            onClick={() => setAuth("sign-in")}
+          >
             Sign in
           </button>
         </p>

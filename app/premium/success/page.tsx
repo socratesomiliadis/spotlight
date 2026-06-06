@@ -3,6 +3,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 
 import { api } from "@/convex/_generated/api"
+import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
 import CustomButton from "@/components/custom-button"
 import PageWrapper from "@/components/page-wrapper"
@@ -11,7 +12,7 @@ async function SuccessContent() {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!user) {
-    redirect("/?auth=sign-in")
+    redirect(signInUrl("/premium/success"))
   }
 
   const isPremium = await fetchAuthQuery(api.subscriptions.isCurrentPremium)

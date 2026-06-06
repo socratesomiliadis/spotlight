@@ -12,6 +12,11 @@ type OtpArgs = {
   type?: string
 }
 
+type SecurityNotificationArgs = {
+  title: string
+  message: string
+}
+
 const textColor = "#0A0A0A"
 const mutedColor = "#2E2E2E"
 const defaultSiteUrl = "http://localhost:3000"
@@ -181,6 +186,24 @@ export function otpEmail({ otp, type }: OtpArgs): EmailTemplate {
   }
 }
 
+export function securityNotificationEmail({
+  title,
+  message,
+}: SecurityNotificationArgs): EmailTemplate {
+  return {
+    subject: title,
+    html: emailShell({
+      title,
+      body: paragraph(message),
+      action: paragraph(
+        "You can review your account sessions and security settings from Spotlight settings."
+      ),
+      requestNote:
+        "If you did not make this change, reset your password and contact Spotlight support.",
+    }),
+  }
+}
+
 export const emailPreviewSamples = [
   {
     id: "verification-link",
@@ -205,5 +228,14 @@ export const emailPreviewSamples = [
     id: "password-reset-code",
     label: "Password reset / claim code",
     ...otpEmail({ otp: "654321", type: "forget-password" }),
+  },
+  {
+    id: "security-notification",
+    label: "Security notification",
+    ...securityNotificationEmail({
+      title: "Your Spotlight password was changed",
+      message:
+        "The password for your Spotlight account was changed successfully.",
+    }),
   },
 ]

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 
+import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
 import { hasStaffAccess } from "@/lib/roles"
 import PageWrapper from "@/components/page-wrapper"
@@ -16,7 +17,7 @@ export default async function EditProjectPage({ params }: PageProps) {
   const user = await fetchAuthQuery(api.profiles.getCurrentSafe)
 
   if (!user) {
-    redirect("/?auth=sign-in")
+    redirect(signInUrl(`/projects/${slug}/edit`))
   }
 
   const userRole = user.role

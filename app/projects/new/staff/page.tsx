@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { api } from "@/convex/_generated/api"
 
+import { signInUrl } from "@/lib/auth-flow"
 import { fetchAuthQuery } from "@/lib/auth-server"
 import { hasStaffAccess } from "@/lib/roles"
 import PageWrapper from "@/components/page-wrapper"
@@ -13,7 +14,7 @@ export default async function StaffPage() {
   const userRole = user?.role
 
   if (!user) {
-    redirect("/?auth=sign-in")
+    redirect(signInUrl("/projects/new/staff"))
   }
 
   if (!hasStaffAccess(userRole)) {

@@ -11,8 +11,14 @@ import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import {
+  OTP_COOLDOWN_SECONDS,
+  authErrorMessage,
+  safeReturnTo,
+} from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
+import { useCooldown } from "@/hooks/useCooldown"
 
 import { Eye, EyeClosed } from "../icons"
 import MyInput from "./components/Input"
@@ -37,6 +43,7 @@ type ResetFormValues = z.infer<typeof resetSchema>
 
 export default function ResetPasswordForm() {
   const [, setAuth] = useQueryState("auth")
+  const [returnTo, setReturnTo] = useQueryState("returnTo")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -46,6 +53,7 @@ export default function ResetPasswordForm() {
   const [step, setStep] = useState<"email" | "reset">("email")
   const [email, setEmail] = useState("")
   const postResetStarted = useRef(false)
+  const resetCooldown = useCooldown(OTP_COOLDOWN_SECONDS)
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
   const ensureCurrent = useMutation(api.profiles.ensureCurrent)
   const claimCurrent = useMutation(api.profiles.claimCurrent)
@@ -78,12 +86,13 @@ export default function ResetPasswordForm() {
           await claimCurrent()
         }
         setAuth(null)
+        setReturnTo(null)
         router.refresh()
-        router.push("/")
+        router.push(safeReturnTo(returnTo))
       } catch (err) {
         postResetStarted.current = false
         setIsAwaitingConvexAuth(false)
-        setError(err instanceof Error ? err.message : "Failed to reset password")
+        setError(authErrorMessage(err, "Failed to reset password"))
       } finally {
         setIsLoading(false)
       }
@@ -96,6 +105,8 @@ export default function ResetPasswordForm() {
     isAwaitingConvexAuth,
     router,
     setAuth,
+    setReturnTo,
+    returnTo,
   ])
 
   const onEmailSubmit = async (data: EmailFormValues) => {
@@ -109,12 +120,26 @@ export default function ResetPasswordForm() {
       setEmail(data.email)
       setStep("reset")
       setSuccessMessage(`Reset code sent to ${data.email}`)
+      resetCooldown.start()
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to send reset email"
-      )
+      setError(authErrorMessage(err, "Failed to send reset email"))
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const resendResetCode = async () => {
+    if (!email || resetCooldown.isCoolingDown) return
+    setError(null)
+    try {
+      const response = await (authClient as any).emailOtp.requestPasswordReset({
+        email,
+      })
+      if (response?.error) throw new Error(response.error.message)
+      setSuccessMessage(`Reset code sent to ${email}`)
+      resetCooldown.start()
+    } catch (err) {
+      setError(authErrorMessage(err, "Failed to resend reset code"))
     }
   }
 
@@ -139,7 +164,7 @@ export default function ResetPasswordForm() {
       await authClient.getSession({ fetchOptions: { throw: false } })
       setIsAwaitingConvexAuth(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reset password")
+      setError(authErrorMessage(err, "Failed to reset password"))
       setIsLoading(false)
     }
   }
@@ -263,6 +288,16 @@ export default function ResetPasswordForm() {
             <span className={cn("-mb-1", isLoading && "opacity-0")}>
               Reset Password
             </span>
+          </button>
+          <button
+            type="button"
+            disabled={isLoading || resetCooldown.isCoolingDown}
+            onClick={resendResetCode}
+            className="w-full text-sm text-[#787878] underline disabled:no-underline disabled:opacity-60"
+          >
+            {resetCooldown.isCoolingDown
+              ? `Resend code in ${resetCooldown.remaining}s`
+              : "Resend code"}
           </button>
           {error && <p className="text-red-500 mt-4 text-sm">{error}</p>}
         </Form>

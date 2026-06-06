@@ -10,8 +10,10 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
+import { OTP_COOLDOWN_SECONDS, authErrorMessage } from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import type { ProfileView } from "@/lib/spotlight-types"
+import { useCooldown } from "@/hooks/useCooldown"
 import CustomButton from "@/components/custom-button"
 import MyInput from "@/components/Forms/components/Input"
 
@@ -46,6 +48,7 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const postClaimStarted = useRef(false)
+  const claimCooldown = useCooldown(OTP_COOLDOWN_SECONDS)
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
   const ensureCurrent = useMutation(api.profiles.ensureCurrent)
   const claimCurrent = useMutation(api.profiles.claimCurrent)
@@ -86,7 +89,7 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
       } catch (err) {
         postClaimStarted.current = false
         setIsAwaitingConvexAuth(false)
-        setError(err instanceof Error ? err.message : "Failed to claim account")
+        setError(authErrorMessage(err, "Failed to claim account"))
       } finally {
         setIsLoading(false)
       }
@@ -120,14 +123,32 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
       setClaimEmail(normalizedEmail)
       setStep("reset")
       setSuccessMessage(`Reset code sent to ${normalizedEmail}.`)
+      claimCooldown.start()
       toast.success("Claim code sent.")
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to send claim code"
+      const message = authErrorMessage(err, "Failed to send claim code")
       setError(message)
       toast.error(message)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const resendClaimCode = async () => {
+    if (!claimEmail || claimCooldown.isCoolingDown) return
+    setError(null)
+    try {
+      const result = await (authClient as any).emailOtp.requestPasswordReset({
+        email: claimEmail,
+      })
+      if (result?.error) throw new Error(result.error.message)
+      setSuccessMessage(`Reset code sent to ${claimEmail}.`)
+      claimCooldown.start()
+      toast.success("Claim code resent.")
+    } catch (err) {
+      const message = authErrorMessage(err, "Failed to resend claim code")
+      setError(message)
+      toast.error(message)
     }
   }
 
@@ -155,8 +176,7 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
       await authClient.getSession({ fetchOptions: { throw: false } })
       setIsAwaitingConvexAuth(true)
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to complete claim"
+      const message = authErrorMessage(err, "Failed to complete claim")
       setError(message)
       toast.error(message)
       setIsLoading(false)
@@ -259,6 +279,16 @@ export default function ClaimAccountForm({ user }: ClaimAccountFormProps) {
             disabled={isLoading}
             className="w-full"
           />
+          <button
+            type="button"
+            disabled={isLoading || claimCooldown.isCoolingDown}
+            onClick={resendClaimCode}
+            className="w-full text-sm font-medium text-gray-600 underline disabled:no-underline disabled:opacity-60"
+          >
+            {claimCooldown.isCoolingDown
+              ? `Resend code in ${claimCooldown.remaining}s`
+              : "Resend code"}
+          </button>
           <button
             type="button"
             className="w-full text-sm font-medium text-gray-600 underline"

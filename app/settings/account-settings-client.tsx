@@ -16,14 +16,17 @@ import {
   LogOut,
   Mail,
   ShieldCheck,
+  Trash2,
   UserRound,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { OTP_COOLDOWN_SECONDS, authErrorMessage } from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import type { ProfileView } from "@/lib/spotlight-types"
 import { cn } from "@/lib/utils"
+import { useCooldown } from "@/hooks/useCooldown"
 import MyInput from "@/components/Forms/components/Input"
 
 const identitySchema = z.object({
@@ -200,6 +203,10 @@ export default function AccountSettingsClient({
     useState<ActionState>(initialActionState)
   const [authSessions, setAuthSessions] = useState<AuthSession[]>([])
   const [pendingEmail, setPendingEmail] = useState<string | null>(null)
+  const [emailStep, setEmailStep] = useState<"idle" | "current" | "new">(
+    "idle"
+  )
+  const currentEmailCooldown = useCooldown(OTP_COOLDOWN_SECONDS)
 
   const authUser = session?.user
   const currentSessionId = session?.session?.id
@@ -214,7 +221,11 @@ export default function AccountSettingsClient({
     resolver: zodResolver(emailSchema),
     defaultValues: { email: accountEmail },
   })
-  const emailOtpForm = useForm<EmailOtpValues>({
+  const currentEmailOtpForm = useForm<EmailOtpValues>({
+    resolver: zodResolver(emailOtpSchema),
+    defaultValues: { code: "" },
+  })
+  const newEmailOtpForm = useForm<EmailOtpValues>({
     resolver: zodResolver(emailOtpSchema),
     defaultValues: { code: "" },
   })
@@ -243,7 +254,7 @@ export default function AccountSettingsClient({
       setSessionsState(initialActionState)
     } catch (err) {
       setSessionsState({
-        error: err instanceof Error ? err.message : "Failed to load sessions",
+        error: authErrorMessage(err, "Failed to load sessions"),
         success: null,
         loading: false,
       })
@@ -274,7 +285,7 @@ export default function AccountSettingsClient({
       })
     } catch (err) {
       setIdentityState({
-        error: err instanceof Error ? err.message : "Failed to update account",
+        error: authErrorMessage(err, "Failed to update account"),
         success: null,
         loading: false,
       })
@@ -283,28 +294,88 @@ export default function AccountSettingsClient({
 
   async function onEmailSubmit(data: EmailValues) {
     setEmailState({ ...initialActionState, loading: true })
+    const newEmail = data.email.trim().toLowerCase()
     try {
-      const response = await (authClient as any).emailOtp.requestEmailChange({
-        newEmail: data.email,
+      if (newEmail === accountEmail.trim().toLowerCase()) {
+        throw new Error("Email is the same")
+      }
+      const response = await (authClient as any).emailOtp.sendVerificationOtp({
+        email: accountEmail,
+        type: "email-verification",
       })
       const error = responseError(response)
       if (error) throw new Error(error)
-      setPendingEmail(data.email)
+      setPendingEmail(newEmail)
+      setEmailStep("current")
+      currentEmailOtpForm.reset()
+      newEmailOtpForm.reset()
+      currentEmailCooldown.start()
       setEmailState({
         error: null,
-        success: `Verification code sent to ${data.email}.`,
+        success: `Security code sent to ${accountEmail}.`,
         loading: false,
       })
     } catch (err) {
       setEmailState({
-        error: err instanceof Error ? err.message : "Failed to send code",
+        error: authErrorMessage(err, "Failed to send code"),
         success: null,
         loading: false,
       })
     }
   }
 
-  async function onEmailOtpSubmit(data: EmailOtpValues) {
+  async function resendCurrentEmailCode() {
+    if (currentEmailCooldown.isCoolingDown) return
+    setEmailState({ ...initialActionState, loading: true })
+    try {
+      const response = await (authClient as any).emailOtp.sendVerificationOtp({
+        email: accountEmail,
+        type: "email-verification",
+      })
+      const error = responseError(response)
+      if (error) throw new Error(error)
+      currentEmailCooldown.start()
+      setEmailState({
+        error: null,
+        success: `Security code sent to ${accountEmail}.`,
+        loading: false,
+      })
+    } catch (err) {
+      setEmailState({
+        error: authErrorMessage(err, "Failed to resend code"),
+        success: null,
+        loading: false,
+      })
+    }
+  }
+
+  async function onCurrentEmailOtpSubmit(data: EmailOtpValues) {
+    if (!pendingEmail) return
+    setEmailState({ ...initialActionState, loading: true })
+    try {
+      const response = await (authClient as any).emailOtp.requestEmailChange({
+        newEmail: pendingEmail,
+        otp: data.code,
+      })
+      const error = responseError(response)
+      if (error) throw new Error(error)
+      setEmailStep("new")
+      newEmailOtpForm.reset()
+      setEmailState({
+        error: null,
+        success: `Verification code sent to ${pendingEmail}.`,
+        loading: false,
+      })
+    } catch (err) {
+      setEmailState({
+        error: authErrorMessage(err, "Failed to verify current email"),
+        success: null,
+        loading: false,
+      })
+    }
+  }
+
+  async function onNewEmailOtpSubmit(data: EmailOtpValues) {
     if (!pendingEmail) return
     setEmailState({ ...initialActionState, loading: true })
     try {
@@ -319,8 +390,10 @@ export default function AccountSettingsClient({
         displayName: profile.display_name || profile.username,
       })
       setProfile((current) => ({ ...current, email: pendingEmail }))
-      emailOtpForm.reset()
+      currentEmailOtpForm.reset()
+      newEmailOtpForm.reset()
       setPendingEmail(null)
+      setEmailStep("idle")
       await refetch()
       router.refresh()
       setEmailState({
@@ -330,11 +403,19 @@ export default function AccountSettingsClient({
       })
     } catch (err) {
       setEmailState({
-        error: err instanceof Error ? err.message : "Failed to verify code",
+        error: authErrorMessage(err, "Failed to verify code"),
         success: null,
         loading: false,
       })
     }
+  }
+
+  function resetEmailChange() {
+    setPendingEmail(null)
+    setEmailStep("idle")
+    currentEmailOtpForm.reset()
+    newEmailOtpForm.reset()
+    setEmailState(initialActionState)
   }
 
   async function onPasswordSubmit(data: PasswordValues) {
@@ -356,7 +437,7 @@ export default function AccountSettingsClient({
       })
     } catch (err) {
       setPasswordState({
-        error: err instanceof Error ? err.message : "Failed to update password",
+        error: authErrorMessage(err, "Failed to update password"),
         success: null,
         loading: false,
       })
@@ -378,8 +459,7 @@ export default function AccountSettingsClient({
       })
     } catch (err) {
       setSessionsState({
-        error:
-          err instanceof Error ? err.message : "Failed to sign out session",
+        error: authErrorMessage(err, "Failed to sign out session"),
         success: null,
         loading: false,
       })
@@ -400,8 +480,7 @@ export default function AccountSettingsClient({
       })
     } catch (err) {
       setSessionsState({
-        error:
-          err instanceof Error ? err.message : "Failed to sign out sessions",
+        error: authErrorMessage(err, "Failed to sign out sessions"),
         success: null,
         loading: false,
       })
@@ -484,27 +563,72 @@ export default function AccountSettingsClient({
             />
             <div className="lg:self-end">
               <SubmitButton loading={emailState.loading}>
-                Send code
+                Send security code
               </SubmitButton>
             </div>
           </Form>
-          {pendingEmail && (
+          {pendingEmail && emailStep === "current" && (
             <Form
               className="mt-4 grid w-full gap-4 lg:grid-cols-[1fr_auto]"
-              onSubmit={emailOtpForm.handleSubmit(onEmailOtpSubmit)}
+              onSubmit={currentEmailOtpForm.handleSubmit(
+                onCurrentEmailOtpSubmit
+              )}
             >
               <MyInput
-                label="Verification code"
-                {...emailOtpForm.register("code")}
-                isInvalid={!!emailOtpForm.formState.errors.code}
-                errorMessage={emailOtpForm.formState.errors.code?.message}
+                label="Current email code"
+                {...currentEmailOtpForm.register("code")}
+                isInvalid={!!currentEmailOtpForm.formState.errors.code}
+                errorMessage={
+                  currentEmailOtpForm.formState.errors.code?.message
+                }
                 autoComplete="one-time-code"
                 inputMode="numeric"
               />
-              <div className="lg:self-end">
+              <div className="flex flex-wrap gap-2 lg:self-end">
+                <SubmitButton loading={emailState.loading}>
+                  Continue
+                </SubmitButton>
+                <button
+                  type="button"
+                  disabled={
+                    emailState.loading || currentEmailCooldown.isCoolingDown
+                  }
+                  onClick={resendCurrentEmailCode}
+                  className="h-11 rounded-lg border border-[#EAEAEA] px-4 text-sm hover:bg-[#F7F7F7] disabled:opacity-60"
+                >
+                  {currentEmailCooldown.isCoolingDown
+                    ? `${currentEmailCooldown.remaining}s`
+                    : "Resend"}
+                </button>
+              </div>
+            </Form>
+          )}
+          {pendingEmail && emailStep === "new" && (
+            <Form
+              className="mt-4 grid w-full gap-4 lg:grid-cols-[1fr_auto]"
+              onSubmit={newEmailOtpForm.handleSubmit(onNewEmailOtpSubmit)}
+            >
+              <MyInput
+                label="New email code"
+                {...newEmailOtpForm.register("code")}
+                isInvalid={!!newEmailOtpForm.formState.errors.code}
+                errorMessage={newEmailOtpForm.formState.errors.code?.message}
+                description={`Enter the code sent to ${pendingEmail}.`}
+                autoComplete="one-time-code"
+                inputMode="numeric"
+              />
+              <div className="flex flex-wrap gap-2 lg:self-end">
                 <SubmitButton loading={emailState.loading}>
                   Verify email
                 </SubmitButton>
+                <button
+                  type="button"
+                  disabled={emailState.loading}
+                  onClick={resetEmailChange}
+                  className="h-11 rounded-lg border border-[#EAEAEA] px-4 text-sm hover:bg-[#F7F7F7] disabled:opacity-60"
+                >
+                  Start over
+                </button>
               </div>
             </Form>
           )}
@@ -648,6 +772,21 @@ export default function AccountSettingsClient({
             </button>
           </div>
           <StatusMessage state={sessionsState} />
+        </SettingsSection>
+
+        <SettingsSection
+          title="Delete account"
+          description="Permanently remove your Spotlight account and profile."
+          icon={<Trash2 size={20} />}
+        >
+          <div className="rounded-lg border border-[#FFE0E0] bg-[#FFF7F7] p-4">
+            <p className="text-sm leading-snug text-[#6F2A2A]">
+              Account deletion is handled by support so we can verify ownership
+              and avoid accidental loss of projects, awards, and subscriptions.
+              Email support@spotlight.day from your account email to request
+              deletion.
+            </p>
+          </div>
         </SettingsSection>
       </div>
     </main>

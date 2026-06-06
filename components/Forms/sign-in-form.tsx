@@ -11,6 +11,7 @@ import { useQueryState } from "nuqs"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { authErrorMessage, safeReturnTo } from "@/lib/auth-flow"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +27,7 @@ type SignInFormValues = z.infer<typeof signInSchema>
 
 export default function SignInForm() {
   const [, setAuth] = useQueryState("auth")
+  const [returnTo, setReturnTo] = useQueryState("returnTo")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -63,11 +65,13 @@ export default function SignInForm() {
           await claimCurrent()
         }
         setAuth(null)
+        setReturnTo(null)
         router.refresh()
+        router.push(safeReturnTo(returnTo))
       } catch (err) {
         postSignInStarted.current = false
         setIsAwaitingConvexAuth(false)
-        setError(err instanceof Error ? err.message : "Sign in failed")
+        setError(authErrorMessage(err, "Sign in failed"))
       } finally {
         setIsLoading(false)
       }
@@ -80,6 +84,8 @@ export default function SignInForm() {
     isAwaitingConvexAuth,
     router,
     setAuth,
+    setReturnTo,
+    returnTo,
   ])
 
   const onSubmit = async (data: SignInFormValues) => {
@@ -97,12 +103,12 @@ export default function SignInForm() {
         : await (authClient as any).signIn.username({
             ...payload,
             username: data.emailOrUsername,
-          })
+      })
       if (response?.error) throw new Error(response.error.message)
       await authClient.getSession({ fetchOptions: { throw: false } })
       setIsAwaitingConvexAuth(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign in failed")
+      setError(authErrorMessage(err, "Sign in failed"))
       setIsLoading(false)
     }
   }
@@ -165,7 +171,11 @@ export default function SignInForm() {
         {error && <p className="text-danger">{error}</p>}
         <p className="text-sm text-[#787878] lg:mt-4 tracking-tight">
           Don&apos;t have an account?{" "}
-          <button className="underline" onClick={() => setAuth("sign-up")}>
+          <button
+            type="button"
+            className="underline"
+            onClick={() => setAuth("sign-up")}
+          >
             Sign up
           </button>
         </p>

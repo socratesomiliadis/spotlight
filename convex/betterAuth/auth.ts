@@ -11,6 +11,7 @@ import type { DataModel } from "../_generated/dataModel"
 import {
   otpEmail,
   resetPasswordLinkEmail,
+  securityNotificationEmail,
 } from "../../lib/email-templates"
 import authConfig from "../auth.config"
 import { ensureProfileForAuthUser } from "../profileHelpers"
@@ -69,6 +70,47 @@ async function sendEmail({
   })
 }
 
+async function sendSecurityNotification({
+  to,
+  title,
+  message,
+}: {
+  to: string
+  title: string
+  message: string
+}) {
+  try {
+    const email = securityNotificationEmail({ title, message })
+    await sendEmail({
+      to,
+      subject: email.subject,
+      html: email.html,
+    })
+  } catch (error) {
+    console.warn(
+      error instanceof Error
+        ? `Skipping security notification: ${error.message}`
+        : "Skipping security notification"
+    )
+  }
+}
+
+async function findAuthUserById(ctx: GenericCtx<DataModel>, userId: string) {
+  return ctx.runQuery(components.betterAuth.adapter.findOne, {
+    model: "user",
+    where: [{ field: "_id", operator: "eq", value: userId }],
+  })
+}
+
+function requestPath(request?: Request) {
+  if (!request) return ""
+  try {
+    return new URL(request.url).pathname
+  } catch {
+    return ""
+  }
+}
+
 export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
   ({
     appName: "Spotlight",
@@ -76,15 +118,48 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
     trustedOrigins,
     secret: process.env.BETTER_AUTH_SECRET,
     database: authComponent.adapter(_ctx),
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 30,
+    },
+    session: {
+      freshAge: 60 * 15,
+    },
+    databaseHooks: {
+      session: {
+        create: {
+          after: async (session: any) => {
+            const user = await findAuthUserById(_ctx, session.userId)
+            if (!user?.email) return
+            await sendSecurityNotification({
+              to: user.email,
+              title: "New sign-in to Spotlight",
+              message:
+                "A new session was created for your Spotlight account. If this was not you, reset your password and sign out other sessions.",
+            })
+          },
+        },
+      },
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
+      revokeSessionsOnPasswordReset: true,
       sendResetPassword: async ({ user, url }: any) => {
         const email = resetPasswordLinkEmail({ url })
         await sendEmail({
           to: user.email,
           subject: email.subject,
           html: email.html,
+        })
+      },
+      onPasswordReset: async ({ user }: any) => {
+        await sendSecurityNotification({
+          to: user.email,
+          title: "Your Spotlight password was changed",
+          message:
+            "The password for your Spotlight account was changed successfully.",
         })
       },
       password: {
@@ -101,8 +176,16 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
     emailVerification: {
       sendOnSignUp: false,
       autoSignInAfterVerification: true,
-      afterEmailVerification: async (user: any) => {
+      afterEmailVerification: async (user: any, request?: Request) => {
         await ensureProfileForAuthUser(_ctx, user)
+        if (requestPath(request).endsWith("/email-otp/change-email")) {
+          await sendSecurityNotification({
+            to: user.email,
+            title: "Your Spotlight email was changed",
+            message:
+              "The email address for your Spotlight account was changed successfully.",
+          })
+        }
       },
     },
     plugins: [
@@ -115,6 +198,7 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
         expiresIn: 300,
         changeEmail: {
           enabled: true,
+          verifyCurrentEmail: true,
         },
         sendVerificationOTP: async ({ email, otp, type }: any) => {
           const template = otpEmail({ otp, type })
@@ -126,6 +210,10 @@ export const createAuthOptions = (_ctx: GenericCtx<DataModel>) =>
         },
         sendVerificationOnSignUp: true,
         overrideDefaultEmailVerification: true,
+        rateLimit: {
+          window: 60,
+          max: 3,
+        },
       }),
       admin({
         adminRoles: ["staff", "admin"],
