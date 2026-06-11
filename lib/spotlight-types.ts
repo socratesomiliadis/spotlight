@@ -44,6 +44,7 @@ export type ProjectCardView = {
   created_at: string
   profile?: ProfileSummaryView | null
   user?: ProfileSummaryView | null
+  award?: AwardView[]
 }
 
 export type StaffProjectRowView = ProjectCardView & {

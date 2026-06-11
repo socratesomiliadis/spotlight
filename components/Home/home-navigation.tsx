@@ -2,29 +2,70 @@
 
 import { useState } from "react"
 import dynamic from "next/dynamic"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Check } from "lucide-react"
+
+import type { AwardType } from "@/lib/spotlight-types"
+import { cn } from "@/lib/utils"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 import { useFilters } from "./filter-state"
 
 const FilterDialog = dynamic(() => import("./FilterDialog"))
+const trophyAwardFilters = new Set(["otd", "otm", "oty"])
+const awardOptions: Array<{ key: AwardType; label: string }> = [
+  { key: "otd", label: "Of the Day" },
+  { key: "otm", label: "Of the Month" },
+  { key: "oty", label: "Of the Year" },
+]
 
 export default function HomeNavigation() {
-  const { hasActiveFilters, activeFilterCount } = useFilters()
+  const { award, hasActiveFilters, activeFilterCount } = useFilters()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [hasLoadedFilterDialog, setHasLoadedFilterDialog] = useState(false)
+  const [isAwardPickerOpen, setIsAwardPickerOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const openFilterDialog = () => {
     setHasLoadedFilterDialog(true)
     setIsFilterOpen(true)
   }
 
+  const toggleAwardFilter = (awardFilter: AwardType) => {
+    const params = new URLSearchParams(searchParams)
+
+    if (award === awardFilter) {
+      params.delete("award")
+    } else {
+      params.set("award", awardFilter)
+    }
+
+    const queryString = params.toString()
+    router.push(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    })
+  }
+
+  const selectAwardFilter = (awardFilter: AwardType) => {
+    toggleAwardFilter(awardFilter)
+    setIsAwardPickerOpen(false)
+  }
+
+  const isAwardsActive = trophyAwardFilters.has(award)
+  const isHonorableActive = award === "honorable"
+
   return (
     <div className="flex items-center justify-between mt-6 lg:mt-8 mb-8 lg:mb-12 border-y border-[#EAEAEA] px-4 lg:px-8 py-3 lg:py-4">
       <div className="flex items-center gap-2 font-medium tracking-tight">
         <button
           onClick={openFilterDialog}
-          className={`flex items-center gap-2 border-2 box-border px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors relative 
-                bg-transparent text-[#989898] border-[#F6F6F6]
-            }`}
+          className="relative box-border flex items-center gap-2 rounded-lg border-2 border-[#F6F6F6] bg-transparent px-5 py-2 text-[#989898] transition-colors hover:bg-gray-50"
         >
           <span className="size-4 flex">
             <svg
@@ -52,26 +93,69 @@ export default function HomeNavigation() {
         {hasLoadedFilterDialog && (
           <FilterDialog open={isFilterOpen} onOpenChange={setIsFilterOpen} />
         )}
-        <button className="flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
-          <span className="size-4 flex">
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 800 800"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+        <Popover open={isAwardPickerOpen} onOpenChange={setIsAwardPickerOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-pressed={isAwardsActive}
+              className={cn(
+                "flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg transition-colors hover:bg-[#eeeeee]",
+                isAwardsActive && "bg-black text-white hover:bg-black"
+              )}
             >
-              <g>
-                <path
-                  d="M750 50H600C600 22.3125 577.637 0 550 0H250C222.363 0 200 22.3125 200 50H50C22.3625 50 0 72.3125 0 100V200C0 310.45 89.55 400 200 400C202.35 400 204.538 399.362 206.838 399.262C224.8 469.625 279.738 524.663 350 542.875V700H250C222.363 700 200 722.313 200 750V800H600V750C600 722.313 577.637 700 550 700H450V542.875C520.262 524.663 575.2 469.637 593.162 399.275C595.462 399.362 597.65 400 600 400C710.45 400 800 310.45 800 200V100C800 72.3125 777.637 50 750 50ZM100 200V150H200V300C144.775 300 100 255.175 100 200ZM700 200C700 255.175 655.225 300 600 300V150H700V200Z"
-                  fill="currentColor"
-                />
-              </g>
-            </svg>
-          </span>
-          <span>Awards</span>
-        </button>
-        <button className="hidden lg:flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg">
+              <span className="size-4 flex">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 800 800"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g>
+                    <path
+                      d="M750 50H600C600 22.3125 577.637 0 550 0H250C222.363 0 200 22.3125 200 50H50C22.3625 50 0 72.3125 0 100V200C0 310.45 89.55 400 200 400C202.35 400 204.538 399.362 206.838 399.262C224.8 469.625 279.738 524.663 350 542.875V700H250C222.363 700 200 722.313 200 750V800H600V750C600 722.313 577.637 700 550 700H450V542.875C520.262 524.663 575.2 469.637 593.162 399.275C595.462 399.362 597.65 400 600 400C710.45 400 800 310.45 800 200V100C800 72.3125 777.637 50 750 50ZM100 200V150H200V300C144.775 300 100 255.175 100 200ZM700 200C700 255.175 655.225 300 600 300V150H700V200Z"
+                      fill="currentColor"
+                    />
+                  </g>
+                </svg>
+              </span>
+              <span>Awards</span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-48 rounded-lg border-[#EAEAEA] bg-white p-1 shadow-lg"
+          >
+            {awardOptions.map((awardOption) => {
+              const isSelected = award === awardOption.key
+
+              return (
+                <button
+                  key={awardOption.key}
+                  type="button"
+                  onClick={() => selectAwardFilter(awardOption.key)}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm font-medium text-[#989898] transition-colors hover:bg-[#f6f6f6] hover:text-black",
+                    isSelected &&
+                      "bg-black text-white hover:bg-black hover:text-white"
+                  )}
+                >
+                  <span>{awardOption.label}</span>
+                  {isSelected && <Check className="size-3.5" aria-hidden />}
+                </button>
+              )
+            })}
+          </PopoverContent>
+        </Popover>
+        <button
+          type="button"
+          onClick={() => toggleAwardFilter("honorable")}
+          aria-pressed={isHonorableActive}
+          className={cn(
+            "hidden lg:flex items-center gap-2 bg-[#f6f6f6] text-[#989898] px-5 py-2 rounded-lg transition-colors hover:bg-[#eeeeee]",
+            isHonorableActive && "bg-black text-white hover:bg-black"
+          )}
+        >
           <span className="size-[1.1rem] flex">
             <svg
               width="100%"

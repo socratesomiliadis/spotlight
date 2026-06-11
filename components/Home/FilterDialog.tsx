@@ -130,7 +130,7 @@ export default function FilterDialog({
     const queryString = params.toString()
     const newUrl = queryString ? `?${queryString}` : window.location.pathname
 
-    router.push(newUrl)
+    router.push(newUrl, { scroll: false })
     setOpen(false)
   }
 
@@ -139,7 +139,7 @@ export default function FilterDialog({
     setSelectedAward("")
     setSelectedTags([])
     setSearchQuery("")
-    router.push(window.location.pathname)
+    router.push(window.location.pathname, { scroll: false })
     // setOpen(false)
   }
 

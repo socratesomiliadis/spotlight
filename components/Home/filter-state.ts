@@ -15,6 +15,7 @@ export function useFilters() {
   return {
     category,
     tags,
+    award,
     activeFilterCount,
     hasActiveFilters,
   }

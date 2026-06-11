@@ -133,7 +133,13 @@ export async function awardView(award: Doc<"awards">) {
 }
 
 export async function projectCardView(ctx: any, project: Doc<"projects">) {
-  const profile = await getProfileByAuthUserId(ctx, project.ownerAuthUserId)
+  const [profile, awards] = await Promise.all([
+    getProfileByAuthUserId(ctx, project.ownerAuthUserId),
+    ctx.db
+      .query("awards")
+      .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
+      .collect(),
+  ])
   const user = profile ? await profileSummaryView(ctx, profile) : null
 
   return {
@@ -158,21 +164,15 @@ export async function projectCardView(ctx: any, project: Doc<"projects">) {
     created_at: project.createdAt,
     profile: user,
     user,
+    award: await Promise.all(awards.map(awardView)),
   }
 }
 
 export async function staffProjectRowView(ctx: any, project: Doc<"projects">) {
-  const [card, awards] = await Promise.all([
-    projectCardView(ctx, project),
-    ctx.db
-      .query("awards")
-      .withIndex("by_project", (q: any) => q.eq("projectId", project._id))
-      .collect(),
-  ])
+  const card = await projectCardView(ctx, project)
 
   return {
     ...card,
-    award: await Promise.all(awards.map(awardView)),
   }
 }
 
