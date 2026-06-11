@@ -105,6 +105,7 @@ export default function NewProjectForm({
       }, 2000)
     } catch (err: any) {
       console.error("Error creating project:", err)
+      throw err
     } finally {
       setIsLoading(false)
     }
@@ -121,7 +122,10 @@ export default function NewProjectForm({
     toast.promise(insertProject(data), {
       loading: "Creating project...",
       success: "Project created successfully! Redirecting...",
-      error: "Failed to create project. Please try again.",
+      error: (err) =>
+        err instanceof Error
+          ? err.message
+          : "Failed to create project. Please try again.",
     })
   }
 

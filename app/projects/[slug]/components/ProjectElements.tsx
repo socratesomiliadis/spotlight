@@ -52,7 +52,7 @@ export default function ProjectElements({
               alt={`Element ${index + 1}`}
               width={1920}
               height={1080}
-              className="w-full h-auto aspect-video object-cover rounded-2xl transition-transform group-hover:scale-105"
+              className="w-full h-auto aspect-video object-cover rounded-2xl transition-transform group-hover:scale-105 duration-300 ease-out-expo"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-2xl" />
           </button>

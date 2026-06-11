@@ -17,6 +17,61 @@ import { awardValidator, categoryValidator } from "./schema"
 type Category = "websites" | "design" | "films" | "crypto" | "startups" | "ai"
 type Award = "otd" | "otm" | "oty" | "honorable"
 
+const NORMAL_USER_SUBMISSION_WINDOW_MS = 30 * 24 * 60 * 60 * 1000
+
+async function hasActivePremiumSubscription(
+  ctx: any,
+  userAuthUserId: string,
+  now: string
+) {
+  const activeSubscriptions = await ctx.db
+    .query("subscriptions")
+    .withIndex("by_user_status", (q: any) =>
+      q.eq("userAuthUserId", userAuthUserId).eq("status", "active")
+    )
+    .collect()
+
+  return activeSubscriptions.some(
+    (subscription: any) =>
+      !subscription.currentPeriodEnd || subscription.currentPeriodEnd >= now
+  )
+}
+
+async function assertNormalUserCanSubmitProject(
+  ctx: any,
+  ownerAuthUserId: string,
+  now: string
+) {
+  const latestProject = await ctx.db
+    .query("projects")
+    .withIndex("by_owner_created", (q: any) =>
+      q.eq("ownerAuthUserId", ownerAuthUserId)
+    )
+    .order("desc")
+    .first()
+
+  if (!latestProject) return
+
+  const latestCreatedAt = new Date(latestProject.createdAt).getTime()
+  const nowMs = new Date(now).getTime()
+  if (Number.isNaN(latestCreatedAt) || Number.isNaN(nowMs)) return
+
+  const nextAllowedAt = latestCreatedAt + NORMAL_USER_SUBMISSION_WINDOW_MS
+  if (nextAllowedAt > nowMs) {
+    const nextAllowedDate = new Date(nextAllowedAt).toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }
+    )
+    throw new Error(
+      `Free accounts can submit one project every 30 days. You can submit again on ${nextAllowedDate}.`
+    )
+  }
+}
+
 async function listProjectCardPage(
   ctx: any,
   args: {
@@ -305,12 +360,20 @@ export const create = mutation({
     const authUser = await requireAuthUser(ctx)
     const userId = authUserId(authUser)
     const ownerAuthUserId = args.ownerAuthUserId || userId
+    const now = nowIso()
 
     if (ownerAuthUserId !== userId) {
       await requireStaff(ctx)
     }
 
-    const now = nowIso()
+    const isStaffOrAdmin = hasStaffAccess((authUser as any).role)
+    if (
+      !isStaffOrAdmin &&
+      !(await hasActivePremiumSubscription(ctx, userId, now))
+    ) {
+      await assertNormalUserCanSubmitProject(ctx, ownerAuthUserId, now)
+    }
+
     const baseSlug = slugify(args.title)
     let slug = baseSlug
     let suffix = 1
